@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn Baseline RAG — the simplest end-to-end pipeline for grounding LLMs in your documents.">
+
+  <link rel="stylesheet" href="../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../design-system/components.css">
+  <link rel="stylesheet" href="../../design-system/animations.css">
+
+  <title>Baseline RAG — Intuitive Learning</title>
+</head>
+<body>
+  <!-- ── HEADER ──────────────────────────────────────── -->
+  <header class="site-header" role="banner">
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="../../index.html">Home</a>
+      <span aria-hidden="true">/</span>
+      <a href="index.html">RAG</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Baseline RAG</span>
+    </nav>
+    <div class="header-actions">
+      <div data-progress-ring="rag" data-concept-count="11"></div>
+    </div>
+  </header>
+
+  <!-- ── LAYOUT ──────────────────────────────────────── -->
+  <div class="page-layout">
+
+    <!-- SIDEBAR ─────────────────────────────────────────– -->
+    <aside class="sidebar" aria-label="Page navigation">
+      <nav class="section-nav" data-scrollspy>
+        <h3 style="margin-top:0;font-size:var(--text-sm);color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.05em;">This page</h3>
+        <ul style="list-style:none;padding:0;margin:0;">
+          <li><a href="#hook" data-section="hook">Hook</a></li>
+          <li><a href="#why-it-matters" data-section="why">Why it matters</a></li>
+          <li><a href="#interactive-viz" data-section="viz">See it work</a></li>
+          <li><a href="#core-mechanism" data-section="mechanism">How it works</a></li>
+          <li><a href="#tradeoffs" data-section="tradeoffs">Tradeoffs</a></li>
+          <li><a href="#connections" data-section="connections">Connections</a></li>
+          <li><a href="#check-understanding" data-section="quiz">Quiz</a></li>
+        </ul>
+      </nav>
+
+      <nav class="module-tree" aria-label="RAG concepts">
+        <h3 style="margin-top:var(--space-8);margin-bottom:var(--space-3);font-size:var(--text-sm);color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.05em;">RAG pipeline</h3>
+        <ul style="list-style:none;padding:0;margin:0;">
+          <li><a href="./baseline.html" data-active="true" style="font-size:var(--text-xs);font-weight:600;">1. Baseline</a></li>
+          <li><a href="./ingestion.html" style="font-size:var(--text-xs);">2. Document Ingestion</a></li>
+          <li><a href="./search-retrieval.html" style="font-size:var(--text-xs);">3. Search & Retrieval</a></li>
+          <li><a href="./indexing-raptor.html" style="font-size:var(--text-xs);">4. Indexing (RAPTOR)</a></li>
+          <li><a href="./graph-graphrag.html" style="font-size:var(--text-xs);">5. Graph (GraphRAG)</a></li>
+          <li><a href="./verification-agentic.html" style="font-size:var(--text-xs);">6. Verification</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT ────────────────────────────────────– -->
+    <main class="content" id="main-content">
+
+      <!-- ─ SECTION 1: HOOK ──────────────────────────── -->
+      <section id="hook" class="content-section" data-section-id="hook">
+        <div class="hook-analogy" data-reveal="fade-up">
+          <div class="card card-compact" style="background:linear-gradient(135deg, var(--stage-retrieve), var(--stage-generate));color:var(--color-text-inverse);">
+            <p style="margin:0;font-style:italic;font-weight:600;">Think of it like...</p>
+            <p style="margin:var(--space-2) 0 0 0;">
+              You ask a librarian a question. Instead of going to the library, searching shelves, and reading every book, the librarian:
+              <ol style="margin:var(--space-2) 0 0 var(--space-4);padding-left:var(--space-4);">
+                <li>Breaks your question into search terms (chunking)</li>
+                <li>Looks them up in the card catalog (embedding)</li>
+                <li>Pulls the 3 most relevant books (retrieval)</li>
+                <li>Reads from those books to answer you (generation)</li>
+              </ol>
+              Without this process, the librarian would just make something up. Baseline RAG is that process for LLMs.
+            </p>
+          </div>
+        </div>
+
+        <h1 style="margin-top:var(--space-8);">Baseline RAG</h1>
+
+        <div class="pill pill--primary" style="display:inline-block;margin-top:var(--space-4);">
+          <strong>TL;DR:</strong> The simplest end-to-end pipeline: split documents into chunks, embed them, retrieve relevant chunks based on a query, feed them to an LLM to generate grounded answers.
+        </div>
+      </section>
+
+      <!-- ─ SECTION 2: WHY IT MATTERS ────────────────– -->
+      <section id="why-it-matters" class="content-section" data-section-id="why">
+        <h2>Why this matters</h2>
+
+        <p>
+          Large language models are powerful at language, but they have a critical limitation: they only know what they learned during training. They don't have access to your documents, databases, or real-time information. When you ask them a question outside their training data, they confidently make things up — a phenomenon called <strong>hallucination</strong>.
+        </p>
+
+        <p>
+          Baseline RAG solves this by giving the LLM access to your documents <em>at generation time</em>. Instead of answering from memory, the model answers from sources. This is the foundation of every RAG system.
+        </p>
+
+        <h3>The failure chain</h3>
+        <p style="font-size:var(--text-sm);color:var(--color-text-secondary);">Without each step, the entire system breaks down:</p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--space-4);margin:var(--space-6) 0;">
+          <div class="card card-compact" style="background-color:rgba(248,81,73,0.1);border-left:3px solid var(--color-accent-danger);">
+            <h4 style="margin:0 0 var(--space-2) 0;font-size:var(--text-sm);color:var(--color-accent-danger);">No chunking</h4>
+            <p style="margin:0;font-size:var(--text-xs);color:var(--color-text-secondary);">Embed 100-page PDFs as single vectors → slow, loses detail</p>
+          </div>
+
+          <div class="card card-compact" style="background-color:rgba(248,81,73,0.1);border-left:3px solid var(--color-accent-danger);">
+            <h4 style="margin:0 0 var(--space-2) 0;font-size:var(--text-sm);color:var(--color-accent-danger);">No embedding</h4>
+            <p style="margin:0;font-size:var(--text-xs);color:var(--color-text-secondary);">Can't measure similarity → can't retrieve relevant chunks</p>
+          </div>
+
+          <div class="card card-compact" style="background-color:rgba(248,81,73,0.1);border-left:3px solid var(--color-accent-danger);">
+            <h4 style="margin:0 0 var(--space-2) 0;font-size:var(--text-sm);color:var(--color-accent-danger);">No retrieval</h4>
+            <p style="margin:0;font-size:var(--text-xs);color:var(--color-text-secondary);">LLM has no sources → guesses, hallucinates</p>
+          </div>
+
+          <div class="card card-compact" style="background-color:rgba(248,81,73,0.1);border-left:3px solid var(--color-accent-danger);">
+            <h4 style="margin:0 0 var(--space-2) 0;font-size:var(--text-sm);color:var(--color-accent-danger);">No generation</h4>
+            <p style="margin:0;font-size:var(--text-xs);color:var(--color-text-secondary);">You have sources but can't synthesize answers from them</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2" style="gap:var(--space-4);margin-top:var(--space-8);">
+          <div class="callout callout--danger">
+            <h4 style="margin-top:0;">Without RAG:</h4>
+            <p><strong>User:</strong> "What is our Q3 revenue?"<br>
+            <strong>LLM (hallucinating):</strong> "Your Q3 2023 revenue was $5.2 billion."<br>
+            <strong>Reality:</strong> You have no idea if that's true.</p>
+          </div>
+
+          <div class="callout callout--success">
+            <h4 style="margin-top:0;">With baseline RAG:</h4>
+            <p><strong>User:</strong> "What is our Q3 revenue?"<br>
+            <strong>LLM (from your document):</strong> "According to your Q3 earnings report, revenue was $4.8 billion."<br>
+            <strong>Reality:</strong> You can verify the source.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─ SECTION 3: INTERACTIVE VIZ ──────────────── -->
+      <section id="interactive-viz" class="content-section" data-section-id="viz">
+        <h2>See it work</h2>
+
+        <p>
+          Here's the 4-step pipeline in action. Click each step to see what it does and what breaks without it.
+        </p>
+
+        <div class="viz-container" data-viz-type="baseline-pipeline-stepper">
+          <noscript>
+            <p style="text-align:center;color:var(--color-text-secondary);">Interactive visualization unavailable. The baseline RAG pipeline has 4 steps: Chunking → Embedding → Retrieval → Generation.</p>
+          </noscript>
+        </div>
+
+        <p class="viz-caption">
+          Click each circle to learn what that step does and what fails without it.
+        </p>
+      </section>
+
+      <!-- ─ SECTION 4: CORE MECHANISM ──────────────── -->
+      <section id="core-mechanism" class="content-section" data-section-id="mechanism">
+        <h2>How it works</h2>
+
+        <p>
+          Now that you understand the why, let's look at the mechanism. The baseline pipeline is beautifully simple: it's just four sequential operations.
+        </p>
+
+        <!-- Tabbed interface: Overview / Details / Code pattern -->
+        <div class="tab-panel" data-component="tabs">
+          <div role="tablist">
+            <button role="tab" data-tab="overview" aria-selected="true" style="margin-right:0;">Overview</button>
+            <button role="tab" data-tab="details" aria-selected="false">Details</button>
+            <button role="tab" data-tab="pseudocode" aria-selected="false">Pseudocode</button>
+          </div>
+
+          <div role="tabpanel" data-tabpanel="overview">
+            <h3>The four-step baseline</h3>
+
+            <div style="margin:var(--space-6) 0;">
+              <div style="display:flex;align-items:flex-start;gap:var(--space-4);margin-bottom:var(--space-6);">
+                <div style="background-color:var(--stage-ingest);color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;">1</div>
+                <div>
+                  <h4 style="margin:0 0 var(--space-2) 0;">Chunking</h4>
+                  <p style="margin:0;color:var(--color-text-secondary);">
+                    Split documents into fixed-size pieces (e.g., 512 tokens). This is usually done with a sliding window or by splitting on sentence/paragraph boundaries. Simple but effective.
+                  </p>
+                </div>
+              </div>
+
+              <div style="display:flex;align-items:flex-start;gap:var(--space-4);margin-bottom:var(--space-6);">
+                <div style="background-color:var(--stage-index);color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;">2</div>
+                <div>
+                  <h4 style="margin:0 0 var(--space-2) 0;">Embedding</h4>
+                  <p style="margin:0;color:var(--color-text-secondary);">
+                    Pass each chunk through an embedding model (e.g., text-embedding-3-small). Each chunk becomes a 384–1536 dimensional vector. Store these vectors in a vector database.
+                  </p>
+                </div>
+              </div>
+
+              <div style="display:flex;align-items:flex-start;gap:var(--space-4);margin-bottom:var(--space-6);">
+                <div style="background-color:var(--stage-retrieve);color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;">3</div>
+                <div>
+                  <h4 style="margin:0 0 var(--space-2) 0;">Retrieval</h4>
+                  <p style="margin:0;color:var(--color-text-secondary);">
+                    When a user asks a question, embed the query and find the top-k chunks with highest cosine similarity. This is a nearest-neighbor search in vector space.
+                  </p>
+                </div>
+              </div>
+
+              <div style="display:flex;align-items:flex-start;gap:var(--space-4);">
+                <div style="background-color:var(--stage-generate);color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;">4</div>
+                <div>
+                  <h4 style="margin:0 0 var(--space-2) 0;">Generation</h4>
+                  <p style="margin:0;color:var(--color-text-secondary);">
+                    Pass the retrieved chunks (context) + user query to an LLM. The model generates an answer based on the grounded context instead of pure training data.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div role="tabpanel" data-tabpanel="details" hidden>
+            <h3>Technical details</h3>
+
+            <h4>Chunking parameters</h4>
+            <ul>
+              <li><strong>Chunk size:</strong> 256–1024 tokens typical. Larger chunks preserve context, smaller chunks increase retrieval precision.</li>
+              <li><strong>Overlap:</strong> 20–50% overlap prevents information from being split awkwardly across chunks.</li>
+              <li><strong>Strategy:</strong> Fixed size, sentence-aware, or semantic chunking (coming in Document Ingestion lesson).</li>
+            </ul>
+
+            <h4>Embedding model choice</h4>
+            <ul>
+              <li><strong>Dense embeddings:</strong> Capture semantic meaning. Models: OpenAI text-embedding-3, Cohere, BGE.</li>
+              <li><strong>Dimension:</strong> 384–1536 dims typical. More dims = more expressive but slower.</li>
+              <li><strong>Normalized:</strong> Most modern models output unit-normalized vectors (dot product = cosine similarity).</li>
+            </ul>
+
+            <h4>Retrieval: cosine similarity</h4>
+            <p>For each query, compute: <code>similarity = (query_vector · chunk_vector) / (||query|| · ||chunk||)</code></p>
+            <p>Return top-k chunks by similarity score (usually k=3–5).</p>
+
+            <h4>Generation: prompt engineering</h4>
+            <p>The prompt typically looks like:</p>
+            <pre><code>Given the following context:
+&lt;RETRIEVED_CHUNKS&gt;
+
+Answer this question: &lt;USER_QUERY&gt;</code></pre>
+            <p>The LLM must generate an answer that depends on the context. If context is irrelevant, the answer will be hallucinated or off-topic.</p>
+          </div>
+
+          <div role="tabpanel" data-tabpanel="pseudocode" hidden>
+            <h3>Pseudocode</h3>
+
+            <pre><code class="language-python"># Indexing phase (one-time, offline)
+documents = load_documents()
+chunks = []
+for doc in documents:
+    chunks.extend(split_into_chunks(doc, size=512, overlap=0.2))
+
+embeddings = embed_model.encode(chunks)  # [N, 384]
+vector_db.insert(chunks, embeddings)
+
+# Query phase (at runtime)
+user_query = "What is baseline RAG?"
+query_embedding = embed_model.encode(user_query)  # [384]
+
+# Retrieve
+scores = cosine_similarity(query_embedding, embeddings)  # [N]
+top_indices = argsort(scores)[-5:]  # top 5
+retrieved_chunks = [chunks[i] for i in top_indices]
+
+# Generate
+context = "\n\n".join(retrieved_chunks)
+prompt = f"""Given the context:
+{context}
+
+Question: {user_query}
+Answer:"""
+
+answer = llm.generate(prompt)
+print(answer)</code></pre>
+
+            <p style="color:var(--color-text-secondary);font-size:var(--text-sm);margin-top:var(--space-4);">
+              This is pseudocode. Real implementations add error handling, batching, caching, reranking, and much more. But the core is this simple.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─ SECTION 5: TRADEOFFS ────────────────────– -->
+      <section id="tradeoffs" class="content-section" data-section-id="tradeoffs">
+        <h2>Tradeoffs</h2>
+
+        <div class="grid grid-cols-2" style="gap:var(--space-4);margin-bottom:var(--space-6);">
+          <div class="callout callout--use">
+            <h3>Use baseline RAG when</h3>
+            <ul style="margin:0;padding-left:var(--space-6);">
+              <li>You have a document corpus and want Q&A over it</li>
+              <li>You need explainability (retrieve sources alongside answers)</li>
+              <li>You want to avoid hallucination on domain-specific questions</li>
+              <li>You're prototyping and need something that works immediately</li>
+              <li>Your corpus is small-to-medium (< 1M documents)</li>
+            </ul>
+          </div>
+
+          <div class="callout callout--avoid">
+            <h3>Poor fit when</h3>
+            <ul style="margin:0;padding-left:var(--space-6);">
+              <li>Questions require reasoning across multiple documents (no aggregation)</li>
+              <li>You need to find low-frequency information (top-5 retrieval may miss it)</li>
+              <li>Your corpus is massive (billions of documents) — retrieval becomes slow</li>
+              <li>Chunks lose context when isolated (needs hierarchical indexing instead)</li>
+              <li>You need to preserve document structure (PDF tables, etc.)</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>Cost/Benefit Analysis</h3>
+
+        <table style="width:100%;margin-top:var(--space-6);border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:2px solid var(--color-border);">
+              <th style="padding:var(--space-3);text-align:left;font-weight:600;">Dimension</th>
+              <th style="padding:var(--space-3);text-align:left;font-weight:600;">Cost</th>
+              <th style="padding:var(--space-3);text-align:left;font-weight:600;">Benefit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--color-border);">
+              <td style="padding:var(--space-3);">Latency</td>
+              <td style="padding:var(--space-3);">~500ms (embed query + vector search + LLM)</td>
+              <td style="padding:var(--space-3);">Acceptable for most applications</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--color-border);">
+              <td style="padding:var(--space-3);">Index size</td>
+              <td style="padding:var(--space-3);">1GB per million chunks (10M for 1M docs)</td>
+              <td style="padding:var(--space-3);">Manageable on commodity hardware</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--color-border);">
+              <td style="padding:var(--space-3);">Accuracy</td>
+              <td style="padding:var(--space-3);">No guarantee relevant info is top-5</td>
+              <td style="padding:var(--space-3);">Dramatically reduces hallucination vs. zero-shot</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--color-border);">
+              <td style="padding:var(--space-3);">Setup time</td>
+              <td style="padding:var(--space-3);">30 mins to 2 hours (chunk, embed, index)</td>
+              <td style="padding:var(--space-3);">One-time cost, then live immediately</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--color-border);">
+              <td style="padding:var(--space-3);">Cost per query</td>
+              <td style="padding:var(--space-3);">Embedding + LLM calls (~0.1–1 cent)</td>
+              <td style="padding:var(--space-3);">Cheaper than hiring a researcher</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 style="margin-top:var(--space-8);">Next: Why Baseline Isn't Enough</h3>
+        <p>
+          Baseline RAG works, but it has blind spots. What if your top-5 chunks don't contain the answer? What if your document is 500 pages and the answer spans pages 10 and 400 (no single chunk contains both)? What if your embedding model is poor at understanding domain jargon?
+        </p>
+        <p style="color:var(--color-text-secondary);font-style:italic;">
+          Every lesson after this teaches a technique that fixes one of these problems.
+        </p>
+      </section>
+
+      <!-- ─ SECTION 6: CONNECTIONS ──────────────────– -->
+      <section id="connections" class="content-section" data-section-id="connections">
+        <h2>How it connects</h2>
+
+        <p>
+          Baseline RAG is the foundation. Everything else is an improvement to one of its four steps. Here's where this concept fits in the RAG pipeline:
+        </p>
+
+        <div class="grid grid-cols-1" style="gap:var(--space-4);margin-top:var(--space-6);">
+          <div class="callout callout--info" style="border-left:4px solid var(--stage-ingest);">
+            <h4 style="margin:0 0 var(--space-2) 0;color:var(--stage-ingest);">→ Document Ingestion (Next)</h4>
+            <p style="margin:0;font-size:var(--text-sm);">Improves chunking with layout-aware parsing. Instead of naive splitting, understand document structure (tables, headings, etc.).</p>
+          </div>
+
+          <div class="callout callout--info" style="border-left:4px solid var(--stage-retrieve);">
+            <h4 style="margin:0 0 var(--space-2) 0;color:var(--stage-retrieve);">→ Search & Retrieval</h4>
+            <p style="margin:0;font-size:var(--text-sm);">Improves embedding and retrieval. Use better embedding models, hybrid search (dense + sparse), reranking.</p>
+          </div>
+
+          <div class="callout callout--info" style="border-left:4px solid var(--stage-index);">
+            <h4 style="margin:0 0 var(--space-2) 0;color:var(--stage-index);">→ Indexing & Structure</h4>
+            <p style="margin:0;font-size:var(--text-sm);">Improves retrieval via hierarchical indexing (RAPTOR). Instead of flat chunks, build a tree of summaries.</p>
+          </div>
+
+          <div class="callout callout--info" style="border-left:4px solid var(--color-accent-purple);">
+            <h4 style="margin:0 0 var(--space-2) 0;color:var(--color-accent-purple);">→ Verification & Agentic Loops</h4>
+            <p style="margin:0;font-size:var(--text-sm);">Improves generation quality. Have the LLM assess whether it has enough information, retrieve more if needed (self-reflection).</p>
+          </div>
+        </div>
+
+        <p style="margin-top:var(--space-8);color:var(--color-text-secondary);font-size:var(--text-sm);">
+          <strong>No prerequisites:</strong> Baseline RAG assumes you understand what embeddings are and why similarity search works. These are standard ML concepts (not covered here).
+        </p>
+      </section>
+
+      <!-- ─ SECTION 7: CHECK UNDERSTANDING ──────────– -->
+      <section id="check-understanding" class="content-section" data-section-id="quiz">
+        <h2>Check your understanding</h2>
+
+        <p>
+          Answer these 4 questions to confirm you understand baseline RAG. You need to score <strong>≥75%</strong> to mark this concept as learned.
+        </p>
+
+        <div class="quiz-container" data-component="quiz" data-quiz-id="baseline">
+          <!-- Rendered by quiz.js from conceptData.quiz -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ── SCRIPTS ────────────────────────────────────── -->
+  <script type="module">
+    import { initScrollspy } from '../../js/core/router.js';
+    import { initProgress } from '../../js/core/progress.js';
+    import { mountAll as mountViz } from '../../js/components/pipeline-viz.js';
+    import { mountAll as mountTabs } from '../../js/components/tab-panel.js';
+    import { mountAll as mountQuiz } from '../../js/components/quiz.js';
+    import { mountAll as mountProgressRings } from '../../js/components/progress-ring.js';
+    import conceptData from '../../js/topics/rag/baseline-data.js';
+
+    // Initialize scroll-spy for section nav
+    initScrollspy();
+
+    // Initialize progress tracking for this concept
+    initProgress('rag', 'baseline');
+
+    // Mount interactive components with data
+    mountViz(conceptData);
+    mountTabs();
+    mountQuiz(conceptData.quiz);
+    mountProgressRings({ rag: { conceptCount: 11 } });
+  </script>
+</body>
+</html>

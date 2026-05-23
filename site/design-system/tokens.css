@@ -1,0 +1,189 @@
+/* ============================================================
+   INTUITIVE LEARNING PLATFORM — DESIGN TOKENS
+   Single source of truth for all visual and interaction properties.
+   Every value in the platform uses a token from this file.
+   ============================================================ */
+
+:root {
+  /* ─── COLOUR PALETTE ─────────────────────────────────────── */
+  /* Background layers */
+  --color-bg-base:          #0d1117;   /* darkest, canvas */
+  --color-bg-surface:       #161b22;   /* cards, panels */
+  --color-bg-elevated:      #21262d;   /* hover states, code blocks, tooltips */
+  --color-bg-inverse:       #e6edf3;   /* light background for inverting */
+
+  /* Borders and dividers */
+  --color-border:           #30363d;   /* default divider */
+  --color-border-focus:     #58a6ff;   /* focus ring, active states */
+
+  /* Accent colors (semantic) */
+  --color-accent-primary:   #58a6ff;   /* blue — primary interactive, links, focus */
+  --color-accent-secondary: #3fb950;   /* green — verified, correct, success */
+  --color-accent-warning:   #d29922;   /* amber — caution, tradeoff, moderate attention */
+  --color-accent-danger:    #f85149;   /* red — failure, incorrect, error state */
+  --color-accent-purple:    #bc8cff;   /* purple — agentic steps, AI-driven processes */
+  --color-accent-orange:    #f0883e;   /* orange — code, emphasis, highlights */
+
+  /* Text colors */
+  --color-text-primary:     #e6edf3;   /* body text, default */
+  --color-text-secondary:   #8b949e;   /* muted, less important */
+  --color-text-muted:       #484f58;   /* very muted, labels, metadata */
+  --color-text-link:        #58a6ff;   /* links, matches accent-primary */
+  --color-text-code:        #f0883e;   /* inline code, code blocks */
+  --color-text-inverse:     #0d1117;   /* text on light backgrounds */
+
+  /* Pipeline stage colors (used in all animations) */
+  --stage-ingest:           #388bfd;   /* document ingestion */
+  --stage-index:            #3fb950;   /* indexing and structure */
+  --stage-retrieve:         #bc8cff;   /* search and retrieval */
+  --stage-generate:         #f0883e;   /* generation */
+  --stage-verify:           #d29922;   /* verification and agentic loops */
+
+  /* ─── TYPOGRAPHY ────────────────────────────────────────── */
+  --font-sans:   'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:   'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Text sizes (fluid scale, 16px = 1rem) */
+  --text-xs:     0.75rem;    /* 12px — small labels, metadata */
+  --text-sm:     0.875rem;   /* 14px — secondary text */
+  --text-base:   1rem;       /* 16px — body text, default */
+  --text-lg:     1.125rem;   /* 18px — larger body text */
+  --text-xl:     1.25rem;    /* 20px — section headers */
+  --text-2xl:    1.5rem;     /* 24px — subsection headers */
+  --text-3xl:    1.875rem;   /* 30px — topic headers */
+  --text-4xl:    2.25rem;    /* 36px — page title */
+  --text-5xl:    3rem;       /* 48px — hero title */
+
+  /* Line height (readability) */
+  --leading-tight:   1.25;   /* condensed (for headings) */
+  --leading-normal:  1.5;    /* standard (for body) */
+  --leading-relaxed: 1.75;   /* generous (for prose) */
+
+  /* Font weight */
+  --weight-normal:   400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* ─── SPACING (4px grid) ────────────────────────────────── */
+  --space-1:   0.25rem;      /* 4px */
+  --space-2:   0.5rem;       /* 8px */
+  --space-3:   0.75rem;      /* 12px */
+  --space-4:   1rem;         /* 16px */
+  --space-5:   1.25rem;      /* 20px */
+  --space-6:   1.5rem;       /* 24px */
+  --space-8:   2rem;         /* 32px */
+  --space-10:  2.5rem;       /* 40px */
+  --space-12:  3rem;         /* 48px */
+  --space-16:  4rem;         /* 64px */
+  --space-20:  5rem;         /* 80px */
+  --space-24:  6rem;         /* 96px */
+
+  /* ─── LAYOUT ────────────────────────────────────────────── */
+  --max-width-content:  72rem;    /* 1152px reading column */
+  --max-width-narrow:   52rem;    /* 832px for prose sections */
+  --max-width-wide:     90rem;    /* 1440px for full-width viz */
+  --sidebar-width:      16rem;    /* 256px */
+  --header-height:      3.5rem;   /* 56px */
+  --gutter:             var(--space-6);  /* default content padding */
+
+  /* ─── BORDER RADIUS ─────────────────────────────────────── */
+  --radius-sm:   0.25rem;    /* 4px — subtle */
+  --radius-md:   0.5rem;     /* 8px — buttons, cards */
+  --radius-lg:   0.75rem;    /* 12px — larger cards */
+  --radius-xl:   1rem;       /* 16px — modals */
+  --radius-full: 9999px;     /* fully rounded (pills) */
+
+  /* ─── SHADOWS ───────────────────────────────────────────── */
+  --shadow-sm:   0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md:   0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg:   0 8px 32px rgba(0,0,0,0.6);
+  /* Glow effects for interactive highlights */
+  --shadow-glow-blue:   0 0 16px rgba(88,166,255,0.25);
+  --shadow-glow-green:  0 0 16px rgba(63,185,80,0.25);
+  --shadow-glow-purple: 0 0 16px rgba(188,140,255,0.25);
+  --shadow-glow-orange: 0 0 16px rgba(240,136,62,0.25);
+
+  /* ─── ANIMATION & TRANSITION ───────────────────────────── */
+  /* Durations */
+  --duration-fast:    150ms;   /* micro interactions (hover, focus) */
+  --duration-normal:  300ms;   /* standard transitions (tabs, modals) */
+  --duration-slow:    500ms;   /* longer, noticeable transitions */
+  --duration-reveal:  800ms;   /* entrance animations, progressive disclosure */
+
+  /* Easing functions */
+  --ease-linear:      linear;
+  --ease-in:          cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:         cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:      cubic-bezier(0.45, 0, 0.55, 1);
+  --ease-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);  /* bouncy */
+
+  /* ─── Z-INDEX LADDER ────────────────────────────────────── */
+  --z-base:     0;
+  --z-raised:   10;      /* floating cards, hover states */
+  --z-overlay:  100;     /* overlay panels, drawers */
+  --z-modal:    200;     /* modal dialogs, full-screen overlays */
+  --z-toast:    300;     /* notifications, transient messages */
+  --z-tooltip:  400;     /* tooltips, popovers (above everything) */
+
+  /* ─── BREAKPOINTS (for responsive design) ───────────────── */
+  /* Use in media queries: @media (max-width: var(--bp-tablet)) { ... } */
+  --bp-mobile:  640px;   /* ≤ 640px = mobile */
+  --bp-tablet:  1024px;  /* ≤ 1024px = tablet */
+  /* > 1024px = desktop (default) */
+
+  /* ─── FOCUS STYLES ──────────────────────────────────────── */
+  /* For accessible :focus-visible styling */
+  --focus-ring:  2px solid var(--color-border-focus);
+  --focus-offset: 2px;
+
+  /* ─── MOTION PREFERENCES (respect prefers-reduced-motion) ─ */
+  /* Fallback: all animations enabled by default */
+  /* In CSS, check: @media (prefers-reduced-motion: reduce) { --duration-*: 0ms; } */
+  --motion-enabled: 1;
+}
+
+/* ──────────────────────────────────────────────────────────
+   DARK MODE (default — no light mode planned initially)
+   ────────────────────────────────────────────────────────── */
+
+[data-theme="dark"] {
+  /* Inherits all tokens from :root — designed for dark by default */
+}
+
+/* ──────────────────────────────────────────────────────────
+   RESPECT USER'S MOTION PREFERENCES
+   ────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast:    0ms;
+    --duration-normal:  0ms;
+    --duration-slow:    0ms;
+    --duration-reveal:  0ms;
+    --motion-enabled:   0;
+  }
+
+  *, *::before, *::after {
+    animation-duration:        0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration:       0ms !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   PRINT STYLES (optional — simplify for printing)
+   ────────────────────────────────────────────────────────── */
+
+@media print {
+  :root {
+    --color-bg-base: white;
+    --color-text-primary: black;
+  }
+
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+}

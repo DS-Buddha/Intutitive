@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"c:/Users/bhanu.marreddy/Desktop/learning/guru/Intutitive\" log --oneline -20)",
+      "Bash(git -C \"c:/Users/bhanu.marreddy/Desktop/learning/guru/Intutitive\" status)",
+      "Bash(git -C \"c:/Users/bhanu.marreddy/Desktop/learning/guru/Intutitive\" log --format=\"%H %an %ae %ad %s\" --date=short -5)",
+      "Bash(git -C \"c:/Users/bhanu.marreddy/Desktop/learning/guru/Intutitive\" remote -v)",
+      "Bash(git -C \"c:/Users/bhanu.marreddy/Desktop/learning/guru/Intutitive\" show dfe3a5a --stat)",
+      "Bash(git -C \"c:\\\\Users\\\\bhanu.marreddy\\\\Desktop\\\\learning\\\\guru\\\\Intutitive\" status)",
+      "Bash(git -C \"c:\\\\Users\\\\bhanu.marreddy\\\\Desktop\\\\learning\\\\guru\\\\Intutitive\" log --oneline -5)"
+    ]
+  }
+}
