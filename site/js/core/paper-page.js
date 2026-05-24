@@ -8,6 +8,16 @@ import { initLearningChrome } from './learning-chrome.js';
 import { mountAll as mountPlaygrounds } from '../components/playgrounds.js';
 import { mountAll as mountTabs } from '../components/tab-panel.js';
 import { initLabState } from './scenario-bus.js';
+import { initLabJourney } from './lab-journey.js';
+import { initLabOnboarding } from './lab-onboarding.js';
+import {
+  isFlag,
+  setFlag,
+  getProgressArray,
+  getProgressCount,
+  trackProgressArray,
+  KEYS,
+} from './lab-progress.js';
 
 const CONCEPT_SECTIONS = [
   { id: 'hook', label: 'Hook', anchor: '#hook' },
@@ -17,7 +27,12 @@ const CONCEPT_SECTIONS = [
   { id: 'together', label: 'Try it', anchor: '#put-it-together' },
 ];
 
-const UNDERSTAND_COMPLETE_KEY = 'dci-understand-complete';
+const UNDERSTAND_SECTION_IDS = [
+  'understand-hook', 'understand-problem', 'understand-insight',
+  'understand-method', 'understand-evidence', 'understand-vocab',
+];
+
+const CORE_VERIFY_PLAYGROUNDS = ['compare', 'topk', 'terminal'];
 
 export function initPaperConceptPage(paperId, conceptSlug, conceptData, options = {}) {
   renderPaperNav(paperId, conceptSlug, 'concept');
@@ -36,17 +51,25 @@ export function initPaperHub(paperId) {
 export function initPaperLab(paperId, labData, options = {}) {
   const paper = getPaper(paperId);
   const sections = options.sections || paper?.journey?.labSections || [];
+  const partGroups = paper?.journey?.partGroups || [];
 
   renderPaperNav(paperId, null, 'lab');
   initLabState(labData.defaultLabState || {});
   initScrollspy();
-  initLearningChrome({ sections });
+  initLearningChrome({
+    sections,
+    partGroups,
+    sectionProgress: 'part-scoped',
+    floatingNav: 'part-aware',
+  });
   mountPlaygrounds(labData);
   mountTabs();
+  initLabOnboarding();
   initReadinessChecklist(paperId);
   wireReadinessTracking(paperId);
-  wireUnderstandCheckpoint(paperId);
-  wireVerifyNudge();
+  wireJourneyNudges();
+  initLabJourney(paperId);
+  document.body.classList.add('page-layout--lab');
 }
 
 function renderPaperNav(paperId, activeConceptSlug, mode) {
@@ -76,12 +99,17 @@ function renderJourneyMap(paperId) {
   const container = document.querySelector('[data-journey-map]');
   if (!paper?.journey?.phases || !container) return;
 
-  container.innerHTML = paper.journey.phases.map((phase, i) => `
-    <a href="${phase.href}" class="journey-map__phase" data-phase="${phase.id}">
-      <span class="journey-map__num">${i + 1}</span>
-      <strong>${phase.label}</strong>
-    </a>
-  `).join('');
+  container.innerHTML = `
+    <div class="journey-map">
+      ${paper.journey.phases.map((phase, i) => `
+        <a href="${phase.href}" class="journey-map__phase" data-phase="${phase.id}">
+          <span class="journey-map__num">${i + 1}</span>
+          <strong>${phase.label}</strong>
+        </a>
+      `).join('')}
+    </div>
+    <p class="journey-map__meta text-secondary">Estimated time: 45–60 minutes · Part 1 read-only, then playgrounds, then critique</p>
+  `;
 }
 
 function initReadinessChecklist(paperId) {
@@ -93,7 +121,11 @@ function initReadinessChecklist(paperId) {
     <li class="readiness-item" data-readiness-id="${check.id}">
       <label>
         <input type="checkbox" data-readiness-check="${check.id}" disabled>
-        <span>${check.label}</span>
+        <span class="readiness-item__text">
+          <span class="readiness-item__label">${check.label}</span>
+          ${check.hint ? `<span class="readiness-item__hint">${check.hint}</span>` : ''}
+          <span class="readiness-item__fraction" data-readiness-fraction="${check.id}"></span>
+        </span>
       </label>
     </li>
   `).join('');
@@ -108,125 +140,126 @@ function refreshReadinessUI(paperId) {
   paper.journey.readinessChecks.forEach(check => {
     const item = document.querySelector(`[data-readiness-id="${check.id}"]`);
     const input = document.querySelector(`[data-readiness-check="${check.id}"]`);
+    const fractionEl = document.querySelector(`[data-readiness-fraction="${check.id}"]`);
     if (!item || !input) return;
 
-    const done = isCheckComplete(check);
+    const { done, fraction } = getCheckStatus(check);
     input.checked = done;
     item.classList.toggle('readiness-item--done', done);
+    if (fractionEl) fractionEl.textContent = fraction || '';
   });
 
-  const allDone = paper.journey.readinessChecks.every(isCheckComplete);
+  const allDone = paper.journey.readinessChecks.every(c => getCheckStatus(c).done);
   const banner = document.querySelector('[data-readiness-banner]');
-  if (banner) {
-    banner.hidden = !allDone;
+  if (banner) banner.hidden = !allDone;
+
+  document.dispatchEvent(new CustomEvent('dci:progress-updated'));
+}
+
+function getCheckStatus(check) {
+  if (check.id === 'understand-complete') {
+    const count = getProgressCount(KEYS.understandSections);
+    return {
+      done: isFlag(KEYS.understandComplete),
+      fraction: isFlag(KEYS.understandComplete) ? '' : `${count}/6 sections`,
+    };
   }
+  if (check.id === 'verify-lab') {
+    const count = getProgressCount(KEYS.verifyPlaygrounds);
+    return {
+      done: isFlag(KEYS.verifyComplete),
+      fraction: isFlag(KEYS.verifyComplete) ? '' : `${count}/3 labs`,
+    };
+  }
+  if (check.minCount) {
+    const count = getProgressCount(check.storageKey);
+    return {
+      done: count >= check.minCount,
+      fraction: count >= check.minCount ? '' : `${count}/${check.minCount}`,
+    };
+  }
+  return {
+    done: isFlag(check.storageKey),
+    fraction: '',
+  };
 }
 
 function isCheckComplete(check) {
-  try {
-    if (check.minCount) {
-      const raw = sessionStorage.getItem(check.storageKey);
-      const arr = raw ? JSON.parse(raw) : [];
-      return Array.isArray(arr) && arr.length >= check.minCount;
-    }
-    return sessionStorage.getItem(check.storageKey) === '1';
-  } catch (_) {
-    return false;
+  return getCheckStatus(check).done;
+}
+
+function markUnderstandSection(id) {
+  trackProgressArray(KEYS.understandSections, id);
+  const count = getProgressCount(KEYS.understandSections);
+  if (count >= UNDERSTAND_SECTION_IDS.length) {
+    setFlag(KEYS.understandComplete);
   }
 }
 
-function markReady(key) {
-  try {
-    sessionStorage.setItem(key, '1');
-  } catch (_) { /* ignore */ }
+function markVerifyPlayground(id) {
+  trackProgressArray(KEYS.verifyPlaygrounds, id);
+  const count = getProgressCount(KEYS.verifyPlaygrounds);
+  if (count >= CORE_VERIFY_PLAYGROUNDS.length) {
+    setFlag(KEYS.verifyComplete);
+  }
 }
 
-function trackReadyCount(key, id) {
-  try {
-    const raw = sessionStorage.getItem(key);
-    const arr = raw ? JSON.parse(raw) : [];
-    if (!arr.includes(id)) arr.push(id);
-    sessionStorage.setItem(key, JSON.stringify(arr));
-  } catch (_) { /* ignore */ }
+function wireJourneyNudges() {
+  updateVerifyNudge();
+  updateThinkNudge();
 }
 
-function wireUnderstandCheckpoint(paperId) {
-  const btn = document.querySelector('[data-understand-ready]');
-  if (!btn) return;
+function updateVerifyNudge() {
+  const nudge = document.querySelector('[data-verify-nudge]');
+  if (nudge) nudge.hidden = isFlag(KEYS.understandComplete);
+}
 
-  btn.addEventListener('click', () => {
-    markReady(UNDERSTAND_COMPLETE_KEY);
-    refreshReadinessUI(paperId);
-    updateVerifyNudge();
-    document.getElementById('verify-start')?.scrollIntoView({ behavior: 'smooth' });
-  });
+function updateThinkNudge() {
+  const nudge = document.querySelector('[data-think-nudge]');
+  if (nudge) nudge.hidden = isFlag(KEYS.verifyComplete);
+}
 
-  const understandSections = [
-    'understand-hook', 'understand-problem', 'understand-insight',
-    'understand-method', 'understand-evidence', 'understand-vocab',
-  ];
-  let seen = new Set();
-  understandSections.forEach(id => {
+function wireReadinessTracking(paperId) {
+  UNDERSTAND_SECTION_IDS.forEach(id => {
     const section = document.getElementById(id);
     if (!section) return;
     const observer = new IntersectionObserver(entries => {
       if (entries.some(e => e.isIntersecting)) {
-        seen.add(id);
-        if (seen.size >= 4) {
-          markReady(UNDERSTAND_COMPLETE_KEY);
-          refreshReadinessUI(paperId);
-          updateVerifyNudge();
+        markUnderstandSection(id);
+        updateVerifyNudge();
+        refreshReadinessUI(paperId);
+        if (isFlag(KEYS.understandComplete)) {
+          document.dispatchEvent(new CustomEvent('dci:understand-complete'));
         }
       }
     }, { threshold: 0.3 });
     observer.observe(section);
   });
-}
 
-function wireVerifyNudge() {
-  updateVerifyNudge();
-}
-
-function updateVerifyNudge() {
-  const nudge = document.querySelector('[data-verify-nudge]');
-  if (!nudge) return;
-  try {
-    nudge.hidden = sessionStorage.getItem(UNDERSTAND_COMPLETE_KEY) === '1';
-  } catch (_) {
-    nudge.hidden = false;
-  }
-}
-
-function wireReadinessTracking(paperId) {
-  const verifySections = ['compare', 'topk', 'terminal'];
-  verifySections.forEach(id => {
-    const section = document.getElementById(id);
-    if (!section) return;
-    const observer = new IntersectionObserver(entries => {
-      if (entries.some(e => e.isIntersecting)) {
-        markReady('dci-ready-verify');
-        refreshReadinessUI(paperId);
-      }
-    }, { threshold: 0.3 });
-    observer.observe(section);
+  document.addEventListener('dci:playground-used', e => {
+    if (e.detail?.id && CORE_VERIFY_PLAYGROUNDS.includes(e.detail.id)) {
+      markVerifyPlayground(e.detail.id);
+      updateThinkNudge();
+      refreshReadinessUI(paperId);
+    }
   });
 
   document.addEventListener('dci:assumption-explored', e => {
     if (e.detail?.id) {
-      trackReadyCount('dci-ready-stress', e.detail.id);
+      trackProgressArray(KEYS.stress, e.detail.id);
       refreshReadinessUI(paperId);
     }
   });
 
   document.addEventListener('dci:idea-saved', e => {
     if (e.detail?.id) {
-      trackReadyCount('dci-ready-ideas', e.detail.id);
+      trackProgressArray(KEYS.ideas, e.detail.id);
       refreshReadinessUI(paperId);
     }
   });
 
   document.addEventListener('dci:chat-message', () => {
-    markReady('dci-ready-chat');
+    setFlag(KEYS.chat);
     refreshReadinessUI(paperId);
   });
 }

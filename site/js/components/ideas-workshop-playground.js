@@ -1,100 +1,344 @@
 /**
- * Ideas Workshop — brainstorm improvements that could better the DCI solution.
+ * Ideas Workshop — brainstorm improvements (single-page form, always editable).
  */
 
 import { improvementIdeas } from '../topics/papers/dci-agent/journey-data.js';
+import { getLabState } from '../core/scenario-bus.js';
+import { getProgress, setProgress, KEYS } from '../core/lab-progress.js';
 
-const STORAGE_PREFIX = 'dci-idea-';
+const SEED_ICONS = {
+  'hybrid-interface': '⊕',
+  'adaptive-resolution': '◎',
+  'smart-context': '◈',
+  'web-scale-bridge': '⇄',
+  'safe-dci': '⬡',
+};
+
+function getBrokenAssumptions() {
+  try {
+    const raw = getProgress(KEYS.brokenAssumptions);
+    return raw ? JSON.parse(raw) : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function getScenarioHint() {
+  const { scenarioId, topK } = getLabState();
+  if (scenarioId === 'sku' && topK <= 2) {
+    return `You lost gold evidence at top-k=${topK} in the labs — consider a fix for recall.`;
+  }
+  if (scenarioId === 'error-code') {
+    return 'You explored piped grep in the terminal lab — how would you scale that pattern?';
+  }
+  return '';
+}
 
 export function mount(container, config = {}) {
-  const ideas = config.ideas || improvementIdeas;
+  const seeds = config.ideas || improvementIdeas;
+  let highlightedSeedIds = new Set();
 
-  container.className = 'playground playground--ideas';
+  container.className = 'playground playground--ideas playground--interactive';
   container.innerHTML = `
-    <div class="playground__header">
-      <h3 class="playground__title">Ideas Workshop</h3>
-      <p class="playground__subtitle">How could this solution be <strong>better</strong>? Pick a seed idea or write your own — then stress-test it.</p>
+    <div class="playground__header playground__header--accent">
+      <div class="playground__header-icon" aria-hidden="true">💡</div>
+      <div>
+        <h3 class="playground__title">Ideas Workshop</h3>
+        <p class="playground__subtitle">Pick a starting point, draft your improvement, save, then discuss in Paper chat.</p>
+        <p class="ideas-scenario-hint" data-scenario-hint hidden></p>
+      </div>
     </div>
-    <div class="ideas-seeds" data-ideas-seeds></div>
-    <label class="playground__label">Your improvement idea</label>
-    <textarea class="hypothesis-input" rows="5" placeholder="What would you change? Why is it better than plain DCI? What could still break?" data-idea-input></textarea>
-    <div class="hypothesis-actions">
-      <button type="button" class="btn btn--primary btn--sm" data-idea-save>Save idea</button>
-      <button type="button" class="btn btn--secondary btn--sm" data-idea-reveal>See expert angles</button>
+
+    <div class="ideas-layout">
+      <section class="ideas-panel ideas-panel--seeds">
+        <div class="ideas-panel__head">
+          <span class="ideas-panel__step">1</span>
+          <div>
+            <h4 class="ideas-panel__title">Starting points</h4>
+            <p class="ideas-panel__hint">Click a card to pre-fill — highlighted cards match assumptions you broke</p>
+          </div>
+        </div>
+        <div class="ideas-seeds" data-ideas-seeds></div>
+        <button type="button" class="ideas-seed ideas-seed--blank" data-seed-custom>
+          <span class="ideas-seed__icon" aria-hidden="true">✎</span>
+          <span><strong>Start blank</strong><span class="ideas-seed__meta">Clear the form and write your own idea</span></span>
+        </button>
+      </section>
+
+      <section class="ideas-panel ideas-panel--draft">
+        <div class="ideas-panel__head">
+          <span class="ideas-panel__step">2</span>
+          <div>
+            <h4 class="ideas-panel__title">Your draft</h4>
+            <p class="ideas-panel__hint">Four fields — think like a researcher proposing a paper extension</p>
+          </div>
+        </div>
+        <div class="ideas-form">
+          <div class="ideas-form__field">
+            <label class="ideas-form__label" for="ideas-limitation">Limitation</label>
+            <input type="text" id="ideas-limitation" class="ideas-field" data-field="limitation" placeholder="e.g. DCI fails on web-scale corpora" autocomplete="off">
+          </div>
+          <div class="ideas-form__field ideas-form__field--wide">
+            <label class="ideas-form__label" for="ideas-improvement">Your improvement</label>
+            <textarea id="ideas-improvement" class="ideas-field ideas-field--area" rows="3" data-field="improvement" placeholder="What would you build or change?"></textarea>
+          </div>
+          <div class="ideas-form__field">
+            <label class="ideas-form__label" for="ideas-why">Why better than plain DCI?</label>
+            <textarea id="ideas-why" class="ideas-field ideas-field--area" rows="2" data-field="whyBetter" placeholder="Expected gain — accuracy, cost, safety, scale…"></textarea>
+          </div>
+          <div class="ideas-form__field">
+            <label class="ideas-form__label" for="ideas-risk">What could still break?</label>
+            <textarea id="ideas-risk" class="ideas-field ideas-field--area" rows="2" data-field="risk" placeholder="Honest tradeoff or failure mode"></textarea>
+          </div>
+        </div>
+        <div class="ideas-toolbar">
+          <button type="button" class="btn btn--primary btn--sm" data-ideas-save>Save idea</button>
+          <button type="button" class="btn btn--secondary btn--sm" data-ideas-reveal>Expert angles</button>
+          <button type="button" class="btn btn--ghost btn--sm" data-ideas-to-chat>Send to chat ↓</button>
+        </div>
+      </section>
     </div>
+
     <div class="hypothesis-reveal" data-idea-reveal-panel hidden></div>
+
+    <div class="ideas-saved">
+      <h4 class="ideas-saved__heading">Saved ideas</h4>
+      <ul class="ideas-saved__list" data-ideas-saved-list></ul>
+    </div>
   `;
 
-  const state = { selectedId: ideas[0].id };
+  const state = { seedId: null };
+  const scenarioHintEl = container.querySelector('[data-scenario-hint]');
   const seedsEl = container.querySelector('[data-ideas-seeds]');
-  const input = container.querySelector('[data-idea-input]');
-  const saveBtn = container.querySelector('[data-idea-save]');
-  const revealBtn = container.querySelector('[data-idea-reveal]');
+  const blankBtn = container.querySelector('[data-seed-custom]');
   const revealPanel = container.querySelector('[data-idea-reveal-panel]');
+  const savedList = container.querySelector('[data-ideas-saved-list]');
 
-  const loadSaved = (id) => {
-    try {
-      return sessionStorage.getItem(STORAGE_PREFIX + id) || '';
-    } catch (_) {
-      return '';
+  const fields = {
+    limitation: container.querySelector('[data-field="limitation"]'),
+    improvement: container.querySelector('[data-field="improvement"]'),
+    whyBetter: container.querySelector('[data-field="whyBetter"]'),
+    risk: container.querySelector('[data-field="risk"]'),
+  };
+
+  const updateScenarioHint = () => {
+    const hint = getScenarioHint();
+    if (hint) {
+      scenarioHintEl.hidden = false;
+      scenarioHintEl.textContent = hint;
+    } else {
+      scenarioHintEl.hidden = true;
     }
   };
 
-  const renderSeeds = () => {
-    seedsEl.innerHTML = ideas.map(idea => `
-      <button type="button" class="ideas-seed ${idea.id === state.selectedId ? 'ideas-seed--active' : ''}" data-idea-id="${idea.id}">
-        <strong>${escapeHtml(idea.title)}</strong>
-        <p>${escapeHtml(idea.whyBetter)}</p>
-      </button>
-    `).join('');
+  const updateHighlights = () => {
+    highlightedSeedIds = new Set(
+      getBrokenAssumptions().map(a => a.seedId).filter(Boolean)
+    );
+  };
 
-    seedsEl.querySelectorAll('[data-idea-id]').forEach(btn => {
+  const getLimitationFromAssumptions = () => {
+    const broken = getBrokenAssumptions();
+    if (!broken.length) return '';
+    const latest = broken[broken.length - 1];
+    return latest.verdict || latest.title || '';
+  };
+
+  const getSeed = () => (state.seedId ? seeds.find(s => s.id === state.seedId) : null);
+
+  const readDraft = () => ({
+    limitation: fields.limitation.value.trim(),
+    improvement: fields.improvement.value.trim(),
+    whyBetter: fields.whyBetter.value.trim(),
+    risk: fields.risk.value.trim(),
+  });
+
+  const fillDraft = (draft) => {
+    fields.limitation.value = draft.limitation || '';
+    fields.improvement.value = draft.improvement || '';
+    fields.whyBetter.value = draft.whyBetter || '';
+    fields.risk.value = draft.risk || '';
+  };
+
+  const loadSavedIdeas = () => {
+    try {
+      const raw = getProgress(KEYS.savedIdeas);
+      return raw ? JSON.parse(raw) : [];
+    } catch (_) {
+      return [];
+    }
+  };
+
+  const persistSavedIdeas = (list) => {
+    setProgress(KEYS.savedIdeas, JSON.stringify(list));
+  };
+
+  const sendToChat = (draft, seed, send = false) => {
+    document.dispatchEvent(new CustomEvent('dci:chat-prefill', {
+      detail: {
+        message: formatIdeaForChat(draft, seed),
+        scroll: true,
+        send,
+        highlight: true,
+      },
+    }));
+  };
+
+  const renderSaved = () => {
+    const list = loadSavedIdeas();
+    savedList.innerHTML = list.length
+      ? list.map(i => `
+        <li class="ideas-saved__item">
+          <span class="ideas-saved__badge" aria-hidden="true">✓</span>
+          <div class="ideas-saved__body">
+            <strong>${escapeHtml(i.title)}</strong>
+            <p>${escapeHtml(i.improvement.slice(0, 120))}${i.improvement.length > 120 ? '…' : ''}</p>
+          </div>
+          <button type="button" class="btn btn--ghost btn--sm" data-discuss-id="${escapeHtml(i.id)}">Discuss in chat</button>
+        </li>`).join('')
+      : '<li class="ideas-saved__empty">No ideas saved yet — draft one above and hit Save.</li>';
+
+    savedList.querySelectorAll('[data-discuss-id]').forEach(btn => {
       btn.addEventListener('click', () => {
-        state.selectedId = btn.dataset.ideaId;
-        const idea = ideas.find(i => i.id === state.selectedId);
-        const saved = loadSaved(state.selectedId);
-        input.value = saved || idea.seed;
-        revealPanel.hidden = true;
-        renderSeeds();
+        const idea = list.find(x => x.id === btn.dataset.discussId);
+        if (idea) {
+          sendToChat(idea, seeds.find(s => s.id === idea.seedId), false);
+        }
       });
     });
   };
 
-  saveBtn.addEventListener('click', () => {
-    const text = input.value.trim();
-    if (!text) return;
-    try {
-      sessionStorage.setItem(STORAGE_PREFIX + state.selectedId, text);
-      sessionStorage.setItem(STORAGE_PREFIX + 'custom-' + Date.now(), text);
-    } catch (_) { /* ignore */ }
-    document.dispatchEvent(new CustomEvent('dci:idea-saved', { detail: { id: state.selectedId } }));
-    saveBtn.textContent = 'Saved ✓';
-    setTimeout(() => { saveBtn.textContent = 'Save idea'; }, 1500);
+  const applySeed = (seedId) => {
+    state.seedId = seedId;
+    if (seedId === 'custom') {
+      fillDraft({ limitation: getLimitationFromAssumptions(), improvement: '', whyBetter: '', risk: '' });
+    } else {
+      const seed = seeds.find(s => s.id === seedId);
+      if (seed) {
+        fillDraft({
+          limitation: getLimitationFromAssumptions() || `Gap: ${seed.title}`,
+          improvement: seed.seed,
+          whyBetter: seed.whyBetter,
+          risk: '',
+        });
+      }
+    }
+    revealPanel.hidden = true;
+    renderSeeds();
+    fields.improvement.focus();
+  };
+
+  const renderSeeds = () => {
+    updateHighlights();
+    seedsEl.innerHTML = seeds.map((idea, i) => `
+      <button type="button" class="ideas-seed ${idea.id === state.seedId ? 'ideas-seed--active' : ''} ${highlightedSeedIds.has(idea.id) ? 'ideas-seed--suggested' : ''}" data-idea-id="${idea.id}">
+        <span class="ideas-seed__icon" aria-hidden="true">${SEED_ICONS[idea.id] || (i + 1)}</span>
+        <span class="ideas-seed__body">
+          <strong>${escapeHtml(idea.title)}</strong>
+          <p>${escapeHtml(idea.whyBetter)}</p>
+          ${highlightedSeedIds.has(idea.id) ? '<span class="ideas-seed__tag">Matches your broken assumption</span>' : ''}
+        </span>
+      </button>
+    `).join('');
+
+    seedsEl.querySelectorAll('[data-idea-id]').forEach(btn => {
+      btn.addEventListener('click', () => applySeed(btn.dataset.ideaId));
+    });
+  };
+
+  blankBtn.addEventListener('click', () => applySeed('custom'));
+
+  container.querySelector('[data-ideas-save]').addEventListener('click', () => {
+    const draft = readDraft();
+    if (!draft.improvement) {
+      fields.improvement.focus();
+      return;
+    }
+    const seed = getSeed();
+    const entry = {
+      id: `${state.seedId || 'custom'}-${Date.now()}`,
+      seedId: state.seedId,
+      title: seed?.title || 'Custom improvement',
+      ...draft,
+      savedAt: new Date().toISOString(),
+    };
+    const list = loadSavedIdeas();
+    list.push(entry);
+    persistSavedIdeas(list);
+    document.dispatchEvent(new CustomEvent('dci:idea-saved', { detail: { id: entry.id } }));
+    renderSaved();
+    const btn = container.querySelector('[data-ideas-save]');
+    btn.textContent = 'Saved ✓';
+    setTimeout(() => { btn.textContent = 'Save idea'; }, 2000);
   });
 
-  revealBtn.addEventListener('click', () => {
-    const idea = ideas.find(i => i.id === state.selectedId);
-    const userText = input.value.trim();
+  container.querySelector('[data-ideas-reveal]').addEventListener('click', () => {
+    const draft = readDraft();
+    const seed = getSeed();
     revealPanel.hidden = false;
-    revealPanel.innerHTML = `
-      ${userText ? `<div class="hypothesis-compare hypothesis-compare--yours"><h4>Your idea</h4><p>${escapeHtml(userText)}</p></div>` : ''}
-      <div class="hypothesis-compare hypothesis-compare--expert">
-        <h4>Expert angles — ${escapeHtml(idea.title)}</h4>
-        <p><strong>Why this could help:</strong> ${escapeHtml(idea.whyBetter)}</p>
-        <p><strong>Framing:</strong> ${escapeHtml(idea.reveal.framing)}</p>
-        <p><strong>Tradeoffs to watch:</strong></p>
-        <ul>${idea.reveal.tradeoffs.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul>
-        <p><strong>Next steps to validate:</strong></p>
-        <ul>${idea.reveal.nextSteps.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>
-      </div>
-      <p class="playground__insight">Does your idea handle the tradeoffs above? Refine it — or discuss in Paper chat below.</p>
-    `;
+    if (seed && state.seedId !== 'custom') {
+      revealPanel.innerHTML = `
+        <div class="hypothesis-compare hypothesis-compare--expert">
+          <h4>Expert angles — ${escapeHtml(seed.title)}</h4>
+          <p><strong>Framing:</strong> ${escapeHtml(seed.reveal.framing)}</p>
+          <p><strong>Tradeoffs:</strong></p>
+          <ul>${seed.reveal.tradeoffs.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul>
+          <p><strong>Validate with:</strong></p>
+          <ul>${seed.reveal.nextSteps.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>
+        </div>`;
+    } else {
+      revealPanel.innerHTML = `
+        <div class="hypothesis-compare hypothesis-compare--expert">
+          <h4>Stress-test your idea</h4>
+          <ul>
+            <li>Which assumption from Assumption breaker does this fix?</li>
+            <li>Does it preserve DCI's localization advantage?</li>
+            <li>What experiment would prove it beats plain DCI?</li>
+          </ul>
+        </div>`;
+    }
+    if (draft.improvement) {
+      revealPanel.insertAdjacentHTML('afterbegin', `
+        <div class="hypothesis-compare hypothesis-compare--yours"><h4>Your draft</h4><p>${escapeHtml(draft.improvement)}</p></div>
+      `);
+    }
   });
 
+  container.querySelector('[data-ideas-to-chat]').addEventListener('click', () => {
+    const draft = readDraft();
+    if (!draft.improvement) {
+      fields.improvement.focus();
+      return;
+    }
+    sendToChat(draft, getSeed(), false);
+  });
+
+  document.addEventListener('dci:assumptions-changed', () => {
+    renderSeeds();
+  });
+
+  Object.values(fields).forEach(el => {
+    el.removeAttribute('readonly');
+    el.removeAttribute('disabled');
+  });
+
+  updateScenarioHint();
   renderSeeds();
-  input.value = loadSaved(state.selectedId) || ideas[0].seed;
+  renderSaved();
+}
+
+function formatIdeaForChat(draft, seed) {
+  const title = seed?.title ? ` (${seed.title})` : '';
+  return `I'd like to discuss my improvement idea for DCI${title}:
+
+Limitation: ${draft.limitation || 'not specified'}
+Improvement: ${draft.improvement}
+Why better: ${draft.whyBetter || 'not specified'}
+Risk: ${draft.risk || 'not specified'}
+
+Please critique — what's strong, what's missing, and what experiment would validate it?`;
 }
 
 function escapeHtml(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }

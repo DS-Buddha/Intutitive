@@ -134,9 +134,9 @@ A Paper Journey teaches a research paper so the learner can **explain it end-to-
 | Part | Purpose |
 | ---- | ------- |
 | **Orient** | Hub, thesis, prerequisites — on `index.html` |
-| **Understand** | Read-only holistic brief: problem → insight → method → evidence → vocabulary → checkpoint |
+| **Understand** | Read-only holistic brief: problem → insight → method → evidence → vocabulary |
 | **Verify** | Playgrounds — each labeled "You read X — now prove it" |
-| **Think** | Assumption breaker + Research Extension Studio |
+| **Think** | Assumption breaker + Ideas workshop + Paper chat (optional Gemini tutor via dev server) |
 
 Single-page flow on `lab.html`: Part 1 (Understand) → Part 2 (Verify) → Part 3 (Think).
 
@@ -152,19 +152,21 @@ The learner toggles assumptions (scale, structure, agent capability) and watches
 This happens in **Part 3 — Think** (`assumption-breaker` playground).
 
 ### Moment 5: "I could propose a research direction from here"
-The learner writes a short hypothesis for an extension prompt, then compares to an expert reveal. Gap = learning. No code required.
+The learner drafts an improvement (limitation, fix, tradeoffs), saves it, and stress-tests it with the AI tutor or expert angles. Gap = learning. No code required.
 
-This happens in **Part 3 — Think** (`hypothesis-studio` playground).
+This happens in **Part 3 — Think** (`ideas-workshop` + `paper-chat` playgrounds).
 
 ### Hypothesis gate (not quiz)
 
-Papers do **not** use multiple-choice quizzes. Mastery is:
+Papers do **not** use multiple-choice quizzes. Mastery is tracked via a **research readiness checklist**:
 
-- Completed Part 1 (Understand) — checkpoint or scrolled through key sections
-- Used verify playgrounds (compare, top-k, terminal)
+- Completed Part 1 (Understand) — all 6 sections read
+- Used core verify playgrounds (compare, top-k, terminal) — interaction-based
 - Explored ≥3 assumption-breaker scenarios
-- Completed hypothesis for ≥2 extension prompts (stored in `sessionStorage`)
-- Self-honor **Research readiness** checklist in the sidebar
+- Saved ≥2 improvement ideas in Ideas workshop
+- Discussed the paper in Paper chat (requires local dev server + Gemini API key)
+
+Progress persists in `localStorage` across sessions.
 
 Implementation links (arXiv, GitHub) are optional footnotes — never the mastery gate.
 

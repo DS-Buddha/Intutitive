@@ -2,6 +2,8 @@
  * Terminal playground — mock corpus + grep vs top-k contrast.
  */
 
+import { markPlaygroundUsed } from '../core/playground-events.js';
+
 export function mount(container, config = {}) {
   const files = config.files || {};
   const presets = config.presets || [];
@@ -115,12 +117,13 @@ export function mount(container, config = {}) {
       : 'Try preset: grep SKU-8842 or piped clue conjunction.';
   };
 
-  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') render(); });
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { markPlaygroundUsed('terminal'); render(); } });
   presetsEl.querySelectorAll('[data-cmd]').forEach(btn => {
-    btn.addEventListener('click', () => { input.value = btn.getAttribute('data-cmd'); render(); });
+    btn.addEventListener('click', () => { markPlaygroundUsed('terminal'); input.value = btn.getAttribute('data-cmd'); render(); });
   });
 
   topKSlider.addEventListener('input', () => {
+    markPlaygroundUsed('terminal');
     topK = parseInt(topKSlider.value, 10);
     render();
   });

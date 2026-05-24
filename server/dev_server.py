@@ -4,7 +4,7 @@ Dev server: serves site/ and proxies Gemini chat (keeps API key server-side).
 
 Usage (from repo root):
   pip install -r requirements.txt
-  # Set GEMINI_API_KEY in .env
+  # Set GEMINI_API_KEY in .env (optional GEMINI_MODEL, default gemini-3.5-flash)
   python server/dev_server.py
 """
 
@@ -28,7 +28,8 @@ except ImportError:
     pass
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+# Stable Gemini 3.x Flash — see https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash
+DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
 PORT = int(os.getenv("PORT", "8080"))
 
 PAPER_PROMPTS = {
@@ -47,20 +48,24 @@ def gemini_chat(system_prompt: str, messages: list[dict]) -> str:
     if not GEMINI_API_KEY:
         raise RuntimeError("GEMINI_API_KEY is not set in .env")
 
-    import google.generativeai as genai
+    from google import genai
+    from google.genai import types
 
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel(
-        DEFAULT_MODEL,
-        system_instruction=system_prompt,
-    )
+    client = genai.Client(api_key=GEMINI_API_KEY)
 
-    history = []
+    history: list[types.Content] = []
     for msg in messages[:-1]:
         role = "user" if msg.get("role") == "user" else "model"
-        history.append({"role": role, "parts": [msg.get("content", "")]})
+        history.append(
+            types.Content(role=role, parts=[types.Part(text=msg.get("content", ""))])
+        )
 
-    chat = model.start_chat(history=history)
+    chat = client.chats.create(
+        model=DEFAULT_MODEL,
+        config=types.GenerateContentConfig(system_instruction=system_prompt),
+        history=history,
+    )
+
     last = messages[-1].get("content", "") if messages else ""
     response = chat.send_message(last)
     return response.text or ""

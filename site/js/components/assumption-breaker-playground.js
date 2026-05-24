@@ -3,17 +3,30 @@
  */
 
 import { assumptions } from '../topics/papers/dci-agent/journey-data.js';
+import { trackProgressArray, setProgress, KEYS } from '../core/lab-progress.js';
+
+const ASSUMPTION_TO_SEED = {
+  'local-corpus': 'web-scale-bridge',
+  'capable-agent': 'hybrid-interface',
+  'structured-files': 'hybrid-interface',
+  'latency-budget': 'hybrid-interface',
+  'no-index': 'web-scale-bridge',
+};
 
 export function mount(container, config = {}) {
   const items = config.assumptions || assumptions;
 
-  container.className = 'playground playground--assumption';
+  container.className = 'playground playground--assumption playground--interactive';
   container.innerHTML = `
-    <div class="playground__header">
-      <h3 class="playground__title">Assumption breaker</h3>
-      <p class="playground__subtitle">The paper assumes certain conditions. Turn one off — see where DCI stops winning.</p>
+    <div class="playground__header playground__header--accent playground__header--assumption">
+      <div class="playground__header-icon" aria-hidden="true">⚡</div>
+      <div>
+        <h3 class="playground__title">Assumption breaker</h3>
+        <p class="playground__subtitle">Turn assumptions off one at a time — see where DCI stops winning. Broken scenarios feed Ideas workshop below.</p>
+      </div>
     </div>
     <div class="assumption-toggles" data-assumption-toggles></div>
+    <div class="assumption-chips" data-assumption-chips hidden></div>
     <div class="assumption-scenario playground__panel" data-assumption-scenario>
       <p class="playground__hint">All assumptions hold — DCI wins on lexical precision scenarios. Turn one off.</p>
     </div>
@@ -22,7 +35,10 @@ export function mount(container, config = {}) {
   `;
 
   const state = Object.fromEntries(items.map(a => [a.id, a.defaultOn]));
+  let activeBrokenId = null;
+
   const togglesEl = container.querySelector('[data-assumption-toggles]');
+  const chipsEl = container.querySelector('[data-assumption-chips]');
   const scenarioEl = container.querySelector('[data-assumption-scenario]');
   const verdictEl = container.querySelector('[data-assumption-verdict]');
 
@@ -33,29 +49,26 @@ export function mount(container, config = {}) {
     </label>
   `).join('');
 
-  const explored = new Set();
+  const getBroken = () => items.filter(a => !state[a.id]);
 
-  const render = () => {
-    const broken = items.filter(a => !state[a.id]);
-    if (broken.length === 0) {
-      scenarioEl.innerHTML = `
-        <div class="assumption-outcome assumption-outcome--dci">
-          <span>DCI</span> wins · <span>Retriever</span> struggles
-        </div>
-        <p>Exact SKU lookup, piped grep, error codes — DCI localizes evidence the retriever loses at low k.</p>
-      `;
-      verdictEl.textContent = 'All paper assumptions hold. This is DCI\'s home turf.';
-      return;
-    }
+  const persistBroken = (broken) => {
+    setProgress(KEYS.brokenAssumptions, JSON.stringify(broken.map(a => ({
+      id: a.id,
+      label: a.label,
+      verdict: a.breakScenario.verdict,
+      title: a.breakScenario.title,
+      seedId: ASSUMPTION_TO_SEED[a.id] || null,
+    }))));
+    document.dispatchEvent(new CustomEvent('dci:assumptions-changed', {
+      detail: { broken: broken.map(a => a.id) },
+    }));
+  };
 
-    const active = broken[broken.length - 1];
-    const s = active.breakScenario;
-    explored.add(active.id);
-    document.dispatchEvent(new CustomEvent('dci:assumption-explored', { detail: { id: active.id } }));
-
+  const renderScenario = (assumption) => {
+    const s = assumption.breakScenario;
     scenarioEl.innerHTML = `
       <h4>${s.title}</h4>
-      <p class="text-secondary">Broken assumption: <em>${active.label}</em></p>
+      <p class="text-secondary">Broken assumption: <em>${assumption.label}</em></p>
       <div class="assumption-outcomes">
         <div class="assumption-outcome assumption-outcome--${s.dciOutcome}">DCI: ${s.dciOutcome}</div>
         <div class="assumption-outcome assumption-outcome--${s.retrieverOutcome}">Retriever: ${s.retrieverOutcome}</div>
@@ -64,12 +77,70 @@ export function mount(container, config = {}) {
     verdictEl.textContent = s.verdict;
   };
 
+  const renderChips = (broken) => {
+    if (!broken.length) {
+      chipsEl.hidden = true;
+      chipsEl.innerHTML = '';
+      return;
+    }
+    chipsEl.hidden = false;
+    chipsEl.innerHTML = `
+      <span class="assumption-chips__label">Broken assumptions — click to review:</span>
+      ${broken.map(a => `
+        <button type="button" class="assumption-chip ${activeBrokenId === a.id ? 'assumption-chip--active' : ''}" data-chip-id="${a.id}">
+          ${a.label}
+        </button>
+      `).join('')}
+    `;
+    chipsEl.querySelectorAll('[data-chip-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeBrokenId = btn.dataset.chipId;
+        const item = items.find(i => i.id === activeBrokenId);
+        if (item) renderScenario(item);
+        renderChips(broken);
+      });
+    });
+  };
+
+  const render = () => {
+    const broken = getBroken();
+    persistBroken(broken);
+
+    if (broken.length === 0) {
+      activeBrokenId = null;
+      scenarioEl.innerHTML = `
+        <div class="assumption-outcome assumption-outcome--dci">
+          <span>DCI</span> wins · <span>Retriever</span> struggles
+        </div>
+        <p>Exact SKU lookup, piped grep, error codes — DCI localizes evidence the retriever loses at low k.</p>
+      `;
+      verdictEl.textContent = 'All paper assumptions hold. This is DCI\'s home turf.';
+      renderChips(broken);
+      return;
+    }
+
+    if (!activeBrokenId || !broken.some(a => a.id === activeBrokenId)) {
+      activeBrokenId = broken[broken.length - 1].id;
+    }
+
+    const active = items.find(a => a.id === activeBrokenId);
+    if (active) renderScenario(active);
+    renderChips(broken);
+  };
+
   togglesEl.querySelectorAll('input[type="checkbox"]').forEach(input => {
     input.addEventListener('change', () => {
-      state[input.dataset.assumptionId] = input.checked;
+      const id = input.dataset.assumptionId;
+      state[id] = input.checked;
+      if (!input.checked) {
+        trackProgressArray(KEYS.stress, id);
+        document.dispatchEvent(new CustomEvent('dci:assumption-explored', { detail: { id } }));
+      }
       render();
     });
   });
 
   render();
 }
+
+export { ASSUMPTION_TO_SEED };

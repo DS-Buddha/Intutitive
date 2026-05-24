@@ -21,7 +21,9 @@ export function getLabState() {
 export function setLabState(partial) {
   state = { ...state, ...partial };
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const json = JSON.stringify(state);
+    sessionStorage.setItem(STORAGE_KEY, json);
+    localStorage.setItem(`dci-agent:${STORAGE_KEY}`, json);
   } catch (_) { /* private browsing */ }
   emit('lab:state', state);
 }
@@ -33,7 +35,8 @@ export function subscribeLabState(handler) {
 
 export function initLabState(defaults = {}) {
   try {
-    const saved = sessionStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(`dci-agent:${STORAGE_KEY}`)
+      ?? sessionStorage.getItem(STORAGE_KEY);
     if (saved) {
       state = { ...DEFAULT_STATE, ...JSON.parse(saved), ...defaults };
     } else {

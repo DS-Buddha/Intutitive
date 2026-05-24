@@ -4,6 +4,7 @@
 
 import { labChunks, labScenarios, rankByScenario } from '../topics/papers/dci-agent/dci-scenarios.js';
 import { getLabState, setLabState, subscribeLabState } from '../core/scenario-bus.js';
+import { markPlaygroundUsed } from '../core/playground-events.js';
 
 export function mount(container, config = {}) {
   const scenarios = config.scenarios || labScenarios;
@@ -92,8 +93,8 @@ export function mount(container, config = {}) {
       : `<strong>Gold evidence LOST</strong> at k=${state.topK}. Rank of first gold: #${ranked.findIndex(c => scenario.goldIds.includes(c.id)) + 1}. Agent will hallucinate or guess.`;
   };
 
-  scenarioSelect.addEventListener('change', () => { state.scenarioId = scenarioSelect.value; emitState(); render(); });
-  slider.addEventListener('input', () => { state.topK = parseInt(slider.value, 10); emitState(); render(); });
+  scenarioSelect.addEventListener('change', () => { markPlaygroundUsed('topk'); state.scenarioId = scenarioSelect.value; emitState(); render(); });
+  slider.addEventListener('input', () => { markPlaygroundUsed('topk'); state.topK = parseInt(slider.value, 10); emitState(); render(); });
 
   if (syncBus) {
     subscribeLabState(bus => {

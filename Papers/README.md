@@ -91,7 +91,8 @@ export const contextLevels = [...];      // if paper has ablation levels
 export const evidenceBenchmarks = [...]; // paper tables with numbers
 export const contributions = [...];    // claims → lab anchor links
 export const assumptions = [...];        // id, label, breakScenario
-export const extensionPrompts = [...];   // id, prompt, reveal, relatedSection
+export const improvementIdeas = [...];   // id, title, seed, reveal — Ideas workshop
+export const chatStarters = [...];       // Paper chat quick starters
 ```
 
 ## Playgrounds
@@ -105,7 +106,8 @@ Reusable types from DCI:
 | `interface-compare` | A/B two methods on same scenario |
 | `topk-bottleneck` | Early filtering loses evidence |
 | `assumption-breaker` | Toggle assumptions, flip outcomes |
-| `hypothesis-studio` | Write hypothesis → reveal expert take |
+| `ideas-workshop` | Draft improvement ideas → save → discuss in chat |
+| `paper-chat` | Gemini tutor (requires `server/dev_server.py`) |
 | `evidence-lens` | Predict benchmark winner, reveal numbers |
 | `paradigm-compare` | Step-through two trajectories |
 | `context-level` | Ablation / context management levels |
@@ -121,17 +123,32 @@ For Verify-layer stations that share scenario/top-k:
 
 ## Readiness tracking
 
-- `dci-understand-complete` — checkpoint button or scrolled through ≥4 Understand sections
-- `dci-ready-verify` — visited compare, top-k, terminal playgrounds
-- `dci-ready-stress` / `dci-ready-extend` — assumption + hypothesis counts
+Progress keys (persisted in `localStorage` via `lab-progress.js`):
+
+- `dci-understand-complete` — all 6 Understand sections scrolled
+- `dci-ready-verify` — interacted with compare, top-k, and terminal playgrounds
+- `dci-ready-stress` — ≥3 assumption-breaker scenarios explored
+- `dci-ready-ideas` — ≥2 ideas saved in Ideas workshop
+- `dci-ready-chat` — sent at least one Paper chat message
+
+## UX patterns (DCI reference)
+
+- **Hub journey map** — `[data-journey-map]` rendered from `paperRegistry.journey.phases`
+- **Part-scoped progress** — header shows "Part 2 · 3/8" not 18 dots
+- **Part CTAs** — "Continue to Part 2/3" between phases
+- **Floating prev/next** — part-aware labels at boundaries
+- **Onboarding card** — first-visit dismissible panel on lab hook
+- **Think pipeline** — broken assumptions highlight Ideas seeds; workshop prefills chat
 
 ## Checklist before shipping
 
 - [ ] Hub CTA links to `lab.html#understand-hook`
+- [ ] Hub journey map with time estimate
 - [ ] Part 1 read-only sections exist before any playground
 - [ ] Verify bridges link back to Understand anchors
+- [ ] Part 2→3 CTA after evidence lens
 - [ ] At least 3 assumption-breaker scenarios
-- [ ] At least 3 extension prompts with expert reveals
+- [ ] Ideas workshop with ≥2 saveable improvement seeds
 - [ ] Paper-Notes.md complete
 - [ ] Registry entry with understand → verify → think phases
 - [ ] Run locally: `cd site && python -m http.server 8080`

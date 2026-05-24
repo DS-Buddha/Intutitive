@@ -4,6 +4,7 @@
 
 import { labChunks, labScenarios, rankByScenario, dciMatches } from '../topics/papers/dci-agent/dci-scenarios.js';
 import { getLabState, setLabState, subscribeLabState } from '../core/scenario-bus.js';
+import { markPlaygroundUsed } from '../core/playground-events.js';
 
 export function mount(container, config = {}) {
   const scenarios = config.scenarios || labScenarios;
@@ -124,9 +125,9 @@ export function mount(container, config = {}) {
     els.insight.textContent = scenario.insight;
   };
 
-  els.scenario.addEventListener('change', () => { state.scenarioId = els.scenario.value; emitState(); render(); });
-  els.topK.addEventListener('input', () => { state.topK = parseInt(els.topK.value, 10); emitState(); render(); });
-  els.resolution.addEventListener('change', () => { state.resolution = els.resolution.value; emitState(); render(); });
+  els.scenario.addEventListener('change', () => { markPlaygroundUsed('compare'); state.scenarioId = els.scenario.value; emitState(); render(); });
+  els.topK.addEventListener('input', () => { markPlaygroundUsed('compare'); state.topK = parseInt(els.topK.value, 10); emitState(); render(); });
+  els.resolution.addEventListener('change', () => { markPlaygroundUsed('compare'); state.resolution = els.resolution.value; emitState(); render(); });
 
   if (syncBus) {
     subscribeLabState(bus => {
