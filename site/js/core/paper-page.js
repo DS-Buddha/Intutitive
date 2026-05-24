@@ -218,11 +218,16 @@ function wireReadinessTracking(paperId) {
     }
   });
 
-  document.addEventListener('dci:hypothesis-saved', e => {
+  document.addEventListener('dci:idea-saved', e => {
     if (e.detail?.id) {
-      trackReadyCount('dci-ready-extend', e.detail.id);
+      trackReadyCount('dci-ready-ideas', e.detail.id);
       refreshReadinessUI(paperId);
     }
+  });
+
+  document.addEventListener('dci:chat-message', () => {
+    markReady('dci-ready-chat');
+    refreshReadinessUI(paperId);
   });
 }
 

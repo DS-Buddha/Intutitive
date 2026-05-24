@@ -26,6 +26,8 @@ import { mount as mountContextLevel } from './context-level-playground.js';
 import { mount as mountEvidenceLens } from './evidence-lens-playground.js';
 import { mount as mountAssumptionBreaker } from './assumption-breaker-playground.js';
 import { mount as mountHypothesisStudio } from './hypothesis-studio-playground.js';
+import { mount as mountIdeasWorkshop } from './ideas-workshop-playground.js';
+import { mount as mountPaperChat } from './paper-chat-playground.js';
 
 const MOUNTERS = {
   chunking: mountChunking,
@@ -52,6 +54,8 @@ const MOUNTERS = {
   'evidence-lens': mountEvidenceLens,
   'assumption-breaker': mountAssumptionBreaker,
   'hypothesis-studio': mountHypothesisStudio,
+  'ideas-workshop': mountIdeasWorkshop,
+  'paper-chat': mountPaperChat,
 };
 
 export function mountAll(conceptData = {}) {

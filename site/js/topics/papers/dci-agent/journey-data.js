@@ -252,6 +252,126 @@ export const extensionPrompts = [
   },
 ];
 
+/** Ideas to better the DCI solution — Part 3 Ideas Workshop */
+export const improvementIdeas = [
+  {
+    id: 'hybrid-interface',
+    title: 'Retriever proposes, DCI verifies',
+    seed: 'Index finds candidate documents; terminal grep confirms exact spans before the agent answers.',
+    whyBetter: 'Fixes recall at scale without losing the localization wins that make DCI strong.',
+    reveal: {
+      framing: 'The most practical upgrade path — combine index recall with grep precision.',
+      tradeoffs: [
+        'Better: web-scale candidate generation + DCI-level citations',
+        'Risk: retriever bias hides docs outside top-N; two-hop latency',
+        'Design choice: fixed pipeline vs learned router between index and grep',
+      ],
+      nextSteps: [
+        'Prototype: top-20 files from BM25 → DCI span verification only inside those files',
+        'Measure: does localization stay high when recall depends on the index?',
+      ],
+    },
+  },
+  {
+    id: 'adaptive-resolution',
+    title: 'Adaptive interface resolution',
+    seed: 'Train or rule-based policy: SKU queries → line span; overview questions → whole document skim first.',
+    whyBetter: 'Cuts context bloat on long trajectories while keeping precision when it matters.',
+    reveal: {
+      framing: 'The paper names resolution as a lens — making it adaptive is a natural upgrade.',
+      tradeoffs: [
+        'Better: fewer tokens on low-precision queries',
+        'Risk: wrong granularity choice loses gold evidence',
+        'Signal: reward localization score from trajectory metrics',
+      ],
+      nextSteps: [
+        'Heuristic v1: regex/detect entities → auto zoom to span',
+        'Learned v2: policy trained on DCI success/failure logs',
+      ],
+    },
+  },
+  {
+    id: 'smart-context',
+    title: 'Smarter L0–L4 context policy',
+    seed: 'Instead of fixed truncation, evict low-salience tool output first; never summarize grep hits that matched gold patterns.',
+    whyBetter: 'Long agent runs lose early evidence under L4 — a smarter policy preserves what matters.',
+    reveal: {
+      framing: 'Context management is the hidden bottleneck in long DCI trajectories.',
+      tradeoffs: [
+        'Better: longer effective horizon without unbounded cost',
+        'Risk: salience model wrong → evicts the one line you needed',
+        'Needs: entity/SKU-aware retention rules',
+      ],
+      nextSteps: [
+        'Ablation: never-summarize-gold-lines vs paper L4',
+        'Score chunks by query overlap before eviction',
+      ],
+    },
+  },
+  {
+    id: 'web-scale-bridge',
+    title: 'Web-scale corpus bridge',
+    seed: 'Shard corpus by domain; lightweight file-level index points agent to the right shard before DCI grep.',
+    whyBetter: 'Addresses the biggest limitation — grep cannot scan the open web linearly.',
+    reveal: {
+      framing: 'DCI assumes workspace-scale corpora; sharding + coarse routing extends the idea.',
+      tradeoffs: [
+        'Better: bounded grep scope per query',
+        'Risk: wrong shard = never find gold doc',
+        'Hybrid: sitemap / metadata index as first hop only',
+      ],
+      nextSteps: [
+        'Simulate: 10K folders, metadata index → pick folder → DCI inside',
+        'Compare cost/latency vs pure retriever on BrowseComp-style tasks',
+      ],
+    },
+  },
+  {
+    id: 'safe-dci',
+    title: 'Production-safe DCI sandbox',
+    seed: 'Allowlist rg/head/wc; cap output bytes; chroot per tenant; audit every corpus read.',
+    whyBetter: 'Raw shell access is powerful for research agents but unsafe in production as-is.',
+    reveal: {
+      framing: 'Making DCI deployable requires constraining the interface without killing composability.',
+      tradeoffs: [
+        'Better: compliance-friendly agent search',
+        'Risk: over-restricted toolset recreates top-k rigidity',
+        'Balance: pipeable patterns only, no arbitrary shell',
+      ],
+      nextSteps: [
+        'Define minimal tool grammar (grep | grep | head)',
+        'Red-team: path traversal and resource exhaustion',
+      ],
+    },
+  },
+  {
+    id: 'semantic-fallback',
+    title: 'Semantic fallback for paraphrase queries',
+    seed: 'When grep returns empty, fall back to embedding search on file summaries — not full top-k pipeline.',
+    whyBetter: 'Covers paraphrase-heavy queries where DCI weakens, without abandoning terminal-first design.',
+    reveal: {
+      framing: 'DCI wins on lexical anchors; a controlled fallback handles the rest.',
+      tradeoffs: [
+        'Better: robustness on paraphrase QA',
+        'Risk: fallback overused → back to retriever-mediated behavior',
+        'Gate: only trigger after N failed grep attempts',
+      ],
+      nextSteps: [
+        'Benchmark paraphrase set with no shared tokens',
+        'Ablate: grep-only vs grep-then-fallback crossover point',
+      ],
+    },
+  },
+];
+
+export const chatStarters = [
+  'Where does DCI break down, and why?',
+  'How would you improve DCI for a web-scale corpus?',
+  'Explain the top-k bottleneck in one paragraph.',
+  'Compare DCI to baseline RAG for agentic search.',
+  'What hybrid of retriever + terminal would you build?',
+];
+
 export const paradigmSteps = {
   retriever: [
     { step: 1, action: 'Embed query', detail: 'Single vector representation' },
@@ -273,5 +393,7 @@ export default {
   contributions,
   assumptions,
   extensionPrompts,
+  improvementIdeas,
+  chatStarters,
   paradigmSteps,
 };

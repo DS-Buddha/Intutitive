@@ -40,12 +40,22 @@ Intutitive/
 
 ## Running Locally
 
-**Option 1: With a local HTTP server** (recommended)
+**Option 1: Static only** (playgrounds, no paper chat)
 ```bash
 cd site
 python -m http.server 8080
-# Then open http://localhost:8080 in your browser
+# Open http://localhost:8080
 ```
+
+**Option 2: Dev server with Gemini paper chat**
+```bash
+pip install -r requirements.txt
+# Add GEMINI_API_KEY to .env (see .env.example)
+python server/dev_server.py
+# Open http://127.0.0.1:8080/topics/papers/dci-agent/lab.html#chat
+```
+
+Paper chat calls `/api/chat` on the same origin — the API key stays in `.env` on the server, never in the browser.
 
 **Option 2: Direct from filesystem** (ES modules will fail with CORS error)
 ```bash
