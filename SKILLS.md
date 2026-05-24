@@ -35,6 +35,7 @@ See [CLAUDE.md](CLAUDE.md) for Claude Code entry point.
 |-------|-----------------|-------------|
 | `new-concept-page` | "Add a concept page for X", "Create the Y page under topic Z" | [.cursor/skills/new-concept-page/SKILL.md](.cursor/skills/new-concept-page/SKILL.md) |
 | `new-topic` | "Start a new topic on X", "Add Transformers / RL" | [.cursor/skills/new-topic/SKILL.md](.cursor/skills/new-topic/SKILL.md) |
+| `new-paper-journey` | "Add a research paper", "Onboard paper X", "Create Paper Journey for Y" | [.cursor/skills/new-paper-journey/SKILL.md](.cursor/skills/new-paper-journey/SKILL.md) |
 | `check-page-completeness` | "Review the X page", "Is Y complete?", "Audit the baseline page" | [.cursor/skills/check-page-completeness/SKILL.md](.cursor/skills/check-page-completeness/SKILL.md) |
 | `design-system-audit` | "Check for magic numbers", "Audit CSS", "Ensure all values use tokens" | [.cursor/skills/design-system-audit/SKILL.md](.cursor/skills/design-system-audit/SKILL.md) |
 | `quiz-quality-check` | "Review quiz for X", "Check quiz quality", "Audit the questions" | [.cursor/skills/quiz-quality-check/SKILL.md](.cursor/skills/quiz-quality-check/SKILL.md) |
@@ -72,6 +73,11 @@ Source: RAG/Search-and-Retrieval/Notes/Late-Interaction-Token-Matching.md
 Topic: Transformers
 Description: How attention mechanisms work and why they matter
 Icon: pyramid
+
+/new-paper-journey
+Paper: My New Paper
+paper-id: my-paper
+Source: Papers/My-New-Paper/Paper-Notes.md
 
 /check-page-completeness
 Page: site/topics/rag/baseline.html

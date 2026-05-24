@@ -11,12 +11,13 @@ import { initLabState } from './scenario-bus.js';
 import { initLabJourney } from './lab-journey.js';
 import { initLabOnboarding } from './lab-onboarding.js';
 import {
+  initLabProgress,
   isFlag,
   setFlag,
-  getProgressArray,
   getProgressCount,
   trackProgressArray,
   KEYS,
+  readinessKeyForCheck,
 } from './lab-progress.js';
 
 const CONCEPT_SECTIONS = [
@@ -27,12 +28,14 @@ const CONCEPT_SECTIONS = [
   { id: 'together', label: 'Try it', anchor: '#put-it-together' },
 ];
 
-const UNDERSTAND_SECTION_IDS = [
+const DEFAULT_UNDERSTAND_SECTION_IDS = [
   'understand-hook', 'understand-problem', 'understand-insight',
   'understand-method', 'understand-evidence', 'understand-vocab',
 ];
 
-const CORE_VERIFY_PLAYGROUNDS = ['compare', 'topk', 'terminal'];
+const DEFAULT_CORE_VERIFY_PLAYGROUNDS = ['compare', 'topk', 'terminal'];
+
+let activeLabPaper = null;
 
 export function initPaperConceptPage(paperId, conceptSlug, conceptData, options = {}) {
   renderPaperNav(paperId, conceptSlug, 'concept');
@@ -43,6 +46,7 @@ export function initPaperConceptPage(paperId, conceptSlug, conceptData, options 
 }
 
 export function initPaperHub(paperId) {
+  initLabProgress(paperId);
   renderPaperNav(paperId, null, 'hub');
   renderJourneyMap(paperId);
   initReadinessChecklist(paperId);
@@ -50,11 +54,13 @@ export function initPaperHub(paperId) {
 
 export function initPaperLab(paperId, labData, options = {}) {
   const paper = getPaper(paperId);
+  activeLabPaper = paper;
   const sections = options.sections || paper?.journey?.labSections || [];
   const partGroups = paper?.journey?.partGroups || [];
 
+  initLabProgress(paperId);
   renderPaperNav(paperId, null, 'lab');
-  initLabState(labData.defaultLabState || {});
+  initLabState(labData.defaultLabState || {}, paperId);
   initScrollspy();
   initLearningChrome({
     sections,
@@ -64,12 +70,23 @@ export function initPaperLab(paperId, labData, options = {}) {
   });
   mountPlaygrounds(labData);
   mountTabs();
-  initLabOnboarding();
+  initLabOnboarding({
+    title: paper?.title,
+    timeEstimate: paper?.journey?.onboarding?.timeEstimate,
+  });
   initReadinessChecklist(paperId);
   wireReadinessTracking(paperId);
   wireJourneyNudges();
   initLabJourney(paperId);
   document.body.classList.add('page-layout--lab');
+}
+
+function getUnderstandSectionIds() {
+  return activeLabPaper?.journey?.understandSectionIds ?? DEFAULT_UNDERSTAND_SECTION_IDS;
+}
+
+function getCoreVerifyPlaygrounds() {
+  return activeLabPaper?.journey?.coreVerifyPlaygrounds ?? DEFAULT_CORE_VERIFY_PLAYGROUNDS;
 }
 
 function renderPaperNav(paperId, activeConceptSlug, mode) {
@@ -99,6 +116,8 @@ function renderJourneyMap(paperId) {
   const container = document.querySelector('[data-journey-map]');
   if (!paper?.journey?.phases || !container) return;
 
+  const timeEstimate = paper.journey.onboarding?.timeEstimate || '45–60 minutes';
+
   container.innerHTML = `
     <div class="journey-map">
       ${paper.journey.phases.map((phase, i) => `
@@ -108,7 +127,7 @@ function renderJourneyMap(paperId) {
         </a>
       `).join('')}
     </div>
-    <p class="journey-map__meta text-secondary">Estimated time: 45–60 minutes · Part 1 read-only, then playgrounds, then critique</p>
+    <p class="journey-map__meta text-secondary">Estimated time: ${timeEstimate} · Part 1 read-only, then playgrounds, then critique</p>
   `;
 }
 
@@ -137,61 +156,61 @@ function refreshReadinessUI(paperId) {
   const paper = getPaper(paperId);
   if (!paper?.journey?.readinessChecks) return;
 
+  const understandTotal = getUnderstandSectionIds().length;
+  const verifyTotal = getCoreVerifyPlaygrounds().length;
+
   paper.journey.readinessChecks.forEach(check => {
     const item = document.querySelector(`[data-readiness-id="${check.id}"]`);
     const input = document.querySelector(`[data-readiness-check="${check.id}"]`);
     const fractionEl = document.querySelector(`[data-readiness-fraction="${check.id}"]`);
     if (!item || !input) return;
 
-    const { done, fraction } = getCheckStatus(check);
+    const { done, fraction } = getCheckStatus(check, { understandTotal, verifyTotal });
     input.checked = done;
     item.classList.toggle('readiness-item--done', done);
     if (fractionEl) fractionEl.textContent = fraction || '';
   });
 
-  const allDone = paper.journey.readinessChecks.every(c => getCheckStatus(c).done);
+  const allDone = paper.journey.readinessChecks.every(c => getCheckStatus(c, { understandTotal, verifyTotal }).done);
   const banner = document.querySelector('[data-readiness-banner]');
   if (banner) banner.hidden = !allDone;
 
   document.dispatchEvent(new CustomEvent('dci:progress-updated'));
 }
 
-function getCheckStatus(check) {
+function getCheckStatus(check, { understandTotal, verifyTotal }) {
   if (check.id === 'understand-complete') {
     const count = getProgressCount(KEYS.understandSections);
     return {
       done: isFlag(KEYS.understandComplete),
-      fraction: isFlag(KEYS.understandComplete) ? '' : `${count}/6 sections`,
+      fraction: isFlag(KEYS.understandComplete) ? '' : `${count}/${understandTotal} sections`,
     };
   }
   if (check.id === 'verify-lab') {
     const count = getProgressCount(KEYS.verifyPlaygrounds);
     return {
       done: isFlag(KEYS.verifyComplete),
-      fraction: isFlag(KEYS.verifyComplete) ? '' : `${count}/3 labs`,
+      fraction: isFlag(KEYS.verifyComplete) ? '' : `${count}/${verifyTotal} labs`,
     };
   }
+  const storageKey = readinessKeyForCheck(check.id) || check.storageKey;
   if (check.minCount) {
-    const count = getProgressCount(check.storageKey);
+    const count = getProgressCount(storageKey);
     return {
       done: count >= check.minCount,
       fraction: count >= check.minCount ? '' : `${count}/${check.minCount}`,
     };
   }
   return {
-    done: isFlag(check.storageKey),
+    done: isFlag(storageKey),
     fraction: '',
   };
-}
-
-function isCheckComplete(check) {
-  return getCheckStatus(check).done;
 }
 
 function markUnderstandSection(id) {
   trackProgressArray(KEYS.understandSections, id);
   const count = getProgressCount(KEYS.understandSections);
-  if (count >= UNDERSTAND_SECTION_IDS.length) {
+  if (count >= getUnderstandSectionIds().length) {
     setFlag(KEYS.understandComplete);
   }
 }
@@ -199,7 +218,7 @@ function markUnderstandSection(id) {
 function markVerifyPlayground(id) {
   trackProgressArray(KEYS.verifyPlaygrounds, id);
   const count = getProgressCount(KEYS.verifyPlaygrounds);
-  if (count >= CORE_VERIFY_PLAYGROUNDS.length) {
+  if (count >= getCoreVerifyPlaygrounds().length) {
     setFlag(KEYS.verifyComplete);
   }
 }
@@ -220,7 +239,7 @@ function updateThinkNudge() {
 }
 
 function wireReadinessTracking(paperId) {
-  UNDERSTAND_SECTION_IDS.forEach(id => {
+  getUnderstandSectionIds().forEach(id => {
     const section = document.getElementById(id);
     if (!section) return;
     const observer = new IntersectionObserver(entries => {
@@ -237,7 +256,7 @@ function wireReadinessTracking(paperId) {
   });
 
   document.addEventListener('dci:playground-used', e => {
-    if (e.detail?.id && CORE_VERIFY_PLAYGROUNDS.includes(e.detail.id)) {
+    if (e.detail?.id && getCoreVerifyPlaygrounds().includes(e.detail.id)) {
       markVerifyPlayground(e.detail.id);
       updateThinkNudge();
       refreshReadinessUI(paperId);

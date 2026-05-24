@@ -2,10 +2,14 @@
  * Resolution zoom — knob to see document vs line vs span access.
  */
 
-import { labChunks } from '../topics/papers/dci-agent/dci-scenarios.js';
-
 export function mount(container, config = {}) {
-  const doc = config.document || labChunks.find(c => c.id === 'c3');
+  const doc = config.document;
+  const chunks = config.chunks || [];
+
+  if (!doc) {
+    container.textContent = 'Resolution playground requires config.document in lab-data.js';
+    return;
+  }
 
   container.className = 'playground playground--resolution';
   container.innerHTML = `
@@ -37,7 +41,7 @@ export function mount(container, config = {}) {
   const label = container.querySelector('[data-res-label]');
   const insight = container.querySelector('[data-res-insight]');
 
-  const fullDoc = labChunks.filter(c => c.file === doc.file).map(c => c.text).join('\n');
+  const fullDoc = chunks.filter(c => c.file === doc.file).map(c => c.text).join('\n') || doc.text;
   const targetLine = doc.text;
 
   const render = () => {

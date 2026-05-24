@@ -121,7 +121,7 @@ We build three kinds of learning experiences:
 
 1. **Concept pages** (RAG curriculum) — one idea, quiz-gated, three moments
 2. **Topic hubs** — sequence and prerequisites only
-3. **Paper Journey** — end-to-end research paper mastery, hypothesis-gated
+3. **Paper Journey** — end-to-end research paper mastery, readiness-gated
 
 ## Paper Journey (fourth content type)
 
@@ -147,7 +147,7 @@ Matches the RAG concept page pattern: analogy → why → play — but at paper 
 Concept pages use three moments. Paper Journeys add two more:
 
 ### Moment 4: "I see where this breaks and why"
-The learner toggles assumptions (scale, structure, agent capability) and watches DCI-style wins flip to struggles. They feel the paper's boundary conditions.
+The learner toggles assumptions (scale, structure, agent capability) and watches the paper's claimed wins flip to struggles. They feel the paper's boundary conditions.
 
 This happens in **Part 3 — Think** (`assumption-breaker` playground).
 
@@ -156,7 +156,7 @@ The learner drafts an improvement (limitation, fix, tradeoffs), saves it, and st
 
 This happens in **Part 3 — Think** (`ideas-workshop` + `paper-chat` playgrounds).
 
-### Hypothesis gate (not quiz)
+### Readiness gate (not quiz)
 
 Papers do **not** use multiple-choice quizzes. Mastery is tracked via a **research readiness checklist**:
 
@@ -174,9 +174,23 @@ Implementation links (arXiv, GitHub) are optional footnotes — never the master
 
 Same as concept pages: direct, concrete, practitioner-facing. Add: name tradeoffs explicitly, cite benchmark numbers when relevant, and always show *what the paper assumes* before celebrating what it achieves.
 
+### Paper Journey UI standard
+
+Every paper uses the **same shell and UX** as the reference implementation ([DCI](site/topics/papers/dci-agent/lab.html)):
+
+- Three-part single-page lab with journey bar, readiness panel, onboarding card, and part-scoped floating nav
+- Standard Think pipeline: Assumption breaker → Ideas workshop → Paper chat
+- Design-system tokens and components only — no per-paper CSS or alternate layouts
+
+**Aesthetic drift across papers is a bug.** Content changes; chrome and interaction patterns do not.
+
+Before authoring a new paper, read [Papers/PAPER-JOURNEY-STANDARD.md](Papers/PAPER-JOURNEY-STANDARD.md).
+
 ## For Agents
 
 Before writing or reviewing concept content, read this file.
+
+Before authoring or reviewing a Paper Journey, read [Papers/PAPER-JOURNEY-STANDARD.md](Papers/PAPER-JOURNEY-STANDARD.md) and use DCI as the structural template.
 
 In Cursor, the `content-voice` rule applies when editing `site/**/*.html`.
 Use the `check-page-completeness` and `quiz-quality-check` skills before marking a page done.

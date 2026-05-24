@@ -2,7 +2,6 @@
  * Paper chat — discuss the paper with a Gemini-powered tutor (via dev server proxy).
  */
 
-import { chatStarters } from '../topics/papers/dci-agent/journey-data.js';
 import { formatChatMarkdown } from '../core/format-chat-markdown.js';
 import { getProgress, setProgress, KEYS } from '../core/lab-progress.js';
 
@@ -20,8 +19,14 @@ function saveMessages(messages) {
 }
 
 export function mount(container, config = {}) {
-  const paperId = config.paperId || 'dci-agent';
-  const starters = config.starters || chatStarters;
+  const paperId = config.paperId;
+  const starters = config.starters;
+  const paperLabel = config.paperLabel || 'the paper';
+
+  if (!paperId || !starters?.length) {
+    container.textContent = 'Paper chat requires paperId and starters in lab-data.js';
+    return;
+  }
 
   container.className = 'playground playground--paper-chat playground--interactive';
   container.innerHTML = `
@@ -29,7 +34,7 @@ export function mount(container, config = {}) {
       <div class="playground__header-icon" aria-hidden="true">💬</div>
       <div>
         <h3 class="playground__title">Paper chat</h3>
-        <p class="playground__subtitle">Discuss the paper, stress-test your ideas, or ask where DCI breaks.</p>
+        <p class="playground__subtitle">Discuss the paper, stress-test your ideas, or ask where ${paperLabel} breaks.</p>
       </div>
     </div>
 
@@ -48,7 +53,7 @@ export function mount(container, config = {}) {
         <p class="paper-chat-compose__label">Quick starters</p>
         <div class="paper-chat-starters" data-chat-starters></div>
         <form class="paper-chat-form" data-chat-form>
-          <textarea class="paper-chat-input" rows="3" placeholder="Ask about the paper, your improvement idea, or where DCI breaks…" data-chat-input autocomplete="off"></textarea>
+          <textarea class="paper-chat-input" rows="3" placeholder="Ask about the paper, your improvement idea, or where it breaks…" data-chat-input autocomplete="off"></textarea>
           <button type="submit" class="btn btn--primary paper-chat-send" data-chat-send>
             <span class="paper-chat-send__label">Send</span>
             <span class="paper-chat-send__icon" aria-hidden="true">→</span>
@@ -225,6 +230,7 @@ export function mount(container, config = {}) {
   });
 
   document.addEventListener('dci:chat-prefill', async (e) => {
+    if (e.detail?.paperId && e.detail.paperId !== paperId) return;
     if (!e.detail?.message) return;
     input.value = e.detail.message;
     if (e.detail.highlight) highlightCompose();

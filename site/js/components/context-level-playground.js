@@ -2,8 +2,6 @@
  * Context level playground — L0–L4 context management from paper §3.
  */
 
-import { contextLevels } from '../topics/papers/dci-agent/journey-data.js';
-
 const MOCK_TRAJECTORY = [
   { tool: 'grep', output: 'contracts.txt:3: SKU-8842 valve warranty: 24 months', chars: 52 },
   { tool: 'read', output: 'Full contracts.txt (4 lines) loaded into context…', chars: 4200 },
@@ -14,8 +12,13 @@ const MOCK_TRAJECTORY = [
 ];
 
 export function mount(container, config = {}) {
-  const levels = config.levels || contextLevels;
+  const levels = config.levels;
   const trajectory = config.trajectory || MOCK_TRAJECTORY;
+
+  if (!levels?.length) {
+    container.textContent = 'Context level requires config.levels in lab-data.js';
+    return;
+  }
 
   container.className = 'playground playground--context-level';
   container.innerHTML = `

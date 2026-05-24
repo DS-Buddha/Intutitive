@@ -2,13 +2,19 @@
  * Coverage vs localization — tune agent strategy knobs.
  */
 
-import { labChunks, labScenarios, rankByScenario, dciMatches } from '../topics/papers/dci-agent/dci-scenarios.js';
 import { getLabState, setLabState, subscribeLabState } from '../core/scenario-bus.js';
 
 export function mount(container, config = {}) {
-  const scenarios = config.scenarios || labScenarios;
-  const chunks = config.chunks || labChunks;
+  const scenarios = config.scenarios;
+  const chunks = config.chunks;
+  const rankByScenario = config.rankByScenario;
+  const dciMatches = config.dciMatches;
   const syncBus = config.syncBus === true;
+
+  if (!scenarios?.length || !chunks?.length || !rankByScenario || !dciMatches) {
+    container.textContent = 'Coverage metrics requires scenarios, chunks, rankByScenario, and dciMatches in lab-data.js';
+    return;
+  }
 
   container.className = 'playground playground--metrics';
   container.innerHTML = `

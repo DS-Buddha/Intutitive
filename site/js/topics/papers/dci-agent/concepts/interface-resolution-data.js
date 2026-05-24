@@ -1,3 +1,7 @@
+import { dciPlaygrounds } from '../playground-configs.js';
+
 export default {
-  playgrounds: { resolution: {} },
+  playgrounds: {
+    resolution: dciPlaygrounds.resolution,
+  },
 };

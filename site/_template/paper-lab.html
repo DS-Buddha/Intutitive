@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TODO: Paper Journey — understand holistically, then verify with playgrounds">
+  <link rel="stylesheet" href="../../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../../design-system/components.css">
+  <link rel="stylesheet" href="../../../design-system/animations.css">
+  <title>TODO: Paper Title — Paper Journey</title>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="../../../index.html">Home</a><span aria-hidden="true"> / </span>
+      <a href="../index.html">Papers</a><span aria-hidden="true"> / </span>
+      <a href="./index.html">TODO: short name</a><span aria-hidden="true"> / </span>
+      <span aria-current="page">Paper journey</span>
+    </nav>
+  </header>
+
+  <div class="page-layout page-layout--paper">
+    <aside class="sidebar sidebar--lab" aria-label="Lab navigation">
+      <div class="readiness-panel readiness-panel--top">
+        <h3 class="sidebar__heading">Research readiness</h3>
+        <ul class="readiness-list" data-readiness-checklist></ul>
+        <p class="readiness-banner" data-readiness-banner hidden>You're research-ready — you can explain the paper and propose extensions.</p>
+      </div>
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading sidebar__heading--spaced">Part 1 — Understand</h3>
+        <ul class="sidebar__list">
+          <li><a href="#understand-hook" data-section="understand-hook">Hook & thesis</a></li>
+          <li><a href="#understand-problem" data-section="understand-problem">The problem</a></li>
+          <li><a href="#understand-insight" data-section="understand-insight">The insight</a></li>
+          <li><a href="#understand-method" data-section="understand-method">Method</a></li>
+          <li><a href="#understand-evidence" data-section="understand-evidence">Benchmarks (read)</a></li>
+          <li><a href="#understand-vocab" data-section="understand-vocab">Vocabulary</a></li>
+        </ul>
+        <h3 class="sidebar__heading sidebar__heading--spaced">Part 2 — Verify</h3>
+        <ul class="sidebar__list">
+          <li><a href="#verify-start" class="sidebar__part-intro" data-section="verify-start">Part 2 intro</a></li>
+          <!-- TODO: verify section nav links -->
+        </ul>
+        <h3 class="sidebar__heading sidebar__heading--spaced">Part 3 — Think</h3>
+        <ul class="sidebar__list">
+          <li><a href="#think-start" class="sidebar__part-intro" data-section="think-start">Part 3 intro</a></li>
+          <li><a href="#assumptions" data-section="assumptions">Assumptions</a></li>
+          <li><a href="#ideas" data-section="ideas">Ideas workshop</a></li>
+          <li><a href="#chat" data-section="chat">Paper chat</a></li>
+          <li><a href="#paper" data-section="paper">Paper links</a></li>
+        </ul>
+      </nav>
+      <details class="module-tree module-tree--collapsed">
+        <summary class="sidebar__heading">More: concept deep dives</summary>
+        <ul class="sidebar__list" data-paper-nav></ul>
+      </details>
+    </aside>
+
+    <main class="content" id="main-content">
+      <div class="journey-progress" data-journey-progress aria-label="Your progress"></div>
+
+      <!-- ═══ PART 1 — UNDERSTAND (read-only, no playgrounds) ═══ -->
+
+      <section id="understand-hook" class="content-section" data-section-id="understand-hook">
+        <p class="journey-part-label">Part 1 — Understand</p>
+        <p class="paper-meta">arXiv:TODO · ~15 min read before playgrounds</p>
+        <div class="learn-objective">
+          <strong>You'll leave Part 1 able to:</strong> TODO: learning objective.
+        </div>
+        <!-- TODO: hook-analogy-card, thesis, tldr-pill -->
+      </section>
+
+      <section id="understand-problem" class="content-section" data-section-id="understand-problem">
+        <h2>1. The problem</h2>
+        <!-- TODO: failure-chain cards -->
+      </section>
+
+      <section id="understand-insight" class="content-section" data-section-id="understand-insight">
+        <h2>2. The insight</h2>
+        <!-- TODO: static diagram -->
+      </section>
+
+      <section id="understand-method" class="content-section" data-section-id="understand-method">
+        <h2>3. Method</h2>
+        <!-- TODO: method content -->
+      </section>
+
+      <section id="understand-evidence" class="content-section" data-section-id="understand-evidence">
+        <h2>4. Evidence</h2>
+        <!-- TODO: read-only benchmark tables -->
+      </section>
+
+      <section id="understand-vocab" class="content-section" data-section-id="understand-vocab">
+        <h2>5. Vocabulary</h2>
+        <!-- TODO: vocab-map cards linking to Part 2 -->
+      </section>
+
+      <p class="understand-next">
+        <a href="#verify-start" class="btn btn--primary">Continue to Part 2 — Verify →</a>
+      </p>
+
+      <!-- ═══ PART 2 — VERIFY ═══ -->
+
+      <div id="verify-start" class="journey-part-divider" data-section-id="verify-start">
+        <span class="journey-part-divider__label">Part 2 — Verify</span>
+        <p class="journey-part-divider__desc">Hands-on — each playground proves something you read above.</p>
+        <div class="learn-objective learn-objective--compact">
+          <strong>Recommended path:</strong> TODO: core labs first, then deep-dives.
+        </div>
+        <p class="verify-nudge" data-verify-nudge hidden><a href="#understand-hook">← Recommended: finish Part 1 first</a></p>
+      </div>
+
+      <!-- TODO: verify sections with verify-bridge, learn-try, data-playground -->
+
+      <p class="understand-next">
+        <a href="#think-start" class="btn btn--primary">Continue to Part 3 — Think →</a>
+      </p>
+
+      <!-- ═══ PART 3 — THINK (standard pipeline — do not reorder) ═══ -->
+
+      <div id="think-start" class="journey-part-divider" data-section-id="think-start">
+        <span class="journey-part-divider__label">Part 3 — Think</span>
+        <p class="journey-part-divider__desc">You understand and verified the paper — now critique it and improve it.</p>
+        <div class="learn-objective learn-objective--compact">
+          <strong>Goal:</strong> Break assumptions → draft an improvement → discuss with the AI tutor.
+        </div>
+        <p class="verify-nudge think-nudge" data-think-nudge hidden><a href="#verify-start">← Recommended: try Part 2 core labs first</a></p>
+      </div>
+
+      <section id="assumptions" class="content-section" data-section-id="assumptions">
+        <h2>Assumption breaker</h2>
+        <div class="learn-try"><strong>Try:</strong> TODO: assumption prompt.</div>
+        <div class="playground" data-playground="assumption-breaker"></div>
+      </section>
+
+      <section id="ideas" class="content-section" data-section-id="ideas">
+        <h2>Ideas workshop</h2>
+        <div class="learn-try learn-try--think"><strong>Goal:</strong> Draft a research-style improvement — save, then discuss in Paper chat.</div>
+        <div class="playground" data-playground="ideas-workshop"></div>
+      </section>
+
+      <section id="chat" class="content-section" data-section-id="chat">
+        <h2>Paper chat</h2>
+        <div class="learn-try learn-try--think"><strong>Goal:</strong> Stress-test your ideas or ask anything about the paper.</div>
+        <div class="playground" data-playground="paper-chat"></div>
+      </section>
+
+      <section id="paper" class="content-section" data-section-id="paper">
+        <h2>Paper links</h2>
+        <p class="paper-links">
+          <a href="https://arxiv.org/abs/TODO" target="_blank" rel="noopener">arXiv</a>
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initPaperLab } from '../../../js/core/paper-page.js';
+    import labData from '../../../js/topics/papers/TODO-paper-id/lab-data.js';
+    initPaperLab('TODO-paper-id', labData);
+  </script>
+</body>
+</html>

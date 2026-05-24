@@ -1,5 +1,7 @@
-import { terminalPlaygroundConfig } from '../dci-corpus.js';
+import { dciPlaygrounds } from '../playground-configs.js';
 
 export default {
-  playgrounds: { 'terminal-corpus': terminalPlaygroundConfig },
+  playgrounds: {
+    'terminal-corpus': dciPlaygrounds['terminal-corpus'],
+  },
 };

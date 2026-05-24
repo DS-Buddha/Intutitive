@@ -94,40 +94,43 @@ export const papers = [
           ],
         },
       ],
+      understandSectionIds: [
+        'understand-hook', 'understand-problem', 'understand-insight',
+        'understand-method', 'understand-evidence', 'understand-vocab',
+      ],
+      coreVerifyPlaygrounds: ['compare', 'topk', 'terminal'],
       readinessChecks: [
         {
           id: 'understand-complete',
           label: 'Completed Part 1 (Understand)',
           hint: 'Read all 6 sections in order',
-          storageKey: 'dci-understand-complete',
         },
         {
           id: 'verify-lab',
           label: 'Used core verify labs',
           hint: 'Interact with compare, top-k, and terminal',
-          storageKey: 'dci-ready-verify',
         },
         {
           id: 'stress-assumptions',
           label: 'Explored assumption scenarios',
           hint: 'Break ≥3 assumptions in Assumption breaker',
-          storageKey: 'dci-ready-stress',
           minCount: 3,
         },
         {
           id: 'ideas-saved',
           label: 'Saved improvement ideas',
           hint: 'Save ≥2 ideas in Ideas workshop',
-          storageKey: 'dci-ready-ideas',
           minCount: 2,
         },
         {
           id: 'chat-used',
           label: 'Discussed the paper in chat',
           hint: 'Send at least one message in Paper chat',
-          storageKey: 'dci-ready-chat',
         },
       ],
+      onboarding: {
+        timeEstimate: '45–60 min',
+      },
     },
   },
 ];

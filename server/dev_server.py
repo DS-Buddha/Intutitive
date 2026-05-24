@@ -32,13 +32,20 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
 PORT = int(os.getenv("PORT", "8080"))
 
-PAPER_PROMPTS = {
-    "dci-agent": PROMPTS_DIR / "dci-agent.md",
-}
+PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
+
+
+def discover_paper_prompts() -> dict[str, Path]:
+    """Load server/prompts/*.md — filename stem is paper id."""
+    prompts: dict[str, Path] = {}
+    if PROMPTS_DIR.is_dir():
+        for path in sorted(PROMPTS_DIR.glob("*.md")):
+            prompts[path.stem] = path
+    return prompts
 
 
 def load_system_prompt(paper_id: str) -> str:
-    path = PAPER_PROMPTS.get(paper_id)
+    path = discover_paper_prompts().get(paper_id)
     if path and path.exists():
         return path.read_text(encoding="utf-8")
     return "You are a helpful research paper tutor."

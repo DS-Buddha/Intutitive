@@ -2,7 +2,6 @@
  * Ideas Workshop — brainstorm improvements (single-page form, always editable).
  */
 
-import { improvementIdeas } from '../topics/papers/dci-agent/journey-data.js';
 import { getLabState } from '../core/scenario-bus.js';
 import { getProgress, setProgress, KEYS } from '../core/lab-progress.js';
 
@@ -35,8 +34,15 @@ function getScenarioHint() {
 }
 
 export function mount(container, config = {}) {
-  const seeds = config.ideas || improvementIdeas;
+  const seeds = config.ideas;
+  const paperLabel = config.paperLabel || 'the paper';
+  const paperId = config.paperId || null;
   let highlightedSeedIds = new Set();
+
+  if (!seeds?.length) {
+    container.textContent = 'Ideas workshop requires config.ideas in lab-data.js';
+    return;
+  }
 
   container.className = 'playground playground--ideas playground--interactive';
   container.innerHTML = `
@@ -76,19 +82,23 @@ export function mount(container, config = {}) {
         <div class="ideas-form">
           <div class="ideas-form__field">
             <label class="ideas-form__label" for="ideas-limitation">Limitation</label>
-            <input type="text" id="ideas-limitation" class="ideas-field" data-field="limitation" placeholder="e.g. DCI fails on web-scale corpora" autocomplete="off">
-          </div>
-          <div class="ideas-form__field ideas-form__field--wide">
-            <label class="ideas-form__label" for="ideas-improvement">Your improvement</label>
-            <textarea id="ideas-improvement" class="ideas-field ideas-field--area" rows="3" data-field="improvement" placeholder="What would you build or change?"></textarea>
+            <p class="ideas-form__hint">What gap or failure mode does your idea address?</p>
+            <input type="text" id="ideas-limitation" class="ideas-field" data-field="limitation" placeholder="e.g. fails on web-scale corpora" autocomplete="off">
           </div>
           <div class="ideas-form__field">
-            <label class="ideas-form__label" for="ideas-why">Why better than plain DCI?</label>
-            <textarea id="ideas-why" class="ideas-field ideas-field--area" rows="2" data-field="whyBetter" placeholder="Expected gain — accuracy, cost, safety, scale…"></textarea>
+            <label class="ideas-form__label" for="ideas-improvement">Your improvement</label>
+            <p class="ideas-form__hint">What would you build or change?</p>
+            <textarea id="ideas-improvement" class="ideas-field ideas-field--area" rows="3" data-field="improvement" placeholder="Describe your proposed method or interface change…"></textarea>
+          </div>
+          <div class="ideas-form__field">
+            <label class="ideas-form__label" for="ideas-why">Why better than the paper's approach?</label>
+            <p class="ideas-form__hint">Expected gain — accuracy, cost, safety, scale…</p>
+            <textarea id="ideas-why" class="ideas-field ideas-field--area" rows="2" data-field="whyBetter" placeholder="What improves vs. the baseline, and why?"></textarea>
           </div>
           <div class="ideas-form__field">
             <label class="ideas-form__label" for="ideas-risk">What could still break?</label>
-            <textarea id="ideas-risk" class="ideas-field ideas-field--area" rows="2" data-field="risk" placeholder="Honest tradeoff or failure mode"></textarea>
+            <p class="ideas-form__hint">Honest tradeoff or failure mode under stress.</p>
+            <textarea id="ideas-risk" class="ideas-field ideas-field--area" rows="2" data-field="risk" placeholder="When would this approach fail or cost too much?"></textarea>
           </div>
         </div>
         <div class="ideas-toolbar">
@@ -176,7 +186,8 @@ export function mount(container, config = {}) {
   const sendToChat = (draft, seed, send = false) => {
     document.dispatchEvent(new CustomEvent('dci:chat-prefill', {
       detail: {
-        message: formatIdeaForChat(draft, seed),
+        message: formatIdeaForChat(draft, seed, paperLabel),
+        paperId,
         scroll: true,
         send,
         highlight: true,
@@ -292,8 +303,8 @@ export function mount(container, config = {}) {
           <h4>Stress-test your idea</h4>
           <ul>
             <li>Which assumption from Assumption breaker does this fix?</li>
-            <li>Does it preserve DCI's localization advantage?</li>
-            <li>What experiment would prove it beats plain DCI?</li>
+            <li>Does it preserve the paper's core advantage?</li>
+            <li>What experiment would prove it beats the baseline?</li>
           </ul>
         </div>`;
     }
@@ -327,9 +338,9 @@ export function mount(container, config = {}) {
   renderSaved();
 }
 
-function formatIdeaForChat(draft, seed) {
+function formatIdeaForChat(draft, seed, paperLabel = 'the paper') {
   const title = seed?.title ? ` (${seed.title})` : '';
-  return `I'd like to discuss my improvement idea for DCI${title}:
+  return `I'd like to discuss my improvement idea for ${paperLabel}${title}:
 
 Limitation: ${draft.limitation || 'not specified'}
 Improvement: ${draft.improvement}

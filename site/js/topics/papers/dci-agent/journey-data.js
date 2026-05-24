@@ -387,11 +387,20 @@ export const paradigmSteps = {
   ],
 };
 
+export const assumptionToSeed = {
+  'local-corpus': 'web-scale-bridge',
+  'capable-agent': 'hybrid-interface',
+  'structured-files': 'hybrid-interface',
+  'latency-budget': 'hybrid-interface',
+  'no-index': 'web-scale-bridge',
+};
+
 export default {
   contextLevels,
   evidenceBenchmarks,
   contributions,
   assumptions,
+  assumptionToSeed,
   extensionPrompts,
   improvementIdeas,
   chatStarters,

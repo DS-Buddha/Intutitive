@@ -2,11 +2,14 @@
  * Paradigm compare — Figure 2 retriever-mediated vs DCI trajectory morph.
  */
 
-import { paradigmSteps } from '../topics/papers/dci-agent/journey-data.js';
-
 export function mount(container, config = {}) {
-  const retrieverSteps = config.retrieverSteps || paradigmSteps.retriever;
-  const dciSteps = config.dciSteps || paradigmSteps.dci;
+  const retrieverSteps = config.retrieverSteps;
+  const dciSteps = config.dciSteps;
+
+  if (!retrieverSteps?.length || !dciSteps?.length) {
+    container.textContent = 'Paradigm compare requires retrieverSteps and dciSteps in lab-data.js';
+    return;
+  }
 
   container.className = 'playground playground--paradigm';
   container.innerHTML = `

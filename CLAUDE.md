@@ -14,3 +14,9 @@ Project instructions live in **AGENTS.md**. Read these files before working in t
 - Cursor users get the same workflows via `.cursor/skills/` and `.cursor/rules/`
 
 Do not duplicate content here — keep AGENTS.md as the single source of truth.
+
+## Paper Journeys
+
+- **Gold standard:** `site/topics/papers/dci-agent/`
+- **Authoring spec:** [Papers/PAPER-JOURNEY-STANDARD.md](Papers/PAPER-JOURNEY-STANDARD.md)
+- Read [SOUL.md](SOUL.md) Paper Journey section before writing paper content

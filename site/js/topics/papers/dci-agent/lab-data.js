@@ -3,8 +3,9 @@
  */
 
 import { labScenarios, labChunks } from './dci-scenarios.js';
-import { corpusFiles, corpusPresets, terminalPlaygroundConfig } from './dci-corpus.js';
+import { corpusFiles, corpusPresets } from './dci-corpus.js';
 import journeyData from './journey-data.js';
+import { dciPlaygrounds } from './playground-configs.js';
 
 export default {
   defaultLabState: {
@@ -13,20 +14,10 @@ export default {
     resolution: 'line',
   },
   playgrounds: {
-    'interface-compare': { scenarios: labScenarios, chunks: labChunks, syncBus: true },
-    'topk-bottleneck': { scenarios: labScenarios, chunks: labChunks, syncBus: true },
-    'resolution': { document: labChunks.find(c => c.id === 'c3') },
-    'terminal-corpus': terminalPlaygroundConfig,
-    'coverage-metrics': { scenarios: labScenarios, chunks: labChunks, syncBus: true },
-    'paradigm-compare': {
-      retrieverSteps: journeyData.paradigmSteps.retriever,
-      dciSteps: journeyData.paradigmSteps.dci,
-    },
-    'context-level': { levels: journeyData.contextLevels },
-    'evidence-lens': { benchmarks: journeyData.evidenceBenchmarks },
-    'assumption-breaker': { assumptions: journeyData.assumptions },
-    'ideas-workshop': { ideas: journeyData.improvementIdeas },
-    'paper-chat': { paperId: 'dci-agent', starters: journeyData.chatStarters },
+    ...dciPlaygrounds,
+    'interface-compare': { ...dciPlaygrounds['interface-compare'], syncBus: true },
+    'topk-bottleneck': { ...dciPlaygrounds['topk-bottleneck'], syncBus: true },
+    'coverage-metrics': { ...dciPlaygrounds['coverage-metrics'], syncBus: true },
   },
   scenarios: labScenarios,
   chunks: labChunks,

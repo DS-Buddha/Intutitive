@@ -65,6 +65,11 @@ export function mountAll(conceptData = {}) {
       return;
     }
     const config = conceptData.playgrounds?.[type] || conceptData[type] || {};
-    mountFn(container, config);
+    try {
+      mountFn(container, config);
+    } catch (err) {
+      console.error(`Playground "${type}" failed to mount:`, err);
+      container.textContent = `Playground failed to load (${type}). Check the browser console.`;
+    }
   });
 }

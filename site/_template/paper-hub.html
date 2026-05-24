@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TODO: paper title — understand the paper end-to-end">
+  <link rel="stylesheet" href="../../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../../design-system/components.css">
+  <link rel="stylesheet" href="../../../design-system/animations.css">
+  <title>TODO: Paper Title — Paper Hub</title>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="../../../index.html">Home</a><span aria-hidden="true"> / </span>
+      <a href="../index.html">Papers</a><span aria-hidden="true"> / </span>
+      <span aria-current="page">TODO: short name</span>
+    </nav>
+  </header>
+  <div class="page-layout page-layout--paper">
+    <aside class="sidebar" aria-label="Paper navigation">
+      <nav class="module-tree" aria-label="Paper sections">
+        <h3 class="sidebar__heading">TODO: paper name</h3>
+        <ul class="sidebar__list" data-paper-nav></ul>
+      </nav>
+      <div class="readiness-panel">
+        <h3 class="sidebar__heading sidebar__heading--spaced">Research readiness</h3>
+        <ul class="readiness-list" data-readiness-checklist></ul>
+        <p class="readiness-banner" data-readiness-banner hidden>You're research-ready — you can explain the paper and propose extensions.</p>
+      </div>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section">
+        <p class="paper-meta">arXiv:TODO · Paper Journey</p>
+        <h1>TODO: Paper Title</h1>
+        <p class="paper-thesis">TODO: one-sentence thesis.</p>
+        <div class="tldr-pill"><strong>How it works:</strong> Read the paper holistically first (Part 1) → verify with playgrounds (Part 2) → critique and extend (Part 3).</div>
+        <div class="paper-hero-actions">
+          <a href="./lab.html#understand-hook" class="btn btn--primary">Begin — understand first →</a>
+          <a href="https://arxiv.org/abs/TODO" class="btn btn--secondary" target="_blank" rel="noopener">Read paper</a>
+        </div>
+      </section>
+
+      <section id="journey" class="content-section">
+        <h2>Your journey</h2>
+        <div data-journey-map></div>
+      </section>
+
+      <section id="concepts" class="content-section">
+        <h2>Deep dive on one concept</h2>
+        <p class="text-secondary">Optional — after Part 1, explore a single idea with its own mini-journey.</p>
+        <div class="concept-map" data-stagger>
+          <!-- TODO: concept-map__card links to ./concepts/*.html -->
+        </div>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initPaperHub } from '../../../js/core/paper-page.js';
+    initPaperHub('TODO-paper-id');
+  </script>
+</body>
+</html>

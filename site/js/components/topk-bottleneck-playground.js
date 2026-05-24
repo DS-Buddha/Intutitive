@@ -2,14 +2,19 @@
  * Top-k bottleneck — tune k and watch gold evidence get lost.
  */
 
-import { labChunks, labScenarios, rankByScenario } from '../topics/papers/dci-agent/dci-scenarios.js';
 import { getLabState, setLabState, subscribeLabState } from '../core/scenario-bus.js';
 import { markPlaygroundUsed } from '../core/playground-events.js';
 
 export function mount(container, config = {}) {
-  const scenarios = config.scenarios || labScenarios;
-  const chunks = config.chunks || labChunks;
+  const scenarios = config.scenarios;
+  const chunks = config.chunks;
+  const rankByScenario = config.rankByScenario;
   const syncBus = config.syncBus === true;
+
+  if (!scenarios?.length || !chunks?.length || !rankByScenario) {
+    container.textContent = 'Top-k bottleneck requires scenarios, chunks, and rankByScenario in lab-data.js';
+    return;
+  }
 
   container.className = 'playground playground--topk';
   container.innerHTML = `

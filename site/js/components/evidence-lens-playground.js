@@ -2,10 +2,13 @@
  * Evidence lens — interactive benchmark tables from paper §4.
  */
 
-import { evidenceBenchmarks } from '../topics/papers/dci-agent/journey-data.js';
-
 export function mount(container, config = {}) {
-  const benchmarks = config.benchmarks || evidenceBenchmarks;
+  const benchmarks = config.benchmarks;
+
+  if (!benchmarks?.length) {
+    container.textContent = 'Evidence lens requires config.benchmarks in lab-data.js';
+    return;
+  }
 
   container.className = 'playground playground--evidence';
   container.innerHTML = `
@@ -40,26 +43,27 @@ export function mount(container, config = {}) {
   const insight = container.querySelector('[data-ev-insight]');
 
   benchSel.innerHTML = benchmarks.map(b =>
-    `<option value="${b.id}">${b.label} (${b.paperSection})</option>`
+    `<option value="${b.id}">${escapeHtml(b.label)} (${escapeHtml(b.paperSection)})</option>`
   ).join('');
 
   const render = () => {
     const bench = benchmarks.find(b => b.id === state.benchmarkId);
     state.revealed = false;
     predictMsg.hidden = true;
+    const showCost = bench.baselines.some(b => b.cost != null);
 
     predictSel.innerHTML = `<option value="">— predict before reveal —</option>` +
-      bench.baselines.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+      bench.baselines.map(b => `<option value="${escapeAttr(b.name)}">${escapeHtml(b.name)}</option>`).join('');
 
     chart.innerHTML = `
       <table class="paper-table evidence-table">
-        <thead><tr><th>System</th><th>Score</th>${bench.baselines.some(b => b.cost) ? '<th>Cost ($)</th>' : ''}</tr></thead>
+        <thead><tr><th>System</th><th>Score</th>${showCost ? '<th>Cost ($)</th>' : ''}</tr></thead>
         <tbody>
-          ${bench.baselines.map(b => `
-            <tr class="evidence-row" data-ev-row="${b.name}">
-              <td>${b.name}</td>
-              <td><span class="evidence-score" data-ev-score="${b.name}">?</span></td>
-              ${bench.baselines.some(x => x.cost) ? `<td>${b.cost != null ? `<span data-ev-cost="${b.name}">?</span>` : '—'}</td>` : ''}
+          ${bench.baselines.map((b, i) => `
+            <tr class="evidence-row" data-ev-row="${i}">
+              <td>${escapeHtml(b.name)}</td>
+              <td><span class="evidence-score" data-ev-score="${i}">?</span></td>
+              ${showCost ? `<td>${b.cost != null ? `<span data-ev-cost="${i}">?</span>` : '—'}</td>` : ''}
             </tr>
           `).join('')}
         </tbody>
@@ -73,13 +77,13 @@ export function mount(container, config = {}) {
     const bench = benchmarks.find(b => b.id === state.benchmarkId);
     state.revealed = true;
 
-    bench.baselines.forEach(b => {
-      const scoreEl = chart.querySelector(`[data-ev-score="${b.name}"]`);
+    bench.baselines.forEach((b, i) => {
+      const scoreEl = chart.querySelector(`[data-ev-score="${i}"]`);
       if (scoreEl) scoreEl.textContent = `${b.accuracy}%`;
-      const costEl = chart.querySelector(`[data-ev-cost="${b.name}"]`);
-      if (costEl) costEl.textContent = b.cost.toLocaleString();
+      const costEl = chart.querySelector(`[data-ev-cost="${i}"]`);
+      if (costEl && b.cost != null) costEl.textContent = b.cost.toLocaleString();
 
-      const row = chart.querySelector(`[data-ev-row="${b.name}"]`);
+      const row = chart.querySelector(`[data-ev-row="${i}"]`);
       const isWinner = b.accuracy === Math.max(...bench.baselines.map(x => x.accuracy));
       row?.classList.toggle('evidence-row--winner', isWinner);
     });
@@ -111,4 +115,12 @@ export function mount(container, config = {}) {
   });
 
   render();
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function escapeAttr(s) {
+  return String(s).replace(/"/g, '&quot;');
 }

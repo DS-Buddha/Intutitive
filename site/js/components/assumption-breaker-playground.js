@@ -1,20 +1,18 @@
 /**
- * Assumption breaker — toggle paper assumptions, flip DCI wins to struggles.
+ * Assumption breaker — toggle paper assumptions, flip claimed wins to struggles.
  */
 
-import { assumptions } from '../topics/papers/dci-agent/journey-data.js';
 import { trackProgressArray, setProgress, KEYS } from '../core/lab-progress.js';
 
-const ASSUMPTION_TO_SEED = {
-  'local-corpus': 'web-scale-bridge',
-  'capable-agent': 'hybrid-interface',
-  'structured-files': 'hybrid-interface',
-  'latency-budget': 'hybrid-interface',
-  'no-index': 'web-scale-bridge',
-};
-
 export function mount(container, config = {}) {
-  const items = config.assumptions || assumptions;
+  const items = config.assumptions;
+  const assumptionToSeed = config.assumptionToSeed || {};
+  const paperLabel = config.paperLabel || 'the paper';
+
+  if (!items?.length) {
+    container.textContent = 'Assumption breaker requires config.assumptions in lab-data.js';
+    return;
+  }
 
   container.className = 'playground playground--assumption playground--interactive';
   container.innerHTML = `
@@ -22,15 +20,15 @@ export function mount(container, config = {}) {
       <div class="playground__header-icon" aria-hidden="true">⚡</div>
       <div>
         <h3 class="playground__title">Assumption breaker</h3>
-        <p class="playground__subtitle">Turn assumptions off one at a time — see where DCI stops winning. Broken scenarios feed Ideas workshop below.</p>
+        <p class="playground__subtitle">Turn assumptions off one at a time — see where ${paperLabel} stops winning. Broken scenarios feed Ideas workshop below.</p>
       </div>
     </div>
     <div class="assumption-toggles" data-assumption-toggles></div>
     <div class="assumption-chips" data-assumption-chips hidden></div>
     <div class="assumption-scenario playground__panel" data-assumption-scenario>
-      <p class="playground__hint">All assumptions hold — DCI wins on lexical precision scenarios. Turn one off.</p>
+      <p class="playground__hint">All assumptions hold — ${paperLabel} wins on its home scenarios. Turn one off.</p>
     </div>
-    <p class="assumption-question"><strong>Would you still choose DCI here? Why?</strong></p>
+    <p class="assumption-question"><strong>Would you still choose this approach here? Why?</strong></p>
     <p class="playground__insight" data-assumption-verdict></p>
   `;
 
@@ -57,7 +55,7 @@ export function mount(container, config = {}) {
       label: a.label,
       verdict: a.breakScenario.verdict,
       title: a.breakScenario.title,
-      seedId: ASSUMPTION_TO_SEED[a.id] || null,
+      seedId: assumptionToSeed[a.id] || null,
     }))));
     document.dispatchEvent(new CustomEvent('dci:assumptions-changed', {
       detail: { broken: broken.map(a => a.id) },
@@ -70,8 +68,8 @@ export function mount(container, config = {}) {
       <h4>${s.title}</h4>
       <p class="text-secondary">Broken assumption: <em>${assumption.label}</em></p>
       <div class="assumption-outcomes">
-        <div class="assumption-outcome assumption-outcome--${s.dciOutcome}">DCI: ${s.dciOutcome}</div>
-        <div class="assumption-outcome assumption-outcome--${s.retrieverOutcome}">Retriever: ${s.retrieverOutcome}</div>
+        <div class="assumption-outcome assumption-outcome--${s.dciOutcome}">${paperLabel}: ${s.dciOutcome}</div>
+        <div class="assumption-outcome assumption-outcome--${s.retrieverOutcome}">Baseline: ${s.retrieverOutcome}</div>
       </div>
     `;
     verdictEl.textContent = s.verdict;
@@ -110,11 +108,11 @@ export function mount(container, config = {}) {
       activeBrokenId = null;
       scenarioEl.innerHTML = `
         <div class="assumption-outcome assumption-outcome--dci">
-          <span>DCI</span> wins · <span>Retriever</span> struggles
+          <span>${paperLabel}</span> wins · <span>Baseline</span> struggles
         </div>
-        <p>Exact SKU lookup, piped grep, error codes — DCI localizes evidence the retriever loses at low k.</p>
+        <p>All paper assumptions hold — this is ${paperLabel}'s home turf.</p>
       `;
-      verdictEl.textContent = 'All paper assumptions hold. This is DCI\'s home turf.';
+      verdictEl.textContent = `All paper assumptions hold. This is where ${paperLabel} shines.`;
       renderChips(broken);
       return;
     }
@@ -142,5 +140,3 @@ export function mount(container, config = {}) {
 
   render();
 }
-
-export { ASSUMPTION_TO_SEED };

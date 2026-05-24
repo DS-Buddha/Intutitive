@@ -2,7 +2,9 @@
 
 ## What This Project Is
 
-A static, zero-build-step web platform that teaches technical AI/ML topics through intuition-first, interactive learning. No backend. No npm. Pure HTML/CSS/JS (ES modules). Deployable on GitHub Pages or opened locally in a browser.
+A static, zero-build-step web platform that teaches technical AI/ML topics through intuition-first, interactive learning. No npm. Pure HTML/CSS/JS (ES modules). Deployable on GitHub Pages or opened locally in a browser.
+
+Paper chat uses an optional local dev server (`server/dev_server.py`) to proxy Gemini — API key stays in `.env`, never in the browser. All other pages work with plain static hosting.
 
 **Designed for practitioners** who want to understand the *why* and *how* of a concept before implementing it. Every topic follows a standardized structure enforced by templates, making it trivial to add new subjects (Transformers, RL, Attention, etc.).
 
@@ -28,13 +30,15 @@ Intutitive/
 ├── SOUL.md                    (mission, principles, voice)
 ├── SKILLS.md                  (project skills catalog)
 ├── ERROR.md                   (known error patterns and fixes)
+├── Papers/                    (Paper-Notes source + PAPER-JOURNEY-STANDARD.md)
 ├── RAG/                       (Obsidian source notes — reference only)
+├── server/                    (dev_server.py + prompts/ for Paper chat)
 └── site/                      (all deliverable static files)
     ├── index.html             (landing page / topic browser)
     ├── design-system/         (tokens.css, components.css, animations.css)
     ├── js/                    (core, components, topics subdirectories)
-    ├── topics/                (topic folders: rag/, transformers/, etc.)
-    ├── _template/             (copy these when adding a new topic/concept)
+    ├── topics/                (topic folders: rag/, papers/, etc.)
+    ├── _template/             (concept-leaf, paper-hub, paper-lab templates)
     └── assets/                (icons, fonts)
 ```
 
@@ -96,6 +100,29 @@ Use the `new-concept-page` skill (see SKILLS.md) to automate this workflow.
 7. No build step. Refresh browser.
 
 Use the `new-topic` skill (see SKILLS.md) to automate this workflow.
+
+## How to Add a Paper Journey
+
+Research papers use a standardized three-part journey (Understand → Verify → Think). **DCI is the gold standard** — every new paper must match its shell and UX.
+
+**Read first:** [Papers/PAPER-JOURNEY-STANDARD.md](Papers/PAPER-JOURNEY-STANDARD.md)
+
+1. Write `Papers/<Paper-Name>/Paper-Notes.md` (assumptions, limits, extensions, benchmark numbers)
+2. Copy `site/_template/paper-hub.html` → `site/topics/papers/<paper-id>/index.html`
+3. Copy `site/_template/paper-lab.html` → `site/topics/papers/<paper-id>/lab.html`
+4. Create `site/js/topics/papers/<paper-id>/journey-data.js` and `lab-data.js`
+5. Add entry to `site/js/topics/paperRegistry.js` (include `understandSectionIds`, `coreVerifyPlaygrounds`, `readinessChecks`)
+6. Add `server/prompts/<paper-id>.md` for Gemini Paper chat
+7. Run `python server/dev_server.py` and audit structure against [DCI lab](site/topics/papers/dci-agent/lab.html)
+
+**Rules:**
+
+- Part 1 (read-only) before any playground
+- Reuse shared chrome: journey bar, readiness panel, onboarding, Think pipeline
+- Pass all paper content via `lab-data.js` config — do not import paper data in shared playground components
+- No per-paper CSS — design-system tokens only
+
+Use the `new-paper-journey` skill (see SKILLS.md) to automate this workflow.
 
 ## Design System
 

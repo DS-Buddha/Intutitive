@@ -4,11 +4,14 @@
 
 import { isFlag, setFlag, KEYS } from './lab-progress.js';
 
-export function initLabOnboarding() {
+export function initLabOnboarding(options = {}) {
   if (isFlag(KEYS.onboardingDismissed)) return;
 
   const hook = document.getElementById('understand-hook');
   if (!hook) return;
+
+  const title = options.title || 'this paper';
+  const timeEstimate = options.timeEstimate || '45–60 min';
 
   const card = document.createElement('div');
   card.className = 'lab-onboarding';
@@ -16,9 +19,9 @@ export function initLabOnboarding() {
   card.setAttribute('aria-label', 'How to use this journey');
   card.innerHTML = `
     <div class="lab-onboarding__content">
-      <h2 class="lab-onboarding__title">Welcome to the DCI Paper Journey</h2>
+      <h2 class="lab-onboarding__title">Welcome to the ${escapeHtml(title)} Paper Journey</h2>
       <ul class="lab-onboarding__list">
-        <li><strong>~45–60 min</strong> — read Part 1, try Part 2 labs, then think in Part 3</li>
+        <li><strong>${escapeHtml(timeEstimate)}</strong> — read Part 1, try Part 2 labs, then think in Part 3</li>
         <li><strong>Part 1 is read-only</strong> — finish before playgrounds (Part 2 unlocks understanding)</li>
         <li><strong>Paper chat</strong> needs <code>python server/dev_server.py</code> and <code>GEMINI_API_KEY</code> in <code>.env</code></li>
       </ul>
@@ -32,4 +35,8 @@ export function initLabOnboarding() {
     setFlag(KEYS.onboardingDismissed);
     card.remove();
   });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
