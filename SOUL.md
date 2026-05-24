@@ -114,3 +114,12 @@ A concept page succeeds if:
 - A reader visits the page, then comes back two weeks later and remembers the core idea (we're building long-term understanding, not cramming)
 
 We don't measure by page views or time on site. We measure by "did this person's mental model change."
+
+## For Agents
+
+Before writing or reviewing concept content, read this file.
+
+In Cursor, the `content-voice` rule applies when editing `site/**/*.html`.
+Use the `check-page-completeness` and `quiz-quality-check` skills before marking a page done.
+
+See also: [AGENTS.md](AGENTS.md) for repo conventions, [SKILLS.md](SKILLS.md) for workflows.

@@ -1,0 +1,30 @@
+---
+description: Intuitive Learning Platform — static site, no build step, local HTTP server required
+alwaysApply: true
+---
+
+# Project Overview
+
+Static, zero-build-step learning platform. Pure HTML/CSS/JS (ES modules). No backend, no npm, no CDN dependencies.
+
+## Constraints
+
+- **Always run a local HTTP server** — ES modules fail on `file://`. Use `python -m http.server 8080` from `site/`.
+- **No build step** — edit files and refresh the browser.
+- **No external dependencies** — everything works offline after serving locally.
+- **Relative paths only** — all HTML links and asset paths must be relative.
+
+## Key paths
+
+- Deliverables: `site/`
+- Templates: `site/_template/`
+- Design tokens: `site/design-system/tokens.css` (single source for colors, spacing, timing)
+- Topic registry: `site/js/topics/registry.js`
+- Source notes: `RAG/` (reference only, not deployed)
+
+## Conventions
+
+- One quiz per concept — passing the quiz marks a concept as learned (localStorage)
+- Analogy before mechanism — interactive viz teaches without jargon first
+- Every failure mode matters — show what breaks without the technique
+- Read SOUL.md before writing content; see ERROR.md when debugging runtime issues

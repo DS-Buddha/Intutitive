@@ -2,6 +2,14 @@
 
 When something goes wrong on the platform, refer to this file first. Each error includes the symptom, root cause, and fix.
 
+## For Cursor Agents
+
+When debugging this repo:
+
+1. Run the local server (`python -m http.server 8080 --directory site`) before testing ES modules
+2. Use browser DevTools for progress/quiz issues — grep `initProgress`, `data-quiz-id`, `data-progress-ring`
+3. If the agent cannot reproduce UI bugs, ask the user to paste console errors
+
 ---
 
 ## ES Module CORS Error When Opening from Filesystem
@@ -38,7 +46,7 @@ Or Node.js (if you have it):
 npx http-server site -p 8080
 ```
 
-This is expected behavior — see CLAUDE.md for instructions.
+This is expected behavior — see AGENTS.md for instructions.
 
 ---
 
@@ -471,7 +479,7 @@ Missing or incorrect ARIA roles, or elements lack `tabindex`.
    });
    ```
 
-See CLAUDE.md for accessibility testing checklist.
+See AGENTS.md for accessibility testing checklist.
 
 ---
 
@@ -484,7 +492,7 @@ If your error isn't listed here:
 3. **Check network** — DevTools → Network → look for failed requests (404s for CSS/JS)
 4. **Check HTML** — View Page Source (Ctrl+U) and search for typos in data attributes
 5. **Grep the codebase** — search for the error message or the broken feature name
-6. **Read SOUL.md and CLAUDE.md** — for principles and conventions that might clarify the issue
+6. **Read SOUL.md and AGENTS.md** — for principles and conventions that might clarify the issue
 7. **Add debug logs** — `console.log` at each step to track the execution flow
 
 If you find a new error pattern, add it to this file with the same structure:

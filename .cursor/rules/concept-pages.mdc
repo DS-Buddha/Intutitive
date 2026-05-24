@@ -1,0 +1,39 @@
+---
+description: Concept page structure, 7 sections, quiz gating, slug alignment
+globs: site/topics/**,site/_template/**
+alwaysApply: false
+---
+
+# Concept Pages
+
+Every concept page has exactly 7 sections with these ids:
+
+1. `hook` — analogy, no jargon
+2. `why-it-matters` — failure narrative (what breaks without this)
+3. `interactive-viz` — animation-first teaching
+4. `core-mechanism` — technical details
+5. `tradeoffs` — use-when / poor-fit-when
+6. `connections` — prerequisites and downstream concepts
+7. `check-understanding` — quiz (the gate)
+
+## Adding a concept
+
+1. Copy `site/_template/concept-leaf.html` → `site/topics/<topic>/<concept-slug>.html`
+2. Create `site/js/topics/<topic>/<concept-slug>-data.js` (quiz, viz config)
+3. Update `site/topics/<topic>/index.html` (link card)
+4. Update `site/js/topics/registry.js` (reading order)
+
+## Slug alignment (critical)
+
+These three must match exactly (kebab-case):
+
+- Topic `id` in `registry.js`
+- `data-progress-ring` on the progress ring container
+- `initProgress('<topic-id>', '<concept-slug>')` call
+- `data-quiz-id` on `.quiz-container` must match concept slug
+
+## Viz and quiz attributes
+
+- `data-viz-type` must exist in `pipeline-viz.js` mountAll() switch
+- Quiz needs ≥ 2 MC questions with `correct` index and `explanation`
+- Include `<noscript>` fallback for the interactive viz

@@ -1,0 +1,26 @@
+---
+description: Design tokens only — no magic numbers in CSS outside tokens.css
+globs: site/design-system/**,**/*.css
+alwaysApply: false
+---
+
+# Design System
+
+All CSS values must come from `site/design-system/tokens.css`. No hardcoded px, rem, hex, rgb, or color names elsewhere.
+
+## Token files
+
+- `tokens.css` — colors (`--color-*`, `--stage-*`), spacing (`--space-*`), typography (`--text-*`, `--weight-*`), shadows, timing
+- `components.css` — layout, cards, callouts (uses tokens only)
+- `animations.css` — keyframes and animation utilities (uses tokens only)
+
+## Naming
+
+- CSS classes: BEM-lite (`section--hook`, `callout callout--use`, `viz-container`)
+- Custom properties: lowercase with hyphens (`--color-accent-primary`)
+
+## Adding new values
+
+Define new colors, spacing, or durations in `tokens.css` first, then reference via `var(--*)` everywhere else.
+
+Run the `design-system-audit` skill to find violations.

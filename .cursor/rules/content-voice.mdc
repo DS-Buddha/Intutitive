@@ -1,0 +1,36 @@
+---
+description: Three-Moment Rule, analogy-first voice, quiz gating for concept content
+globs: site/**/*.html,RAG/**
+alwaysApply: false
+---
+
+# Content Voice
+
+Read SOUL.md for full philosophy. Apply these when writing or editing concept pages.
+
+## Three-Moment Rule
+
+Every concept page must create:
+
+1. **"Oh, I've seen this before"** — analogy lands in `#hook` and `#interactive-viz`
+2. **"Now I get why this is hard"** — failure visible in `#why-it-matters`
+3. **"I could explain this to someone else"** — quiz passed in `#check-understanding`
+
+## Voice
+
+- Direct and concrete, not academic
+- Use "you" and "your corpus" — address practitioners
+- Short sentences, active verbs
+- Take positions — no hedging
+- Concrete examples over abstract principles
+
+## Banned patterns
+
+- Definition before analogy
+- Passive consumption (no "read this paragraph" without interaction)
+- Multiple concepts per page
+- Quiz as optional bonus — quiz is the gate
+
+## Progressive disclosure
+
+TL;DR → Visual → Details → Tradeoffs → Quiz. A reader should grasp the core idea from the first three sections without reading technical details.

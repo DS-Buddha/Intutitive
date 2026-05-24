@@ -1,0 +1,35 @@
+---
+description: ES module patterns, eventbus, progress tracking, localStorage keys
+globs: site/js/**
+alwaysApply: false
+---
+
+# JavaScript Modules
+
+Vanilla ES modules only. No bundler, no npm packages.
+
+## Architecture
+
+- `site/js/core/eventbus.js` — pub/sub between components (`emit`, `on`)
+- `site/js/core/progress.js` — localStorage progress (`intuitive:progress:<topic-id>`)
+- `site/js/core/router.js` — scroll-spy section navigation (IntersectionObserver)
+- `site/js/components/` — quiz, pipeline-viz, tab-panel, comparison, etc.
+- `site/js/topics/registry.js` — single source of truth for topics and reading order
+
+## Progress and quiz flow
+
+1. Quiz completes → `emit('quiz:passed', { conceptSlug })`
+2. `progress.js` listens and writes to localStorage
+3. Progress ring reads from same topic id as registry
+
+## Common pitfalls
+
+- Topic id case mismatch across registry, `data-progress-ring`, and `initProgress()`
+- Quiz score must use `>= 0.75` (float), not `>= 75` (integer division)
+- `data-viz-type` must match a handler in `pipeline-viz.js`
+- Comparison slider needs `{ passive: false }` and `preventDefault()` on pointermove
+
+## Data files
+
+- Naming: `<concept-slug>-data.js` in `site/js/topics/<topic>/`
+- Export `quiz` array and viz config (`stages`, `comparison`, etc.)

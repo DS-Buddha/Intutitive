@@ -6,11 +6,16 @@ The Intuitive Learning Platform foundation is now complete and ready for content
 
 ### 📋 Completed Files
 
-#### Claude Code Project Files (Root)
-- ✓ `CLAUDE.md` — How to use and extend the platform
+#### Agent Project Files (Root)
+- ✓ `AGENTS.md` — Shared repo guide (Cursor, Codex, and other agents)
+- ✓ `CLAUDE.md` — Claude Code entry point (pointer to AGENTS.md)
 - ✓ `SOUL.md` — Project mission, design principles, voice
-- ✓ `SKILLS.md` — Custom Claude Code skills for automating common tasks
+- ✓ `SKILLS.md` — Skill catalog with Cursor and Claude Code invocation
 - ✓ `ERROR.md` — Known error patterns and fixes
+
+#### Cursor Configuration (`.cursor/`)
+- ✓ `.cursor/rules/` — 5 scoped rules (project overview, concept pages, design system, JS modules, content voice)
+- ✓ `.cursor/skills/` — 9 executable project skills
 
 #### Design System (`site/design-system/`)
 - ✓ `tokens.css` — 90+ CSS custom properties (colors, typography, spacing, timing, etc.)
@@ -50,12 +55,9 @@ The Intuitive Learning Platform foundation is now complete and ready for content
 ### For Adding Content
 
 1. **Prepare source material** from `RAG/` Obsidian notes
-2. Use the `/new-concept-page` skill in Claude Code to scaffold a concept page:
-   ```
-   /new-concept-page
-   Topic: RAG
-   Concept: Late Interaction (ColBERT)
-   ```
+2. Use the `new-concept-page` skill to scaffold a concept page:
+   - **Cursor:** `Use the new-concept-page skill — Topic: RAG, Concept: Late Interaction (ColBERT)`
+   - **Claude Code:** `/new-concept-page` with topic and concept details
 3. Fill in the sections of the template with:
    - Real-world analogy (hook)
    - Failure narrative (why-it-matters)
@@ -164,10 +166,12 @@ When you're ready to add content, edit these files:
 
 ## Documentation
 
-- **For platform usage**: Read `CLAUDE.md`
+- **For platform usage**: Read `AGENTS.md`
+- **For Claude Code**: Read `CLAUDE.md` (points to AGENTS.md)
 - **For design principles**: Read `SOUL.md`
-- **For custom skills**: Read `SKILLS.md`
+- **For agent skills**: Read `SKILLS.md` and `.cursor/skills/`
 - **For troubleshooting**: Read `ERROR.md`
+- **For Cursor rules**: See `.cursor/rules/`
 
 ---
 
