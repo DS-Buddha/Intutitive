@@ -10,344 +10,101 @@
   <link rel="stylesheet" href="design-system/animations.css">
 
   <title>Intuitive Learning — AI/ML Concepts</title>
-
-  <style>
-    .hero {
-      text-align: center;
-      padding: var(--space-20) var(--space-8);
-      background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .hero h1 {
-      font-size: var(--text-5xl);
-      margin: 0 0 var(--space-4) 0;
-      color: var(--color-text-primary);
-    }
-
-    .hero p {
-      font-size: var(--text-xl);
-      color: var(--color-text-secondary);
-      margin: 0 0 var(--space-6) 0;
-    }
-
-    .how-it-works {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-6);
-      padding: var(--space-12) var(--space-8);
-      max-width: var(--max-width-content);
-      margin: 0 auto;
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .how-card {
-      text-align: center;
-      padding: var(--space-6);
-    }
-
-    .how-icon {
-      font-size: var(--text-4xl);
-      margin-bottom: var(--space-4);
-    }
-
-    .how-card h3 {
-      font-size: var(--text-lg);
-      margin: 0 0 var(--space-2) 0;
-    }
-
-    .how-card p {
-      font-size: var(--text-sm);
-      color: var(--color-text-secondary);
-      margin: 0;
-    }
-
-    .topics-section {
-      padding: var(--space-12) var(--space-8);
-      max-width: var(--max-width-content);
-      margin: 0 auto;
-    }
-
-    .topics-section h2 {
-      text-align: center;
-      margin: 0 0 var(--space-12) 0;
-    }
-
-    .topic-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: var(--space-6);
-      margin-bottom: var(--space-12);
-    }
-
-    .topic-card {
-      background-color: var(--color-bg-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg);
-      padding: var(--space-6);
-      transition: all var(--duration-normal) var(--ease-out);
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-4);
-    }
-
-    .topic-card:hover {
-      background-color: var(--color-bg-elevated);
-      border-color: var(--color-accent-primary);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .topic-card a {
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .topic-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-    }
-
-    .topic-icon {
-      font-size: 2.5rem;
-    }
-
-    .topic-meta {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: var(--space-2);
-    }
-
-    .concept-count {
-      font-size: var(--text-sm);
-      color: var(--color-text-secondary);
-    }
-
-    .topic-title {
-      font-size: var(--text-lg);
-      font-weight: var(--weight-semibold);
-      margin: 0;
-      color: var(--color-text-primary);
-    }
-
-    .topic-description {
-      font-size: var(--text-sm);
-      color: var(--color-text-secondary);
-      margin: 0;
-      flex: 1;
-    }
-
-    .topic-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--space-4);
-      padding-top: var(--space-4);
-      border-top: 1px solid var(--color-border);
-    }
-
-    .progress-ring-container {
-      width: 80px;
-      height: 80px;
-    }
-
-    .status-badge {
-      padding: var(--space-1) var(--space-3);
-      border-radius: var(--radius-full);
-      font-size: var(--text-xs);
-      font-weight: var(--weight-semibold);
-      background-color: var(--color-accent-primary);
-      color: var(--color-text-inverse);
-    }
-
-    .status-badge.in-progress {
-      background-color: var(--color-accent-warning);
-    }
-
-    .status-badge.complete {
-      background-color: var(--color-accent-secondary);
-    }
-
-    .reading-order {
-      padding: var(--space-12) var(--space-8);
-      max-width: var(--max-width-content);
-      margin: 0 auto;
-      border-top: 1px solid var(--color-border);
-    }
-
-    .reading-order h2 {
-      margin: 0 0 var(--space-6) 0;
-      text-align: center;
-    }
-
-    .reading-order-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-3);
-      justify-content: center;
-    }
-
-    .reading-step {
-      padding: var(--space-2) var(--space-4);
-      background-color: var(--color-bg-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      font-size: var(--text-sm);
-      color: var(--color-text-secondary);
-    }
-
-    .reading-step.current {
-      background-color: var(--color-accent-primary);
-      color: var(--color-text-inverse);
-      border-color: var(--color-accent-primary);
-    }
-
-    @media (max-width: 640px) {
-      .hero {
-        padding: var(--space-12) var(--space-4);
-      }
-
-      .hero h1 {
-        font-size: var(--text-3xl);
-      }
-
-      .how-it-works {
-        grid-template-columns: 1fr;
-        padding: var(--space-8) var(--space-4);
-      }
-
-      .topics-section,
-      .reading-order {
-        padding: var(--space-8) var(--space-4);
-      }
-
-      .topic-card {
-        padding: var(--space-4);
-      }
-    }
-  </style>
 </head>
 <body>
-  <!-- ── HEADER ────────────────────────────────────────── -->
   <header class="site-header">
     <nav class="breadcrumb">
       <span aria-current="page">Intuitive Learning</span>
     </nav>
   </header>
 
-  <!-- ── HERO SECTION ──────────────────────────────────── -->
-  <section class="hero" data-reveal="fade-up">
+  <section class="landing-hero" data-reveal="fade-up">
     <h1>Technical AI/ML, Explained Through Intuition</h1>
-    <p>Understand the why and how before reading a single line of code.</p>
-    <a href="#topics" class="btn-primary">Start Learning</a>
+    <p>
+      Learn by doing — tweak parameters in interactive sandboxes and see exactly what happens under the hood.
+      No account. No setup. Start in 30 seconds.
+    </p>
+    <div class="landing-hero__actions">
+      <a href="./topics/rag/baseline.html" class="btn-primary">Start with RAG →</a>
+      <a href="#topics" class="btn-secondary">Browse topics</a>
+    </div>
   </section>
 
-  <!-- ── HOW IT WORKS ──────────────────────────────────── -->
-  <section class="how-it-works">
-    <div class="how-card" data-reveal="fade-up">
-      <div class="how-icon">💡</div>
+  <section class="landing-how">
+    <div class="landing-how-card" data-reveal="fade-up">
+      <div class="landing-how-card__icon">💡</div>
       <h3>Analogy First</h3>
-      <p>Every concept starts with a real-world analogy that makes it click.</p>
+      <p>Every concept starts with a real-world analogy — you understand it before seeing jargon.</p>
     </div>
-    <div class="how-card" data-reveal="fade-up">
-      <div class="how-icon">🎬</div>
-      <h3>Interactive Demo</h3>
-      <p>See the concept in action before learning the technical details.</p>
+    <div class="landing-how-card" data-reveal="fade-up">
+      <div class="landing-how-card__icon">🔬</div>
+      <h3>Playground Sandboxes</h3>
+      <p>Chunk text, inspect vectors, rank by similarity — manipulate every stage interactively.</p>
     </div>
-    <div class="how-card" data-reveal="fade-up">
-      <div class="how-icon">✓</div>
-      <h3>Check Yourself</h3>
-      <p>Quiz yourself to confirm understanding. Concepts are learned when you pass.</p>
-    </div>
-  </section>
-
-  <!-- ── TOPICS GRID ───────────────────────────────────── -->
-  <section class="topics-section" id="topics">
-    <h2>Available Topics</h2>
-    <div class="topic-grid" id="topic-grid" data-stagger>
-      <!-- Populated by JS -->
+    <div class="landing-how-card" data-reveal="fade-up">
+      <div class="landing-how-card__icon">🔗</div>
+      <h3>Full Pipeline</h3>
+      <p>Wire stages together and see the exact prompt that would be sent to an LLM.</p>
     </div>
   </section>
 
-  <!-- ── READING ORDER ──────────────────────────────────– -->
-  <section class="reading-order" id="reading-order-section" style="display:none;">
-    <h2>Suggested Reading Order: RAG</h2>
-    <div class="reading-order-list" id="reading-order-list">
-      <!-- Populated by JS -->
-    </div>
+  <section class="landing-topics" id="topics">
+    <h2>Topics</h2>
+    <div class="landing-topic-grid" id="topic-grid" data-stagger></div>
   </section>
 
-  <!-- ── SCRIPTS ────────────────────────────────────────– -->
+  <section class="landing-topics" id="papers">
+    <h2>Paper Explainers</h2>
+    <p class="text-secondary text-center" style="max-width:36rem;margin:0 auto var(--space-6);">
+      Research papers as visual stories — scrubbable scenes, granular concepts, terminal playgrounds.
+    </p>
+    <div class="landing-topic-grid" id="paper-grid" data-stagger></div>
+  </section>
+
+  <section class="landing-reading-order" id="reading-order-section">
+    <h2>Learning Path: RAG</h2>
+    <p class="text-secondary text-center" style="max-width:36rem;margin:0 auto;">
+      Follow this order — each concept builds on the last.
+    </p>
+    <div class="landing-path" id="reading-order-list"></div>
+  </section>
+
   <script type="module">
     import { topics, getTopic } from './js/topics/registry.js';
-    import { getTopicCompletion, getTopicProgress } from './js/core/progress.js';
+    import { getAllPapers } from './js/topics/paperRegistry.js';
+
+    const ICONS = {
+      'search-doc': '🔍',
+      'brain': '🧠',
+      'zap': '⚡',
+      'layers': '📚',
+      'network': '🕸️',
+    };
 
     function renderTopics() {
       const grid = document.getElementById('topic-grid');
       grid.innerHTML = '';
 
       topics.forEach(topic => {
-        const completion = getTopicCompletion(topic.id, topic.conceptCount);
-        const status = completion === 0 ? 'Start' : (completion === 100 ? 'Complete' : 'In progress');
-        const statusClass = completion === 0 ? '' : (completion === 100 ? 'complete' : 'in-progress');
-
-        const card = document.createElement('div');
-        card.className = 'topic-card';
+        const card = document.createElement('a');
+        card.href = topic.hubPath;
+        card.className = 'landing-topic-card';
         card.setAttribute('data-reveal', 'fade-up');
-        card.style.animationDelay = `${topics.indexOf(topic) * 100}ms`;
         card.innerHTML = `
-          <div class="topic-header">
+          <div class="landing-topic-card__header">
             <div>
-              <div class="topic-icon">${getTopicIcon(topic.icon)}</div>
-              <h3 class="topic-title">${topic.title}</h3>
+              <div class="landing-topic-card__icon">${ICONS[topic.icon] || '📖'}</div>
+              <h3 class="landing-topic-card__title">${topic.title}</h3>
             </div>
-            <div class="topic-meta">
-              <span class="concept-count">${topic.conceptCount} concepts</span>
-            </div>
+            <span class="pill pill--primary">Explore</span>
           </div>
-          <p class="topic-description">${topic.description}</p>
-          <div class="topic-footer">
-            <div class="progress-ring-container" data-progress-ring="${topic.id}" data-concept-count="${topic.conceptCount}">
-              <svg width="80" height="80" viewBox="0 0 100 100" style="width:100%;height:100%;">
-                <circle cx="50" cy="50" r="45" fill="none" stroke="var(--color-border)" stroke-width="4"></circle>
-                <circle cx="50" cy="50" r="45" fill="none" stroke="var(--color-accent-primary)" stroke-width="4"
-                        stroke-linecap="round" stroke-dasharray="282.7 282.7" data-progress-stroke
-                        style="transform: rotate(-90deg); transform-origin: 50px 50px; stroke-dashoffset: 282.7;"></circle>
-                <text x="50" y="57" text-anchor="middle" fill="var(--color-text-secondary)" font-size="18" font-weight="600" data-progress-text>0%</text>
-              </svg>
-            </div>
-            <span class="status-badge ${statusClass}">${status}</span>
+          <p class="landing-topic-card__desc">${topic.description}</p>
+          <div class="landing-topic-card__footer">
+            <span class="text-secondary" style="font-size:var(--text-sm);">${topic.conceptCount} concepts</span>
+            <span class="btn-secondary" style="pointer-events:none;">Open →</span>
           </div>
-          <a href="${topic.hubPath}" style="text-decoration:none;color:inherit;" class="btn-secondary" style="width:100%;text-align:center;">View Topic</a>
         `;
         grid.appendChild(card);
-      });
-
-      // Update progress rings after rendering
-      updateProgressRings();
-    }
-
-    function updateProgressRings() {
-      topics.forEach(topic => {
-        const ring = document.querySelector(`[data-progress-ring="${topic.id}"]`);
-        if (ring) {
-          const completion = getTopicCompletion(topic.id, topic.conceptCount);
-          const circle = ring.querySelector('circle[data-progress-stroke]');
-          const text = ring.querySelector('text[data-progress-text]');
-          if (circle) {
-            const circumference = 282.7;
-            const offset = circumference * (1 - completion / 100);
-            circle.setAttribute('stroke-dashoffset', offset);
-          }
-          if (text) {
-            text.textContent = `${completion}%`;
-          }
-        }
       });
     }
 
@@ -355,38 +112,44 @@
       const rag = getTopic('rag');
       if (!rag) return;
 
-      const section = document.getElementById('reading-order-section');
       const list = document.getElementById('reading-order-list');
-      section.style.display = 'block';
+      list.innerHTML = rag.readingOrder.map((concept, idx) => {
+        const path = concept.path.replace('./topics/', 'topics/');
+        return `
+          <a href="${path}" class="landing-path__item" data-reveal="fade-up" style="animation-delay:${idx * 60}ms">
+            <span class="landing-path__num">${idx + 1}</span>
+            <div class="landing-path__body">
+              <p class="landing-path__label">${concept.label}</p>
+            </div>
+          </a>
+        `;
+      }).join('');
+    }
 
-      list.innerHTML = rag.readingOrder.map((concept, idx) => `
-        <div class="reading-step" style="animation-delay:${idx*50}ms;" data-reveal="fade-up">
-          ${idx + 1}. <a href="${concept.path}" style="color:inherit;text-decoration:underline;">${concept.label}</a>
-        </div>
+    function renderPapers() {
+      const grid = document.getElementById('paper-grid');
+      if (!grid) return;
+      grid.innerHTML = getAllPapers().map(paper => `
+        <a href="${paper.hubPath.replace('./topics/', 'topics/')}" class="landing-topic-card" data-reveal="fade-up">
+          <div class="landing-topic-card__header">
+            <div>
+              <div class="landing-topic-card__icon">📄</div>
+              <h3 class="landing-topic-card__title">${paper.title}</h3>
+            </div>
+            <span class="pill pill--primary">Paper</span>
+          </div>
+          <p class="landing-topic-card__desc">${paper.thesis}</p>
+          <div class="landing-topic-card__footer">
+            <span class="text-secondary" style="font-size:var(--text-sm);">arXiv:${paper.arxiv}</span>
+            <span class="btn-secondary" style="pointer-events:none;">Explore →</span>
+          </div>
+        </a>
       `).join('');
     }
 
-    function getTopicIcon(icon) {
-      const icons = {
-        'search-doc': '🔍',
-        'brain': '🧠',
-        'zap': '⚡',
-        'layers': '📚',
-        'network': '🕸️',
-      };
-      return icons[icon] || '📖';
-    }
-
-    // Initialize on load
     renderTopics();
+    renderPapers();
     renderReadingOrder();
-
-    // Listen for progress changes
-    window.addEventListener('storage', (e) => {
-      if (e.key && e.key.startsWith('intuitive:progress:')) {
-        updateProgressRings();
-      }
-    });
   </script>
 </body>
 </html>

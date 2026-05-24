@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Research paper explainers — 3Blue1Brown-style interactive visuals">
+  <link rel="stylesheet" href="../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../design-system/components.css">
+  <link rel="stylesheet" href="../../design-system/animations.css">
+  <title>Papers — Intuitive Learning</title>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="breadcrumb">
+      <a href="../../index.html">Home</a><span aria-hidden="true"> / </span>
+      <span aria-current="page">Papers</span>
+    </nav>
+  </header>
+  <section class="topic-hero" data-reveal="fade-up">
+    <h1>Paper Journeys</h1>
+    <p>Understand research papers end-to-end — tune knobs, stress-test assumptions, propose extensions.</p>
+  </section>
+  <section class="learning-path-section">
+    <div class="concept-path-list" id="paper-list"></div>
+  </section>
+  <script type="module">
+    import { getAllPapers } from '../../js/topics/paperRegistry.js';
+    document.getElementById('paper-list').innerHTML = getAllPapers().map(p => `
+      <a href="./${p.id}/lab.html" class="concept-path-item" data-recommended="true">
+        <span class="concept-path-item__num">📄</span>
+        <div class="concept-path-item__content">
+          <p class="concept-path-item__title">${p.title}</p>
+          <p class="concept-path-item__desc">${p.thesis}</p>
+        </div>
+        <span class="concept-path-item__badge">Paper journey</span>
+      </a>`).join('');
+  </script>
+</body>
+</html>

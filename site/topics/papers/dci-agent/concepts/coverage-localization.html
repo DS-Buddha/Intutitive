@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Coverage vs localization — DCI paper concept">
+  <link rel="stylesheet" href="../../../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../../../design-system/components.css">
+  <link rel="stylesheet" href="../../../../design-system/animations.css">
+  <title>Coverage vs Localization — DCI</title>
+</head>
+<body>
+  <header class="site-header"><nav class="breadcrumb">
+    <a href="../../../../index.html">Home</a> / <a href="../../index.html">Papers</a> / <a href="../index.html">DCI</a> / <span aria-current="page">Coverage vs localization</span>
+  </nav></header>
+  <div class="page-layout page-layout--paper">
+    <aside class="sidebar">
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading">This page</h3>
+        <ul class="sidebar__list">
+          <li><a href="#hook" data-section="hook">Analogy</a></li>
+          <li><a href="#why-it-matters" data-section="why">Why</a></li>
+          <li><a href="#interactive-viz" data-section="viz">Visual</a></li>
+          <li><a href="#core-mechanism" data-section="mechanism">Mechanism</a></li>
+          <li><a href="#put-it-together" data-section="together">Together</a></li>
+        </ul>
+      </nav>
+      <nav class="module-tree"><h3 class="sidebar__heading sidebar__heading--spaced">DCI paper</h3><ul class="sidebar__list" data-paper-nav></ul></nav>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section" data-section-id="hook">
+        <div class="hook-analogy-card"><p class="hook-analogy-card__lead">Think of it like…</p>
+        <p>Finding the right book on the shelf (coverage) vs finding the exact three sentences you need (localization).</p></div>
+        <h1>Coverage vs Localization</h1>
+        <div class="tldr-pill"><strong>TL;DR:</strong> DCI often wins by localizing evidence more precisely — not merely surfacing more gold documents.</div>
+      </section>
+      <section id="why-it-matters" class="content-section" data-section-id="why">
+        <h2>Why this matters</h2>
+        <p>On BrowseComp-Plus, DCI sometimes beats retrieval agents even when both surfaced gold docs — gains come from finer verification steps.</p>
+      </section>
+      <section id="interactive-viz" class="content-section" data-section-id="viz">
+        <h2>Coverage vs localization knobs</h2>
+        <p class="text-secondary">Toggle Retriever ↔ DCI. Compare the two bars on the same scenario.</p>
+        <div class="playground" data-playground="coverage-metrics"></div>
+      </section>
+      <section id="core-mechanism" class="content-section" data-section-id="mechanism">
+        <h2>Mechanism</h2>
+        <p><strong>Coverage:</strong> did the trajectory surface relevant gold documents? <strong>Localization:</strong> segment-score — how small is the exposed snippet relative to the full gold doc?</p>
+      </section>
+      <section id="put-it-together" class="content-section" data-section-id="together">
+        <h2>Put it together</h2>
+        <p><a href="../lab.html">Full interactive lab →</a> · <a href="https://arxiv.org/abs/2605.05242" target="_blank" rel="noopener">Read the paper</a></p>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initPaperConceptPage } from '../../../../js/core/paper-page.js';
+    import conceptData from '../../../../js/topics/papers/dci-agent/concepts/coverage-localization-data.js';
+    initPaperConceptPage('dci-agent', 'coverage-localization', conceptData);
+  </script>
+</body>
+</html>

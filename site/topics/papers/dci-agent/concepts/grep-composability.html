@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CLI composability — DCI paper concept">
+  <link rel="stylesheet" href="../../../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../../../design-system/components.css">
+  <link rel="stylesheet" href="../../../../design-system/animations.css">
+  <title>CLI Composability — DCI</title>
+</head>
+<body>
+  <header class="site-header"><nav class="breadcrumb">
+    <a href="../../../../index.html">Home</a> / <a href="../../index.html">Papers</a> / <a href="../index.html">DCI</a> / <span aria-current="page">CLI composability</span>
+  </nav></header>
+  <div class="page-layout page-layout--paper">
+    <aside class="sidebar">
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading">This page</h3>
+        <ul class="sidebar__list">
+          <li><a href="#hook" data-section="hook">Analogy</a></li>
+          <li><a href="#why-it-matters" data-section="why">Why</a></li>
+          <li><a href="#interactive-viz" data-section="viz">Terminal</a></li>
+          <li><a href="#core-mechanism" data-section="mechanism">Mechanism</a></li>
+          <li><a href="#put-it-together" data-section="together">Together</a></li>
+        </ul>
+      </nav>
+      <nav class="module-tree"><h3 class="sidebar__heading sidebar__heading--spaced">DCI paper</h3><ul class="sidebar__list" data-paper-nav></ul></nav>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section" data-section-id="hook">
+        <div class="hook-analogy-card"><p class="hook-analogy-card__lead">Think of it like…</p>
+        <p>Unix pipes: combine weak clues (`grep warranty | grep SKU-8842`) instead of one semantic guess that might miss exact terms.</p></div>
+        <h1>CLI Composability</h1>
+        <div class="tldr-pill"><strong>TL;DR:</strong> DCI's power is composable shell primitives — grep, find, read, piped together by the agent.</div>
+      </section>
+      <section id="why-it-matters" class="content-section" data-section-id="why">
+        <h2>Why this matters</h2>
+        <p>Multi-hop agentic search often needs sparse clue conjunctions and exact string matches — hard to express as a single embedding query.</p>
+      </section>
+      <section id="interactive-viz" class="content-section" data-section-id="viz">
+        <h2>Terminal sandbox</h2>
+        <p>Run commands on a mock corpus. Compare grep output vs top-k retriever.</p>
+        <div class="playground" data-playground="terminal-corpus"></div>
+      </section>
+      <section id="core-mechanism" class="content-section" data-section-id="mechanism">
+        <h2>Mechanism</h2>
+        <p>Examples from the paper: <code>grep 'foo' file | grep 'bar'</code>, <code>find . | grep 'report' | grep '2024'</code>, <code>grep -n 'keyword' file | head</code>.</p>
+      </section>
+      <section id="put-it-together" class="content-section" data-section-id="together">
+        <h2>Put it together</h2>
+        <p>Metrics lab: <a href="../lab.html#metrics">Coverage vs localization →</a> · <a href="../lab.html">Full lab →</a></p>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initPaperConceptPage } from '../../../../js/core/paper-page.js';
+    import conceptData from '../../../../js/topics/papers/dci-agent/concepts/grep-composability-data.js';
+    initPaperConceptPage('dci-agent', 'grep-composability', conceptData);
+  </script>
+</body>
+</html>

@@ -4,6 +4,7 @@
  */
 
 import { on } from './eventbus.js';
+import { getTopic } from '../topics/registry.js';
 
 const STORAGE_KEY_PREFIX = 'intuitive:progress:';
 
@@ -139,4 +140,31 @@ export function clearAllProgress() {
       localStorage.removeItem(key);
     }
   });
+}
+
+/**
+ * Find the next concept to continue learning in a topic.
+ */
+export function getContinueLearning(topicId) {
+  const topic = getTopic(topicId);
+  if (!topic) return null;
+
+  const progress = getTopicProgress(topicId);
+
+  for (const concept of topic.readingOrder) {
+    if (!progress[concept.slug]?.quizPassed) {
+      return {
+        label: concept.label,
+        path: concept.path,
+        slug: concept.slug,
+      };
+    }
+  }
+
+  return {
+    label: topic.readingOrder[0].label,
+    path: topic.readingOrder[0].path,
+    slug: topic.readingOrder[0].slug,
+    complete: true,
+  };
 }

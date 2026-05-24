@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Entity graph community retrieval for global corpus questions.">
+  <link rel="stylesheet" href="../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../design-system/components.css">
+  <link rel="stylesheet" href="../../design-system/animations.css">
+  <title>GraphRAG — Intuitive Learning</title>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="../../index.html">Home</a><span aria-hidden="true"> / </span>
+      <a href="index.html">RAG</a><span aria-hidden="true"> / </span>
+      <span aria-current="page">GraphRAG</span>
+    </nav>
+  </header>
+  <div class="page-layout">
+    <aside class="sidebar" aria-label="Page navigation">
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading">This page</h3>
+        <ul class="sidebar__list">
+          <li><a href="#hook" data-section="hook">💡 The analogy</a></li>
+          <li><a href="#why-it-matters" data-section="why">⚠️ Why it matters</a></li>
+          <li><a href="#interactive-viz" data-section="viz">🔬 Playgrounds</a></li>
+          <li><a href="#core-mechanism" data-section="mechanism">⚙️ How it works</a></li>
+          <li><a href="#tradeoffs" data-section="tradeoffs">⚖️ Tradeoffs</a></li>
+          <li><a href="#connections" data-section="connections">🔗 Connections</a></li>
+          <li><a href="#put-it-together" data-section="together">🧩 Put it together</a></li>
+        </ul>
+      </nav>
+      <nav class="module-tree" aria-label="RAG concepts">
+        <h3 class="sidebar__heading sidebar__heading--spaced">RAG pipeline</h3>
+        <ul class="sidebar__list" data-rag-module-tree></ul>
+      </nav>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section" data-section-id="hook">
+        <div class="hook-analogy" data-reveal="fade-up">
+          <div class="hook-analogy-card">
+            <p class="hook-analogy-card__lead">Think of it like...</p>
+            <div class="hook-analogy-card__body">Instead of reading random pages from 100 books, you get a map of characters and themes connecting those books — then read the summary of the relevant story cluster.</div>
+          </div>
+        </div>
+        <h1>GraphRAG</h1>
+        <div class="tldr-pill"><strong>TL;DR:</strong> GraphRAG lifts chunks into entity/relation graphs, clusters communities, and summarizes them — answering global thematic questions isolated chunk retrieval misses.</div>
+      </section>
+      <section id="why-it-matters" class="content-section" data-section-id="why">
+        <h2>Why this matters</h2>
+        <p>GraphRAG lifts chunks into entity/relation graphs, clusters communities, and summarizes them — answering global thematic questions isolated chunk retrieval misses.</p>
+        <div class="callout callout--danger">
+          <strong>Without this:</strong> downstream retrieval and generation inherit upstream mistakes — bigger models and rerankers rarely recover.
+        </div>
+        <div class="callout callout--success">
+          <strong>With this:</strong> each pipeline stage receives clean, structured input — grounding becomes possible instead of hopeful.
+        </div>
+      </section>
+      <section id="interactive-viz" class="content-section" data-section-id="viz">
+        <h2>Play with the machinery</h2>
+        <p>Ask a global question. See which community summary and entities light up on the graph.</p>
+        <div class="playground" data-playground="graphrag"></div>
+      </section>
+      <section id="core-mechanism" class="content-section" data-section-id="mechanism">
+        <h2>How it works</h2>
+        <p>Extract entities and relations → community detection at multiple scales → summarize communities → query via graph structure + summaries, not only vector NN to raw chunks.</p><ul><li><strong>Global queries:</strong> "What themes connect our product lines?"</li><li><strong>Cost:</strong> graph build heavier than flat embed</li></ul>
+      </section>
+      <section id="tradeoffs" class="content-section" data-section-id="tradeoffs">
+        <h2>Tradeoffs</h2>
+        <div class="grid grid-cols-2" style="gap:var(--space-4);">
+          <div class="callout callout--use"><h3>Use when</h3><ul><li>Corpus-level synthesis, multi-hop entity questions</li><li>Cross-document relational structure matters</li></ul></div>
+          <div class="callout callout--danger"><h3>Skip when</h3><ul><li>Small narrow corpora without stable entities</li><li>When graph extraction noise exceeds value</li></ul></div>
+        </div>
+      </section>
+      <section id="connections" class="content-section" data-section-id="connections">
+        <h2>Connections</h2>
+        <p><a href="./indexing-raptor.html">RAPTOR</a> · <a href="./ingestion-evidence-pins.html">Evidence Pins</a></p>
+        <p class="text-secondary"><a href="./indexing-pageindex.html">← Previous lesson</a> · <a href="./verification-agentic.html">Next lesson →</a></p>
+      </section>
+      <section id="put-it-together" class="content-section" data-section-id="together">
+        <h2>Put it together</h2>
+        <p>Ask "What connects cloud and enterprise customers?" The community summary synthesizes what no single chunk contains.</p>
+        <a href="./verification-agentic.html" class="btn btn--primary">Next: continue path →</a>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initRagConceptPage } from '../../js/core/concept-page.js';
+    import conceptData from '../../js/topics/rag/graph-graphrag-data.js';
+    initRagConceptPage('graph-graphrag', conceptData);
+  </script>
+</body>
+</html>

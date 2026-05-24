@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DCI Paper Journey — understand the paper holistically, then verify with playgrounds">
+  <link rel="stylesheet" href="../../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../../design-system/components.css">
+  <link rel="stylesheet" href="../../../design-system/animations.css">
+  <title>DCI Paper Journey</title>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="../../../index.html">Home</a><span aria-hidden="true"> / </span>
+      <a href="../index.html">Papers</a><span aria-hidden="true"> / </span>
+      <a href="./index.html">DCI</a><span aria-hidden="true"> / </span>
+      <span aria-current="page">Paper journey</span>
+    </nav>
+  </header>
+
+  <div class="page-layout page-layout--paper">
+    <aside class="sidebar" aria-label="Lab navigation">
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading">Part 1 — Understand</h3>
+        <ul class="sidebar__list">
+          <li><a href="#understand-hook" data-section="understand-hook">Hook & thesis</a></li>
+          <li><a href="#understand-problem" data-section="understand-problem">The problem</a></li>
+          <li><a href="#understand-insight" data-section="understand-insight">The insight</a></li>
+          <li><a href="#understand-method" data-section="understand-method">Method</a></li>
+          <li><a href="#understand-evidence" data-section="understand-evidence">Evidence</a></li>
+          <li><a href="#understand-vocab" data-section="understand-vocab">Vocabulary</a></li>
+          <li><a href="#understand-checkpoint" data-section="understand-checkpoint">Checkpoint</a></li>
+        </ul>
+        <h3 class="sidebar__heading sidebar__heading--spaced">Part 2 — Verify</h3>
+        <ul class="sidebar__list">
+          <li><a href="#compare" data-section="compare">A/B compare</a></li>
+          <li><a href="#topk" data-section="topk">Top-k bottleneck</a></li>
+          <li><a href="#resolution" data-section="resolution">Resolution</a></li>
+          <li><a href="#terminal" data-section="terminal">Terminal</a></li>
+          <li><a href="#metrics" data-section="metrics">Metrics</a></li>
+          <li><a href="#paradigm" data-section="paradigm">Paradigm (Fig 2)</a></li>
+          <li><a href="#context" data-section="context">Context L0–L4</a></li>
+          <li><a href="#evidence" data-section="evidence">Evidence lens</a></li>
+        </ul>
+        <h3 class="sidebar__heading sidebar__heading--spaced">Part 3 — Think</h3>
+        <ul class="sidebar__list">
+          <li><a href="#assumptions" data-section="assumptions">Assumptions</a></li>
+          <li><a href="#studio" data-section="studio">Extension studio</a></li>
+          <li><a href="#paper" data-section="paper">Paper links</a></li>
+        </ul>
+      </nav>
+      <div class="readiness-panel">
+        <h3 class="sidebar__heading sidebar__heading--spaced">Research readiness</h3>
+        <ul class="readiness-list" data-readiness-checklist></ul>
+        <p class="readiness-banner" data-readiness-banner hidden>You're research-ready on DCI — you can explain it and propose extensions.</p>
+      </div>
+      <nav class="module-tree">
+        <h3 class="sidebar__heading sidebar__heading--spaced">DCI paper</h3>
+        <ul class="sidebar__list" data-paper-nav></ul>
+      </nav>
+    </aside>
+
+    <main class="content" id="main-content">
+
+      <!-- ═══ PART 1 — UNDERSTAND ═══ -->
+
+      <section id="understand-hook" class="content-section" data-section-id="understand-hook">
+        <p class="journey-part-label">Part 1 — Understand</p>
+        <p class="paper-meta">arXiv:2605.05242 · Paper Journey</p>
+        <div class="hook-analogy-card">
+          <p class="hook-analogy-card__lead">Think of it like…</p>
+          <p>Two ways to find evidence in a case file:</p>
+          <ul>
+            <li><strong>Retriever-mediated:</strong> A clerk hands you 5 pre-selected pages. You can't flip to page 47 or grep for an exact SKU.</li>
+            <li><strong>Direct corpus interaction (DCI):</strong> You sit at a terminal — grep, pipe, read lines, refine until you hit the exact span.</li>
+          </ul>
+        </div>
+        <h1>Direct Corpus Interaction</h1>
+        <p class="paper-thesis">Retrieval for capable agents is an <strong>interface-design</strong> problem — a terminal gives higher <em>interface resolution</em> than a fixed top-k API.</p>
+        <div class="tldr-pill"><strong>TL;DR:</strong> Skip the vector index. Let the agent grep, read, and pipe commands on raw files — like a researcher at a terminal. Strong results on agentic search, multi-hop QA, and IR benchmarks.</div>
+        <p class="text-secondary"><strong>Path on this page:</strong> Read Part 1 to build the mental model → Part 2 playgrounds to verify → Part 3 to critique and extend.</p>
+      </section>
+
+      <section id="understand-problem" class="content-section" data-section-id="understand-problem">
+        <h2>The problem</h2>
+        <p>Baseline RAG works for single-shot Q&amp;A: embed query, retrieve top-k chunks, generate answer. But <strong>agentic search</strong> is different — the agent runs many steps, combines weak clues, and verifies hypotheses against local context.</p>
+        <p>A fixed top-k retriever API decides <em>too early</em> what the agent is allowed to see. Evidence filtered at this step cannot be recovered — no second chance to grep page 47.</p>
+
+        <h3>The failure chain</h3>
+        <p class="text-secondary">Without a composable interface, agentic search breaks down:</p>
+        <div class="failure-chain">
+          <div class="failure-chain__card">
+            <h4>Top-k filter</h4>
+            <p>Retriever ranks chunks once. Gold evidence at rank #12 never reaches the agent.</p>
+          </div>
+          <div class="failure-chain__card">
+            <h4>Lost evidence</h4>
+            <p>Agent can't pipe "grep warranty | grep valve" or re-query with a refined pattern.</p>
+          </div>
+          <div class="failure-chain__card">
+            <h4>Agent guesses</h4>
+            <p>Without exact spans, the model hallucinates or cites coarse, unverifiable snippets.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="understand-insight" class="content-section" data-section-id="understand-insight">
+        <h2>The insight — two paradigms</h2>
+        <p>The paper's core reframing: retrieval is not just <em>retriever design</em> — it's <em>interface design</em>. Same agent goal, two ways to access the corpus:</p>
+
+        <div class="understand-diagram compare-grid">
+          <div class="playground__panel">
+            <h4>Retriever-mediated</h4>
+            <p class="compare-panel__meta">Offline index · top-k API</p>
+            <ol class="understand-diagram__steps">
+              <li>Embed query → single vector</li>
+              <li>Search ANN index over chunks</li>
+              <li>Return top-k ranked snippets</li>
+              <li>Agent reads — cannot re-query differently</li>
+            </ol>
+          </div>
+          <div class="playground__panel">
+            <h4>Direct corpus interaction</h4>
+            <p class="compare-panel__meta">Raw files · grep, read, pipe</p>
+            <ol class="understand-diagram__steps">
+              <li>Agent plans tool sequence</li>
+              <li>grep / rg on raw corpus</li>
+              <li>Pipe &amp; refine weak clues</li>
+              <li>Read exact line → verify &amp; cite</li>
+            </ol>
+          </div>
+        </div>
+
+        <h3>Two terms to remember</h3>
+        <dl class="understand-terms">
+          <dt>Interface resolution</dt>
+          <dd>Granularity of corpus access: whole document → passage → line → exact span. DCI operates at finer units than chunk retrieval.</dd>
+          <dt>Coverage vs localization</dt>
+          <dd><strong>Coverage:</strong> did the trajectory surface gold documents at all? <strong>Localization:</strong> how precise is the exposed snippet? DCI often ties on coverage but wins on localization.</dd>
+        </dl>
+        <p class="text-secondary">You'll verify both paradigms and both metrics in <a href="#verify-start">Part 2</a>.</p>
+      </section>
+
+      <section id="understand-method" class="content-section" data-section-id="understand-method">
+        <h2>Method — how DCI works</h2>
+        <p>DCI gives the agent direct access to a raw corpus via terminal tools — no embeddings, no vector index:</p>
+        <ul>
+          <li><strong>Raw corpus</strong> — files on disk, not pre-chunked embeddings</li>
+          <li><strong>Terminal tools</strong> — grep, rg, find, read, shell pipes</li>
+          <li><strong>Agent loop</strong> — plan → search → refine → verify across many steps</li>
+        </ul>
+
+        <h3>Two implementations</h3>
+        <p><strong>DCI-Agent-Lite</strong> — Pi-based harness, bash + read only, lightweight context management for reproducibility.</p>
+        <p><strong>DCI-Agent-CC</strong> — Claude Code harness, same DCI interface, used for main benchmark numbers.</p>
+
+        <h3>Context management (L0–L4)</h3>
+        <p>Long trajectories fill context. The paper ablates truncation, compaction, and summarization:</p>
+        <table class="paper-table">
+          <thead>
+            <tr><th>Level</th><th>Truncation</th><th>Compaction</th><th>Summarization</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>L0</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>L1</td><td>50K chars</td><td>—</td><td>—</td></tr>
+            <tr><td>L2</td><td>20K chars</td><td>—</td><td>—</td></tr>
+            <tr><td>L3</td><td>20K chars</td><td>✓</td><td>—</td></tr>
+            <tr><td>L4</td><td>20K chars</td><td>✓</td><td>✓</td></tr>
+          </tbody>
+        </table>
+        <p class="text-secondary">Interact with these levels in <a href="#context">station 12</a>.</p>
+      </section>
+
+      <section id="understand-evidence" class="content-section" data-section-id="understand-evidence">
+        <h2>Evidence — what the paper proved</h2>
+        <p>Same LLM backbone across conditions — the paper swaps the retrieval <em>interface</em>, not the model. Key numbers:</p>
+
+        <table class="paper-table">
+          <thead>
+            <tr><th>Benchmark</th><th>Baseline</th><th>Score</th><th>DCI-Agent-CC</th><th>Score</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>BrowseComp-Plus</td>
+              <td>Retriever (Qwen3-Embed-8B)</td>
+              <td>69.0% · $1,440</td>
+              <td>DCI-Agent-CC</td>
+              <td><strong>80.0%</strong> · $1,016 (−29% cost)</td>
+            </tr>
+            <tr>
+              <td>Multi-hop QA (avg)</td>
+              <td>ASearcher-Local-14B</td>
+              <td>52.3%</td>
+              <td>DCI-Agent-CC</td>
+              <td><strong>83.0%</strong> (+30.7)</td>
+            </tr>
+            <tr>
+              <td>IR ranking (avg NDCG@10)</td>
+              <td>ReasonRank-32B</td>
+              <td>47.0%</td>
+              <td>DCI-Agent-CC</td>
+              <td><strong>68.5%</strong> (+21.5)</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>The takeaway: composable grep-based search beats strong sparse/dense/rerank baselines on agentic tasks — especially where exact localization matters.</p>
+        <p class="text-secondary">Predict winners yourself in <a href="#evidence">station 13</a>.</p>
+      </section>
+
+      <section id="understand-vocab" class="content-section" data-section-id="understand-vocab">
+        <h2>Vocabulary map</h2>
+        <p class="text-secondary">Four concepts from the paper — each has a verification playground in Part 2.</p>
+        <div class="vocab-map">
+          <div class="vocab-map__card">
+            <strong>Top-k bottleneck</strong>
+            <p>Early filter loses evidence forever — agent never sees gold at rank #12.</p>
+            <span class="vocab-map__verify">Verify at <a href="#topk">station 7</a></span>
+            <a href="./concepts/top-k-bottleneck.html" class="vocab-map__deep">Deep dive →</a>
+          </div>
+          <div class="vocab-map__card">
+            <strong>Interface resolution</strong>
+            <p>Granularity of corpus access — document vs line vs exact span.</p>
+            <span class="vocab-map__verify">Verify at <a href="#resolution">station 8</a></span>
+            <a href="./concepts/interface-resolution.html" class="vocab-map__deep">Deep dive →</a>
+          </div>
+          <div class="vocab-map__card">
+            <strong>CLI composability</strong>
+            <p>Pipe weak clues: grep warranty | grep valve — no single semantic guess.</p>
+            <span class="vocab-map__verify">Verify at <a href="#terminal">station 9</a></span>
+            <a href="./concepts/grep-composability.html" class="vocab-map__deep">Deep dive →</a>
+          </div>
+          <div class="vocab-map__card">
+            <strong>Coverage vs localization</strong>
+            <p>Did you find the gold doc? How precise is the snippet within it?</p>
+            <span class="vocab-map__verify">Verify at <a href="#metrics">station 10</a></span>
+            <a href="./concepts/coverage-localization.html" class="vocab-map__deep">Deep dive →</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="understand-checkpoint" class="content-section" data-section-id="understand-checkpoint">
+        <h2>Checkpoint — ready to verify?</h2>
+        <p class="text-secondary">No right or wrong answers. Pause and check your mental model before touching the playgrounds.</p>
+        <ol class="checkpoint-prompts">
+          <li class="checkpoint-prompt">In one sentence, what problem does DCI solve?</li>
+          <li class="checkpoint-prompt">How is DCI different from baseline RAG?</li>
+          <li class="checkpoint-prompt">Name one benchmark win and why it matters.</li>
+        </ol>
+        <button type="button" class="btn btn--primary" data-understand-ready>I'm ready to verify with playgrounds →</button>
+      </section>
+
+      <!-- ═══ PART 2 — VERIFY ═══ -->
+
+      <div id="verify-start" class="journey-part-divider" data-section-id="verify-start">
+        <span class="journey-part-divider__label">Part 2 — Verify</span>
+        <p class="journey-part-divider__desc">You read the paper holistically — now prove it with your hands.</p>
+        <p class="verify-nudge" data-verify-nudge hidden><a href="#understand-hook">Recommended: read Part 1 first</a> — playgrounds make more sense with context.</p>
+      </div>
+
+      <section id="compare" class="content-section" data-section-id="compare">
+        <div class="verify-bridge">
+          <span>You read about <a href="#understand-insight">two paradigms</a> — compare them live.</span>
+        </div>
+        <h2>6. Retriever vs DCI — side by side</h2>
+        <p class="text-secondary">Pick a scenario, drag top-k, flip resolution. Read the verdict cards — can the agent actually answer?</p>
+        <div class="playground" data-playground="interface-compare"></div>
+      </section>
+
+      <section id="topk" class="content-section" data-section-id="topk">
+        <div class="verify-bridge">
+          <span>You read about the <a href="#understand-problem">top-k bottleneck</a> — shrink k and watch gold get LOST.</span>
+        </div>
+        <h2>7. Top-k bottleneck</h2>
+        <p class="text-secondary">Shrink k until the ★ gold chunk gets the red LOST badge. That's evidence the agent never sees again.</p>
+        <div class="playground" data-playground="topk-bottleneck"></div>
+      </section>
+
+      <section id="resolution" class="content-section" data-section-id="resolution">
+        <div class="verify-bridge">
+          <span>You read about <a href="#understand-insight">interface resolution</a> — drag from document to exact span.</span>
+        </div>
+        <h2>8. Interface resolution slider</h2>
+        <p class="text-secondary">Drag from whole document → exact span. This is the paper's core idea in one control.</p>
+        <div class="playground" data-playground="resolution"></div>
+      </section>
+
+      <section id="terminal" class="content-section" data-section-id="terminal">
+        <div class="verify-bridge">
+          <span>You read about <a href="#understand-method">grep composability</a> — type commands in the sandbox.</span>
+        </div>
+        <h2>9. Terminal sandbox</h2>
+        <p class="text-secondary">Type grep commands. Tune retriever top-k on the right. Watch DCI hit exact lines the retriever misses.</p>
+        <div class="playground" data-playground="terminal-corpus"></div>
+      </section>
+
+      <section id="metrics" class="content-section" data-section-id="metrics">
+        <div class="verify-bridge">
+          <span>You read about <a href="#understand-insight">coverage vs localization</a> — toggle and compare the bars.</span>
+        </div>
+        <h2>10. Coverage vs localization</h2>
+        <p class="text-secondary">Toggle Retriever ↔ DCI. Same scenario — DCI often ties on coverage but wins localization.</p>
+        <div class="playground" data-playground="coverage-metrics"></div>
+      </section>
+
+      <section id="paradigm" class="content-section" data-section-id="paradigm">
+        <div class="verify-bridge">
+          <span>You saw the static <a href="#understand-insight">Figure 2 diagram</a> — step through trajectories interactively.</span>
+        </div>
+        <h2>11. Two paradigms walkthrough</h2>
+        <p class="text-secondary">Step through retriever-mediated vs DCI trajectories — same agent goal, different interface.</p>
+        <div class="playground" data-playground="paradigm-compare"></div>
+      </section>
+
+      <section id="context" class="content-section" data-section-id="context">
+        <div class="verify-bridge">
+          <span>You read the <a href="#understand-method">L0–L4 table</a> — now interact with context policies.</span>
+        </div>
+        <h2>12. Context management (L0–L4)</h2>
+        <p class="text-secondary">Long DCI trajectories fill context. Toggle truncation, compaction, summarization — see what the agent forgets.</p>
+        <div class="playground" data-playground="context-level"></div>
+      </section>
+
+      <section id="evidence" class="content-section" data-section-id="evidence">
+        <div class="verify-bridge">
+          <span>You saw the <a href="#understand-evidence">benchmark numbers</a> — predict winners before reveal.</span>
+        </div>
+        <h2>13. Evidence lens</h2>
+        <p class="text-secondary">Pick a benchmark. Predict the winner, then reveal paper results.</p>
+        <div class="playground" data-playground="evidence-lens"></div>
+      </section>
+
+      <!-- ═══ PART 3 — THINK ═══ -->
+
+      <div id="think-start" class="journey-part-divider" data-section-id="think-start">
+        <span class="journey-part-divider__label">Part 3 — Think</span>
+        <p class="journey-part-divider__desc">Critique assumptions and propose research extensions.</p>
+      </div>
+
+      <section id="assumptions" class="content-section" data-section-id="assumptions">
+        <h2>14. Assumption breaker</h2>
+        <p class="text-secondary">Turn off paper assumptions — watch DCI wins flip to struggles. Would you still choose DCI here?</p>
+        <div class="playground" data-playground="assumption-breaker"></div>
+      </section>
+
+      <section id="studio" class="content-section" data-section-id="studio">
+        <h2>15. Research Extension Studio</h2>
+        <p class="text-secondary">Write your hypothesis for an extension — compare to an expert take. No code required.</p>
+        <div class="playground" data-playground="hypothesis-studio"></div>
+      </section>
+
+      <section id="paper" class="content-section" data-section-id="paper">
+        <h2>Paper links</h2>
+        <p>After this journey, read §3–§4 of the full paper for implementation details and benchmark setup.</p>
+        <p class="paper-links">
+          <a href="https://arxiv.org/abs/2605.05242" target="_blank" rel="noopener">arXiv:2605.05242</a> ·
+          <a href="https://github.com/DCI-Agent/DCI-Agent-Lite" target="_blank" rel="noopener">GitHub</a>
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initPaperLab } from '../../../js/core/paper-page.js';
+    import labData from '../../../js/topics/papers/dci-agent/lab-data.js';
+    initPaperLab('dci-agent', labData);
+  </script>
+</body>
+</html>

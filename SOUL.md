@@ -115,6 +115,63 @@ A concept page succeeds if:
 
 We don't measure by page views or time on site. We measure by "did this person's mental model change."
 
+## Content Types
+
+We build three kinds of learning experiences:
+
+1. **Concept pages** (RAG curriculum) — one idea, quiz-gated, three moments
+2. **Topic hubs** — sequence and prerequisites only
+3. **Paper Journey** — end-to-end research paper mastery, hypothesis-gated
+
+## Paper Journey (fourth content type)
+
+A Paper Journey teaches a research paper so the learner can **explain it end-to-end** and **propose credible extensions** — thinking, not implementing.
+
+### Three parts (every paper journey page)
+
+**Rule: Never lead a paper journey with a playground. Understanding sections come first.**
+
+| Part | Purpose |
+| ---- | ------- |
+| **Orient** | Hub, thesis, prerequisites — on `index.html` |
+| **Understand** | Read-only holistic brief: problem → insight → method → evidence → vocabulary → checkpoint |
+| **Verify** | Playgrounds — each labeled "You read X — now prove it" |
+| **Think** | Assumption breaker + Research Extension Studio |
+
+Single-page flow on `lab.html`: Part 1 (Understand) → Part 2 (Verify) → Part 3 (Think).
+
+Matches the RAG concept page pattern: analogy → why → play — but at paper scale.
+
+### Five moments (papers)
+
+Concept pages use three moments. Paper Journeys add two more:
+
+### Moment 4: "I see where this breaks and why"
+The learner toggles assumptions (scale, structure, agent capability) and watches DCI-style wins flip to struggles. They feel the paper's boundary conditions.
+
+This happens in **Part 3 — Think** (`assumption-breaker` playground).
+
+### Moment 5: "I could propose a research direction from here"
+The learner writes a short hypothesis for an extension prompt, then compares to an expert reveal. Gap = learning. No code required.
+
+This happens in **Part 3 — Think** (`hypothesis-studio` playground).
+
+### Hypothesis gate (not quiz)
+
+Papers do **not** use multiple-choice quizzes. Mastery is:
+
+- Completed Part 1 (Understand) — checkpoint or scrolled through key sections
+- Used verify playgrounds (compare, top-k, terminal)
+- Explored ≥3 assumption-breaker scenarios
+- Completed hypothesis for ≥2 extension prompts (stored in `sessionStorage`)
+- Self-honor **Research readiness** checklist in the sidebar
+
+Implementation links (arXiv, GitHub) are optional footnotes — never the mastery gate.
+
+### Paper Journey voice
+
+Same as concept pages: direct, concrete, practitioner-facing. Add: name tradeoffs explicitly, cite benchmark numbers when relevant, and always show *what the paper assumes* before celebrating what it achieves.
+
 ## For Agents
 
 Before writing or reviewing concept content, read this file.

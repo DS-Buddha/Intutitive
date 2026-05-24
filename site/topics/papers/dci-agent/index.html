@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Direct Corpus Interaction — understand the paper end-to-end and extend the research">
+  <link rel="stylesheet" href="../../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../../design-system/components.css">
+  <link rel="stylesheet" href="../../../design-system/animations.css">
+  <title>Direct Corpus Interaction — Paper Hub</title>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="../../../index.html">Home</a><span aria-hidden="true"> / </span>
+      <a href="../index.html">Papers</a><span aria-hidden="true"> / </span>
+      <span aria-current="page">DCI</span>
+    </nav>
+  </header>
+  <div class="page-layout page-layout--paper">
+    <aside class="sidebar" aria-label="Paper navigation">
+      <nav class="module-tree" aria-label="Paper sections">
+        <h3 class="sidebar__heading">DCI paper</h3>
+        <ul class="sidebar__list" data-paper-nav></ul>
+      </nav>
+      <div class="readiness-panel">
+        <h3 class="sidebar__heading sidebar__heading--spaced">Research readiness</h3>
+        <ul class="readiness-list" data-readiness-checklist></ul>
+        <p class="readiness-banner" data-readiness-banner hidden>You're research-ready on DCI.</p>
+      </div>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section">
+        <p class="paper-meta">arXiv:2605.05242 · Paper Journey</p>
+        <h1>Direct Corpus Interaction</h1>
+        <p class="paper-thesis">Retrieval for capable agents is an <strong>interface-design</strong> problem — a terminal gives higher <em>interface resolution</em> than a fixed top-k API.</p>
+        <div class="tldr-pill"><strong>How it works:</strong> Read the paper holistically first (Part 1) → verify with playgrounds (Part 2) → critique and extend (Part 3).</div>
+        <div class="paper-hero-actions">
+          <a href="./lab.html#understand-hook" class="btn btn--primary">Begin — understand first →</a>
+          <a href="https://arxiv.org/abs/2605.05242" class="btn btn--secondary" target="_blank" rel="noopener">Read paper</a>
+        </div>
+      </section>
+
+      <section id="journey" class="content-section">
+        <h2>Paper Journey — three parts</h2>
+        <p class="text-secondary">Build the mental model before touching knobs. Playgrounds verify what you read — they don't replace reading.</p>
+        <div class="journey-map" data-journey-map></div>
+      </section>
+
+      <section id="prerequisites" class="content-section">
+        <h2>Prerequisites</h2>
+        <ul class="paper-prereq-list">
+          <li><a href="../../rag/baseline.html">Baseline RAG</a> — retriever-mediated pipeline</li>
+          <li><a href="../../rag/search-retrieval.html">Search & Retrieval</a> — BM25/dense limits</li>
+          <li><a href="../../rag/verification-agentic.html">Agentic RAG</a> — multi-step search loops</li>
+        </ul>
+      </section>
+
+      <section id="concepts" class="content-section">
+        <h2>Deep dive on one concept</h2>
+        <p class="text-secondary">Optional — after Part 1, explore a single idea with its own mini-journey (analogy → playground).</p>
+        <div class="concept-map" data-stagger>
+          <a href="./concepts/top-k-bottleneck.html" class="concept-map__card"><span class="concept-map__num">1</span><strong>Top-k bottleneck</strong><p>Why early filtering loses evidence forever</p></a>
+          <a href="./concepts/interface-resolution.html" class="concept-map__card"><span class="concept-map__num">2</span><strong>Interface resolution</strong><p>Document vs line vs exact span access</p></a>
+          <a href="./concepts/grep-composability.html" class="concept-map__card"><span class="concept-map__num">3</span><strong>CLI composability</strong><p>Pipe weak clues in the terminal sandbox</p></a>
+          <a href="./concepts/coverage-localization.html" class="concept-map__card"><span class="concept-map__num">4</span><strong>Coverage vs localization</strong><p>Why DCI wins on precision, not just recall</p></a>
+        </div>
+      </section>
+
+      <section id="success" class="content-section">
+        <h2>You'll know you're done when…</h2>
+        <ul class="paper-prereq-list">
+          <li>You can draw retriever-mediated vs DCI from memory</li>
+          <li>You can explain top-k bottleneck + interface resolution + coverage vs localization</li>
+          <li>You can name one benchmark win <em>and</em> one limitation scenario</li>
+          <li>You can propose one non-trivial extension with stated tradeoffs</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initPaperHub } from '../../../js/core/paper-page.js';
+    initPaperHub('dci-agent');
+  </script>
+</body>
+</html>

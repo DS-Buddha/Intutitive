@@ -8,13 +8,19 @@ import { emit } from '../core/eventbus.js';
 
 /**
  * Mount all quiz containers on the page.
+ * Accepts either { quizId: questions[] } or a flat questions array (single quiz).
  */
 export function mountAll(quizzes = {}) {
   const containers = document.querySelectorAll('[data-component="quiz"]');
   containers.forEach(container => {
     const quizId = container.getAttribute('data-quiz-id');
-    const quizData = quizzes[quizId] || [];
-    renderQuiz(container, quizId, quizData);
+    let quizData = quizzes[quizId];
+
+    if (!quizData && Array.isArray(quizzes)) {
+      quizData = quizzes;
+    }
+
+    renderQuiz(container, quizId, quizData || []);
   });
 }
 
@@ -23,7 +29,7 @@ export function mountAll(quizzes = {}) {
  */
 function renderQuiz(container, quizId, questions) {
   if (!questions || questions.length === 0) {
-    container.innerHTML = '<p>No quiz available for this concept.</p>';
+    container.innerHTML = '<p class="text-secondary">No quiz available for this concept.</p>';
     return;
   }
 
@@ -31,82 +37,68 @@ function renderQuiz(container, quizId, questions) {
   quiz.className = 'quiz';
   quiz.setAttribute('data-quiz-id', quizId);
 
+  const progress = document.createElement('div');
+  progress.className = 'quiz-progress';
+  progress.innerHTML = `
+    <div class="quiz-progress__bar"><div class="quiz-progress__fill" data-quiz-fill></div></div>
+    <span class="quiz-progress__text" data-quiz-count>0 / ${questions.length} answered</span>
+  `;
+  quiz.appendChild(progress);
+
   questions.forEach((q, idx) => {
-    const questionEl = createQuestionElement(q, idx, quizId);
-    quiz.appendChild(questionEl);
+    quiz.appendChild(createQuestionElement(q, idx));
   });
 
-  // Submit button
   const submitBtn = document.createElement('button');
   submitBtn.className = 'btn-primary';
-  submitBtn.style.marginTop = 'var(--space-6)';
-  submitBtn.textContent = 'Check answers';
-
+  submitBtn.style.marginTop = 'var(--space-4)';
+  submitBtn.style.width = '100%';
+  submitBtn.style.minHeight = '2.75rem';
+  submitBtn.textContent = 'Check my answers';
   submitBtn.addEventListener('click', () => {
-    const results = scoreQuiz(container, quizId, questions);
+    const results = scoreQuiz(quiz, questions);
     showResults(container, results, quizId, questions);
   });
 
-  const buttonWrapper = document.createElement('div');
-  buttonWrapper.style.textAlign = 'center';
-  buttonWrapper.appendChild(submitBtn);
-  quiz.appendChild(buttonWrapper);
-
+  quiz.appendChild(submitBtn);
   container.innerHTML = '';
   container.appendChild(quiz);
+
+  quiz.addEventListener('change', () => updateAnswerProgress(quiz, questions.length));
 }
 
-/**
- * Create a question element (question + radio options).
- */
-function createQuestionElement(question, questionIdx, quizId) {
+function updateAnswerProgress(quiz, total) {
+  const answered = quiz.querySelectorAll('input[type="radio"]:checked').length;
+  const fill = quiz.querySelector('[data-quiz-fill]');
+  const count = quiz.querySelector('[data-quiz-count]');
+  if (fill) fill.style.width = `${(answered / total) * 100}%`;
+  if (count) count.textContent = `${answered} / ${total} answered`;
+}
+
+function createQuestionElement(question, questionIdx) {
   const div = document.createElement('div');
   div.className = 'question-block';
-  div.style.marginBottom = 'var(--space-6)';
-  div.style.padding = 'var(--space-4)';
-  div.style.borderRadius = 'var(--radius-lg)';
-  div.style.backgroundColor = 'var(--color-bg-elevated)';
+  div.setAttribute('data-question', questionIdx);
 
-  // Question text
   const qText = document.createElement('h4');
-  qText.style.marginTop = '0';
-  qText.style.marginBottom = 'var(--space-4)';
-  qText.textContent = question.question;
+  qText.textContent = `${questionIdx + 1}. ${question.question}`;
   div.appendChild(qText);
 
-  // Options
   const optionsDiv = document.createElement('div');
-  optionsDiv.style.display = 'flex';
-  optionsDiv.style.flexDirection = 'column';
-  optionsDiv.style.gap = 'var(--space-3)';
+  optionsDiv.className = 'quiz-options';
 
   question.options.forEach((option, optIdx) => {
     const label = document.createElement('label');
-    label.style.display = 'flex';
-    label.style.alignItems = 'center';
-    label.style.gap = 'var(--space-2)';
-    label.style.cursor = 'pointer';
-    label.style.padding = 'var(--space-2)';
-    label.style.borderRadius = 'var(--radius-md)';
-    label.style.transition = 'background-color var(--duration-fast) var(--ease-out)';
-
-    label.addEventListener('mouseover', () => {
-      label.style.backgroundColor = 'var(--color-bg-surface)';
-    });
-
-    label.addEventListener('mouseout', () => {
-      label.style.backgroundColor = 'transparent';
-    });
+    label.className = 'quiz-option';
 
     const radio = document.createElement('input');
     radio.type = 'radio';
     radio.name = `q${questionIdx}`;
     radio.value = optIdx;
-    radio.style.cursor = 'pointer';
 
     const optText = document.createElement('span');
+    optText.className = 'quiz-option__text';
     optText.textContent = option;
-    optText.style.flex = '1';
 
     label.appendChild(radio);
     label.appendChild(optText);
@@ -115,110 +107,128 @@ function createQuestionElement(question, questionIdx, quizId) {
 
   div.appendChild(optionsDiv);
 
-  // Explanation space (filled on reveal)
   const explDiv = document.createElement('div');
-  explDiv.className = `explanation explanation-q${questionIdx}`;
-  explDiv.style.marginTop = 'var(--space-4)';
-  explDiv.style.padding = 'var(--space-3)';
-  explDiv.style.borderRadius = 'var(--radius-md)';
-  explDiv.style.display = 'none';
+  explDiv.className = `quiz-explanation explanation-q${questionIdx}`;
   div.appendChild(explDiv);
 
   return div;
 }
 
-/**
- * Score the quiz by checking selected answers.
- */
-function scoreQuiz(container, quizId, questions) {
-  const inputs = container.querySelectorAll('input[type="radio"]:checked');
+function scoreQuiz(quiz, questions) {
   let correct = 0;
+  let answered = 0;
 
-  inputs.forEach((input, idx) => {
-    const selected = parseInt(input.value);
-    if (selected === questions[idx].correct) {
-      correct++;
+  questions.forEach((question, qIdx) => {
+    const input = quiz.querySelector(`input[name="q${qIdx}"]:checked`);
+    if (input) {
+      answered++;
+      if (parseInt(input.value, 10) === question.correct) {
+        correct++;
+      }
     }
   });
+
+  const percentage = questions.length > 0
+    ? Math.round((correct / questions.length) * 100)
+    : 0;
 
   return {
     correct,
     total: questions.length,
-    percentage: Math.round((correct / questions.length) * 100),
-    passed: (correct / questions.length) >= 0.75,
+    answered,
+    percentage,
+    passed: questions.length > 0 && (correct / questions.length) >= 0.75,
+    allAnswered: answered === questions.length,
   };
 }
 
-/**
- * Show quiz results and reveal explanations.
- */
 function showResults(container, results, quizId, questions) {
   const quiz = container.querySelector('.quiz');
-  const inputs = quiz.querySelectorAll('input[type="radio"]:checked');
 
-  // Show explanations
-  inputs.forEach((input, idx) => {
-    const selected = parseInt(input.value);
-    const question = questions[idx];
-    const explDiv = quiz.querySelector(`.explanation-q${idx}`);
+  if (!results.allAnswered) {
+    let warn = container.querySelector('[data-quiz-warn]');
+    if (!warn) {
+      warn = document.createElement('p');
+      warn.setAttribute('data-quiz-warn', 'true');
+      warn.style.color = 'var(--color-accent-warning)';
+      warn.style.textAlign = 'center';
+      warn.style.marginTop = 'var(--space-4)';
+      container.appendChild(warn);
+    }
+    warn.textContent = `Please answer all ${results.total} questions before checking.`;
+    return;
+  }
+
+  container.querySelector('[data-quiz-warn]')?.remove();
+
+  questions.forEach((question, qIdx) => {
+    const input = quiz.querySelector(`input[name="q${qIdx}"]:checked`);
+    const selected = input ? parseInt(input.value, 10) : -1;
     const isCorrect = selected === question.correct;
+    const explDiv = quiz.querySelector(`.explanation-q${qIdx}`);
 
-    explDiv.style.display = 'block';
-    explDiv.style.borderLeft = `4px solid ${isCorrect ? 'var(--color-accent-secondary)' : 'var(--color-accent-danger)'}`;
+    explDiv.className = `quiz-explanation explanation-q${qIdx} visible ${isCorrect ? 'quiz-explanation--correct' : 'quiz-explanation--incorrect'}`;
     explDiv.innerHTML = `
-      <p style="margin: 0; font-weight: 600; color: ${isCorrect ? 'var(--color-accent-secondary)' : 'var(--color-accent-danger)'}">
-        ${isCorrect ? '✓ Correct' : '✗ Incorrect'}
+      <p style="margin:0;font-weight:600;color:${isCorrect ? 'var(--color-accent-secondary)' : 'var(--color-accent-danger)'}">
+        ${isCorrect ? '✓ Correct' : '✗ Not quite'}
       </p>
-      <p style="margin: var(--space-2) 0 0 0; font-size: var(--text-sm); color: var(--color-text-secondary);">
+      <p style="margin:var(--space-2) 0 0 0;font-size:var(--text-sm);color:var(--color-text-secondary)">
         ${question.explanation}
       </p>
     `;
+
+    const block = quiz.querySelector(`[data-question="${qIdx}"]`);
+    if (block) {
+      block.style.borderColor = isCorrect
+        ? 'var(--color-accent-secondary)'
+        : 'var(--color-accent-danger)';
+    }
   });
 
-  // Show overall results
   let resultDiv = container.querySelector('[data-quiz-result]');
   if (!resultDiv) {
     resultDiv = document.createElement('div');
     resultDiv.setAttribute('data-quiz-result', 'true');
-    resultDiv.style.marginTop = 'var(--space-6)';
-    resultDiv.style.padding = 'var(--space-4)';
-    resultDiv.style.borderRadius = 'var(--radius-lg)';
-    resultDiv.style.textAlign = 'center';
     container.appendChild(resultDiv);
   }
 
-  const statusColor = results.passed
-    ? 'var(--color-accent-secondary)'
-    : 'var(--color-accent-warning)';
-
+  resultDiv.className = `quiz-result ${results.passed ? 'quiz-result--passed' : 'quiz-result--failed'}`;
   resultDiv.innerHTML = `
-    <div style="font-size: var(--text-2xl); font-weight: 700; color: ${statusColor}; margin-bottom: var(--space-2);">
-      ${results.correct} / ${results.total} correct
-    </div>
-    <div style="font-size: var(--text-lg); color: var(--color-text-secondary); margin-bottom: var(--space-4);">
-      ${results.percentage}%
-    </div>
-    <div style="padding: var(--space-3); border-radius: var(--radius-md); background-color: var(--color-bg-elevated);">
+    <div class="quiz-result__score">${results.correct} / ${results.total}</div>
+    <div class="quiz-result__message">${results.percentage}% — ${
+      results.passed
+        ? 'You got it! This concept is mastered.'
+        : 'Review the explanations above and try again (need 75%).'
+    }</div>
+    <div class="quiz-result__actions">
       ${results.passed
-        ? `<p style="margin: 0; color: var(--color-accent-secondary); font-weight: 600;">🎉 Concept mastered! Moving to next...</p>`
-        : `<p style="margin: 0; color: var(--color-accent-warning); font-weight: 600;">Review the concept and try again to reach 75%.</p>`
+        ? '<a href="index.html" class="btn-secondary">Back to RAG hub</a>'
+        : '<button type="button" class="btn-secondary" data-retry-quiz>Try again</button>'
       }
     </div>
   `;
 
-  // Emit quiz:passed if successful
+  if (!results.passed) {
+    resultDiv.querySelector('[data-retry-quiz]')?.addEventListener('click', () => {
+      resultDiv.remove();
+      quiz.querySelectorAll('input[type="radio"]').forEach(r => { r.checked = false; });
+      quiz.querySelectorAll('.quiz-explanation').forEach(e => {
+        e.className = e.className.replace(' visible', '').replace('quiz-explanation--correct', '').replace('quiz-explanation--incorrect', '');
+        e.innerHTML = '';
+      });
+      quiz.querySelectorAll('.question-block').forEach(b => { b.style.borderColor = ''; });
+      updateAnswerProgress(quiz, questions.length);
+    });
+  }
+
   if (results.passed) {
     emit('quiz:passed', { conceptSlug: quizId });
-    console.log(`Quiz passed for concept: ${quizId}`);
   }
+
+  resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-/**
- * Mount quiz from data object.
- * Expects format: { conceptSlug: [...questions] }
- */
 export function mountQuiz(conceptSlug, quizData) {
-  if (!quizData || typeof quizData !== 'object') return;
-  const quizzes = { [conceptSlug]: quizData };
-  mountAll(quizzes);
+  if (!quizData) return;
+  mountAll({ [conceptSlug]: quizData });
 }

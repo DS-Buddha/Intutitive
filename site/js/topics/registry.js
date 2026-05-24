@@ -6,6 +6,15 @@
 
 export const topics = [
   {
+    id: 'papers',
+    title: 'Research Paper Explainers',
+    description: 'Papers rebuilt as visual stories with scrubbable scenes and terminal playgrounds.',
+    icon: 'layers',
+    hubPath: './topics/papers/index.html',
+    conceptCount: 1,
+    readingOrder: [],
+  },
+  {
     id: 'rag',
     title: 'Retrieval-Augmented Generation',
     description: 'How to ground LLMs in documents so they answer from sources instead of guessing.',

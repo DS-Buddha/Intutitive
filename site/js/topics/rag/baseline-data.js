@@ -44,59 +44,6 @@ export default {
     { label: 'Hallucination', color: 'var(--color-accent-danger)' },
   ],
 
-  // Quiz questions (2–4, each with 4 options, correct index, and explanation)
-  quiz: [
-    {
-      question: 'What is the primary purpose of chunking in RAG?',
-      options: [
-        'To compress documents for storage',
-        'To split documents into pieces that can be individually embedded and retrieved',
-        'To remove duplicate content',
-        'To encrypt sensitive information',
-      ],
-      correct: 1,
-      explanation:
-        'Chunking breaks documents into manageable pieces so each chunk can be embedded as a vector and retrieved independently. This enables semantic search over document content.',
-    },
-    {
-      question: 'Why do we need embeddings in RAG?',
-      options: [
-        'To encrypt text for security',
-        'To reduce file size',
-        'To represent text as numerical vectors so we can measure semantic similarity',
-        'To improve grammar and spelling',
-      ],
-      correct: 2,
-      explanation:
-        'Embeddings convert text into numerical vectors in a high-dimensional space. Semantically similar chunks have vectors that are close together, allowing us to find relevant content via similarity search.',
-    },
-    {
-      question: 'What happens if retrieval fails to find relevant chunks?',
-      options: [
-        'The system silently returns no results',
-        'The LLM has no source material and is forced to generate answers from its training data, leading to hallucinations',
-        'The system automatically expands the search scope',
-        'The embedding model retrains itself',
-      ],
-      correct: 1,
-      explanation:
-        'If retrieval returns irrelevant or empty results, the LLM has no grounded context. It falls back to its training data and generates plausible-sounding but potentially false answers. This is hallucination.',
-    },
-    {
-      question: 'In the baseline RAG pipeline, what is the relationship between embedding quality and retrieval quality?',
-      options: [
-        'Embedding quality is unrelated to retrieval',
-        'Better embeddings (more semantically meaningful vectors) lead to better retrieval because relevant chunks cluster closer',
-        'Retrieval quality depends only on the corpus size',
-        'Embedding quality only matters for compression',
-      ],
-      correct: 1,
-      explanation:
-        'The entire baseline RAG pipeline depends on embeddings. Better embeddings mean semantically similar chunks have similar vectors. This makes similarity-based retrieval more accurate. Poor embeddings = irrelevant results.',
-    },
-  ],
-
-  // Comparison data (if the tradeoffs section uses before/after slider)
   comparison: {
     before: {
       title: 'This technique',
@@ -105,6 +52,72 @@ export default {
     after: {
       title: 'This technique',
       description: 'With baseline RAG: LLM grounds answers in your documents',
+    },
+  },
+
+  playgrounds: {
+    chunking: {
+      defaultMode: 'recursive',
+      defaultChunkSize: 280,
+      defaultOverlap: 20,
+      sampleText: `Q3 2024 Earnings Summary
+
+Our third-quarter revenue reached $4.8 billion, up 12% year-over-year. Cloud services drove most of the growth, while legacy hardware declined slightly.
+
+Machine Learning Platform Update
+
+We deployed a new embedding model for document retrieval. The model converts text chunks into 384-dimensional vectors. Retrieval latency improved by 40% after switching to approximate nearest-neighbor search.
+
+Employee Handbook — Remote Work
+
+All employees may work remotely up to three days per week. Office attendance is required for quarterly planning sessions and team onboarding.`,
+    },
+    retrieval: {
+      defaultQuery: 'What was Q3 revenue?',
+      defaultTopK: 3,
+      corpus: [
+        {
+          label: 'Q3 earnings',
+          text: 'Our third-quarter revenue reached $4.8 billion, up 12% year-over-year. Cloud services drove most of the growth.',
+        },
+        {
+          label: 'ML platform',
+          text: 'We deployed a new embedding model for document retrieval. Text chunks become 384-dimensional vectors stored in a vector database.',
+        },
+        {
+          label: 'Remote work policy',
+          text: 'Employees may work remotely up to three days per week. Office attendance is required for quarterly planning sessions.',
+        },
+        {
+          label: 'Cloud growth',
+          text: 'Cloud services revenue increased 28% in Q3. Enterprise customers expanded their usage of managed Kubernetes.',
+        },
+        {
+          label: 'Retrieval latency',
+          text: 'Approximate nearest-neighbor search reduced retrieval latency by 40%. Top-5 chunks are passed to the LLM as context.',
+        },
+        {
+          label: 'Hardware decline',
+          text: 'Legacy hardware revenue declined 3% year-over-year as customers migrated to cloud-hosted solutions.',
+        },
+      ],
+    },
+    embedding: {
+      defaultText: 'Our third-quarter revenue reached $4.8 billion, up 12% year-over-year.',
+    },
+    pipeline: {
+      defaultQuery: 'What was Q3 revenue?',
+      defaultTopK: 3,
+      defaultChunkSize: 280,
+      defaultOverlap: 20,
+      defaultMode: 'recursive',
+      sampleText: `Q3 2024 Earnings Summary
+
+Our third-quarter revenue reached $4.8 billion, up 12% year-over-year. Cloud services drove most of the growth, while legacy hardware declined slightly.
+
+Machine Learning Platform Update
+
+We deployed a new embedding model for document retrieval. The model converts text chunks into 384-dimensional vectors.`,
     },
   },
 };

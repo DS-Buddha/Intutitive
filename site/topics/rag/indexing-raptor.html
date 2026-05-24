@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Hierarchical summary trees for multi-scale retrieval.">
+  <link rel="stylesheet" href="../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../design-system/components.css">
+  <link rel="stylesheet" href="../../design-system/animations.css">
+  <title>RAPTOR Trees — Intuitive Learning</title>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="../../index.html">Home</a><span aria-hidden="true"> / </span>
+      <a href="index.html">RAG</a><span aria-hidden="true"> / </span>
+      <span aria-current="page">RAPTOR Trees</span>
+    </nav>
+  </header>
+  <div class="page-layout">
+    <aside class="sidebar" aria-label="Page navigation">
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading">This page</h3>
+        <ul class="sidebar__list">
+          <li><a href="#hook" data-section="hook">💡 The analogy</a></li>
+          <li><a href="#why-it-matters" data-section="why">⚠️ Why it matters</a></li>
+          <li><a href="#interactive-viz" data-section="viz">🔬 Playgrounds</a></li>
+          <li><a href="#core-mechanism" data-section="mechanism">⚙️ How it works</a></li>
+          <li><a href="#tradeoffs" data-section="tradeoffs">⚖️ Tradeoffs</a></li>
+          <li><a href="#connections" data-section="connections">🔗 Connections</a></li>
+          <li><a href="#put-it-together" data-section="together">🧩 Put it together</a></li>
+        </ul>
+      </nav>
+      <nav class="module-tree" aria-label="RAG concepts">
+        <h3 class="sidebar__heading sidebar__heading--spaced">RAG pipeline</h3>
+        <ul class="sidebar__list" data-rag-module-tree></ul>
+      </nav>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section" data-section-id="hook">
+        <div class="hook-analogy" data-reveal="fade-up">
+          <div class="hook-analogy-card">
+            <p class="hook-analogy-card__lead">Think of it like...</p>
+            <div class="hook-analogy-card__body">A textbook with chapter summaries, section summaries, and full paragraphs. You can read the one-page summary or drill to the exact paragraph — RAPTOR indexes all levels.</div>
+          </div>
+        </div>
+        <h1>RAPTOR Trees</h1>
+        <div class="tldr-pill"><strong>TL;DR:</strong> RAPTOR builds a tree of abstractive summaries: leaves are chunks, parents summarize children. Retrieval hits multiple granularities — detail or theme.</div>
+      </section>
+      <section id="why-it-matters" class="content-section" data-section-id="why">
+        <h2>Why this matters</h2>
+        <p>RAPTOR builds a tree of abstractive summaries: leaves are chunks, parents summarize children. Retrieval hits multiple granularities — detail or theme.</p>
+        <div class="callout callout--danger">
+          <strong>Without this:</strong> downstream retrieval and generation inherit upstream mistakes — bigger models and rerankers rarely recover.
+        </div>
+        <div class="callout callout--success">
+          <strong>With this:</strong> each pipeline stage receives clean, structured input — grounding becomes possible instead of hopeful.
+        </div>
+      </section>
+      <section id="interactive-viz" class="content-section" data-section-id="viz">
+        <h2>Play with the machinery</h2>
+        <p>Query the summary tree. See whether leaf chunks or parent summaries match best.</p>
+        <div class="playground" data-playground="raptor"></div>
+      </section>
+      <section id="core-mechanism" class="content-section" data-section-id="mechanism">
+        <h2>How it works</h2>
+        <p>Recursive summarization: cluster chunks → summarize → repeat up the tree. Query matches at different depths.</p><ul><li><strong>Leaf:</strong> precise local detail</li><li><strong>Parent:</strong> theme-level context for broad questions</li><li><strong>Tradeoff:</strong> abstractive summaries may lose verbatim citeability</li></ul>
+      </section>
+      <section id="tradeoffs" class="content-section" data-section-id="tradeoffs">
+        <h2>Tradeoffs</h2>
+        <div class="grid grid-cols-2" style="gap:var(--space-4);">
+          <div class="callout callout--use"><h3>Use when</h3><ul><li>Long narratives needing both detail and themes</li><li>When flat chunking buries global context</li></ul></div>
+          <div class="callout callout--danger"><h3>Skip when</h3><ul><li>Strict legal citing with no paraphrase allowed</li><li>Tiny corpora where tree build cost exceeds benefit</li></ul></div>
+        </div>
+      </section>
+      <section id="connections" class="content-section" data-section-id="connections">
+        <h2>Connections</h2>
+        <p><a href="./indexing-pageindex.html">PageIndex</a> · <a href="./graph-graphrag.html">GraphRAG</a></p>
+        <p class="text-secondary"><a href="./search-hyde.html">← Previous lesson</a> · <a href="./indexing-pageindex.html">Next lesson →</a></p>
+      </section>
+      <section id="put-it-together" class="content-section" data-section-id="together">
+        <h2>Put it together</h2>
+        <p>Query "cloud revenue" vs "overall strategy" in the sandbox. Different tree levels answer different question shapes.</p>
+        <a href="./indexing-pageindex.html" class="btn btn--primary">Next: continue path →</a>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initRagConceptPage } from '../../js/core/concept-page.js';
+    import conceptData from '../../js/topics/rag/indexing-raptor-data.js';
+    initRagConceptPage('indexing-raptor', conceptData);
+  </script>
+</body>
+</html>

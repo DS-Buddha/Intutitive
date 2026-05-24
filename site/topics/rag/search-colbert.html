@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Token-level MaxSim late interaction for precision retrieval.">
+  <link rel="stylesheet" href="../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../design-system/components.css">
+  <link rel="stylesheet" href="../../design-system/animations.css">
+  <title>ColBERT / Late Interaction — Intuitive Learning</title>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="../../index.html">Home</a><span aria-hidden="true"> / </span>
+      <a href="index.html">RAG</a><span aria-hidden="true"> / </span>
+      <span aria-current="page">ColBERT / Late Interaction</span>
+    </nav>
+  </header>
+  <div class="page-layout">
+    <aside class="sidebar" aria-label="Page navigation">
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading">This page</h3>
+        <ul class="sidebar__list">
+          <li><a href="#hook" data-section="hook">💡 The analogy</a></li>
+          <li><a href="#why-it-matters" data-section="why">⚠️ Why it matters</a></li>
+          <li><a href="#interactive-viz" data-section="viz">🔬 Playgrounds</a></li>
+          <li><a href="#core-mechanism" data-section="mechanism">⚙️ How it works</a></li>
+          <li><a href="#tradeoffs" data-section="tradeoffs">⚖️ Tradeoffs</a></li>
+          <li><a href="#connections" data-section="connections">🔗 Connections</a></li>
+          <li><a href="#put-it-together" data-section="together">🧩 Put it together</a></li>
+        </ul>
+      </nav>
+      <nav class="module-tree" aria-label="RAG concepts">
+        <h3 class="sidebar__heading sidebar__heading--spaced">RAG pipeline</h3>
+        <ul class="sidebar__list" data-rag-module-tree></ul>
+      </nav>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section" data-section-id="hook">
+        <div class="hook-analogy" data-reveal="fade-up">
+          <div class="hook-analogy-card">
+            <p class="hook-analogy-card__lead">Think of it like...</p>
+            <div class="hook-analogy-card__body">Bi-encoder retrieval summarizes a paragraph into one fingerprint. ColBERT keeps every word fingerprint and finds the best word-level matches — like spell-check at retrieval time.</div>
+          </div>
+        </div>
+        <h1>ColBERT / Late Interaction</h1>
+        <div class="tldr-pill"><strong>TL;DR:</strong> ColBERT scores queries and passages with late interaction (MaxSim) — many token vectors, not one pooled dot product. Strong lexical precision without losing neural signal.</div>
+      </section>
+      <section id="why-it-matters" class="content-section" data-section-id="why">
+        <h2>Why this matters</h2>
+        <p>ColBERT scores queries and passages with late interaction (MaxSim) — many token vectors, not one pooled dot product. Strong lexical precision without losing neural signal.</p>
+        <div class="callout callout--danger">
+          <strong>Without this:</strong> downstream retrieval and generation inherit upstream mistakes — bigger models and rerankers rarely recover.
+        </div>
+        <div class="callout callout--success">
+          <strong>With this:</strong> each pipeline stage receives clean, structured input — grounding becomes possible instead of hopeful.
+        </div>
+      </section>
+      <section id="interactive-viz" class="content-section" data-section-id="viz">
+        <h2>Play with the machinery</h2>
+        <p>See the token similarity matrix and how MaxSim sums best matches per query token.</p>
+        <div class="playground" data-playground="colbert"></div>
+      </section>
+      <section id="core-mechanism" class="content-section" data-section-id="mechanism">
+        <h2>How it works</h2>
+        <p>Each query and passage token gets a contextual embedding. Score = sum over query tokens of max similarity to any passage token (MaxSim).</p><ul><li><strong>Recall stage:</strong> often bi-encoder or BM25 first</li><li><strong>Precision stage:</strong> ColBERT rerank on top-k candidates</li><li><strong>Cost:</strong> multi-vector index is larger than single-vector</li></ul>
+      </section>
+      <section id="tradeoffs" class="content-section" data-section-id="tradeoffs">
+        <h2>Tradeoffs</h2>
+        <div class="grid grid-cols-2" style="gap:var(--space-4);">
+          <div class="callout callout--use"><h3>Use when</h3><ul><li>Proper nouns, rare terms, short queries</li><li>As reranker after cheap recall</li></ul></div>
+          <div class="callout callout--danger"><h3>Skip when</h3><ul><li>Strict latency/storage budgets with huge corpora</li></ul></div>
+        </div>
+      </section>
+      <section id="connections" class="content-section" data-section-id="connections">
+        <h2>Connections</h2>
+        <p><a href="./search-retrieval.html">Search & Retrieval</a> · <a href="./search-hyde.html">HyDE</a></p>
+        <p class="text-secondary"><a href="./search-retrieval.html">← Previous lesson</a> · <a href="./search-hyde.html">Next lesson →</a></p>
+      </section>
+      <section id="put-it-together" class="content-section" data-section-id="together">
+        <h2>Put it together</h2>
+        <p>Edit the query in the sandbox. Watch which document wins when rare terms like "GraphRAG" need token-level matching.</p>
+        <a href="./search-hyde.html" class="btn btn--primary">Next: continue path →</a>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initRagConceptPage } from '../../js/core/concept-page.js';
+    import conceptData from '../../js/topics/rag/search-colbert-data.js';
+    initRagConceptPage('search-colbert', conceptData);
+  </script>
+</body>
+</html>

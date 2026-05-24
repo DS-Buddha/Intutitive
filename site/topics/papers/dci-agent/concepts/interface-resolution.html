@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Retrieval interface resolution — DCI paper concept">
+  <link rel="stylesheet" href="../../../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../../../design-system/components.css">
+  <link rel="stylesheet" href="../../../../design-system/animations.css">
+  <title>Interface Resolution — DCI</title>
+</head>
+<body>
+  <header class="site-header"><nav class="breadcrumb">
+    <a href="../../../../index.html">Home</a> / <a href="../../index.html">Papers</a> / <a href="../index.html">DCI</a> / <span aria-current="page">Interface resolution</span>
+  </nav></header>
+  <div class="page-layout page-layout--paper">
+    <aside class="sidebar">
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading">This page</h3>
+        <ul class="sidebar__list">
+          <li><a href="#hook" data-section="hook">Analogy</a></li>
+          <li><a href="#why-it-matters" data-section="why">Why</a></li>
+          <li><a href="#interactive-viz" data-section="viz">Visual</a></li>
+          <li><a href="#core-mechanism" data-section="mechanism">Mechanism</a></li>
+          <li><a href="#put-it-together" data-section="together">Together</a></li>
+        </ul>
+      </nav>
+      <nav class="module-tree"><h3 class="sidebar__heading sidebar__heading--spaced">DCI paper</h3><ul class="sidebar__list" data-paper-nav></ul></nav>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section" data-section-id="hook">
+        <div class="hook-analogy-card"><p class="hook-analogy-card__lead">Think of it like…</p>
+        <p>Reading an entire book vs jumping to the exact sentence on page 12. Higher resolution = smaller, more precise units of access.</p></div>
+        <h1>Retrieval Interface Resolution</h1>
+        <div class="tldr-pill"><strong>TL;DR:</strong> "Resolution" is how fine-grained the agent's corpus access is — document, passage, line, or character span.</div>
+      </section>
+      <section id="why-it-matters" class="content-section" data-section-id="why">
+        <h2>Why this matters</h2>
+        <p>The paper argues retrieval quality depends on interface granularity — what the agent can observe, verify, and act upon — not just retriever embedding quality.</p>
+      </section>
+      <section id="interactive-viz" class="content-section" data-section-id="viz">
+        <h2>Resolution slider</h2>
+        <p class="text-secondary">Drag from document → span. Feel what "higher interface resolution" means.</p>
+        <div class="playground" data-playground="resolution"></div>
+      </section>
+      <section id="core-mechanism" class="content-section" data-section-id="mechanism">
+        <h2>Mechanism</h2>
+        <p>DCI exposes tool outputs: matched lines with line numbers, file paths, surrounding context from targeted reads. Retriever-mediated access typically caps at passage-level snippets.</p>
+      </section>
+      <section id="put-it-together" class="content-section" data-section-id="together">
+        <h2>Put it together</h2>
+        <p>Full lab: <a href="../lab.html">All 5 stations →</a></p>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initPaperConceptPage } from '../../../../js/core/paper-page.js';
+    import conceptData from '../../../../js/topics/papers/dci-agent/concepts/interface-resolution-data.js';
+    initPaperConceptPage('dci-agent', 'interface-resolution', conceptData);
+  </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Learn [CONCEPT_NAME] — an interactive guide to understanding [TOPIC]">
+  <meta name="description" content="Learn [CONCEPT_NAME] — interactive playground-first guide">
 
   <link rel="stylesheet" href="../../design-system/tokens.css">
   <link rel="stylesheet" href="../../design-system/components.css">
@@ -12,7 +12,6 @@
   <title>[CONCEPT_NAME] — Intuitive Learning</title>
 </head>
 <body>
-  <!-- ── HEADER ──────────────────────────────────────── -->
   <header class="site-header" role="banner">
     <nav class="breadcrumb" aria-label="breadcrumb">
       <a href="../../index.html">Home</a>
@@ -21,253 +20,81 @@
       <span aria-hidden="true">/</span>
       <span aria-current="page">[CONCEPT_NAME]</span>
     </nav>
-    <div class="header-actions">
-      <div data-progress-ring="[TOPIC_ID]" data-concept-count="[TOTAL_CONCEPTS]"></div>
-    </div>
   </header>
 
-  <!-- ── LAYOUT ──────────────────────────────────────── -->
   <div class="page-layout">
-
-    <!-- SIDEBAR ─────────────────────────────────────────– -->
     <aside class="sidebar" aria-label="Page navigation">
       <nav class="section-nav" data-scrollspy>
-        <h3 style="margin-top:0;font-size:var(--text-sm);color:var(--color-text-secondary);text-transform:uppercase;">This page</h3>
-        <ul style="list-style:none;padding:0;margin:0;">
-          <li><a href="#hook" data-section="hook">Hook</a></li>
-          <li><a href="#why-it-matters" data-section="why">Why it matters</a></li>
-          <li><a href="#interactive-viz" data-section="viz">See it work</a></li>
-          <li><a href="#core-mechanism" data-section="mechanism">How it works</a></li>
-          <li><a href="#tradeoffs" data-section="tradeoffs">Tradeoffs</a></li>
-          <li><a href="#connections" data-section="connections">Connections</a></li>
-          <li><a href="#check-understanding" data-section="quiz">Quiz</a></li>
+        <h3 class="sidebar__heading">This page</h3>
+        <ul class="sidebar__list">
+          <li><a href="#hook" data-section="hook">💡 The analogy</a></li>
+          <li><a href="#why-it-matters" data-section="why">⚠️ Why it matters</a></li>
+          <li><a href="#interactive-viz" data-section="viz">🔬 Playgrounds</a></li>
+          <li><a href="#core-mechanism" data-section="mechanism">⚙️ How it works</a></li>
+          <li><a href="#tradeoffs" data-section="tradeoffs">⚖️ Tradeoffs</a></li>
+          <li><a href="#connections" data-section="connections">🔗 Connections</a></li>
+          <li><a href="#put-it-together" data-section="together">🧩 Put it together</a></li>
         </ul>
       </nav>
 
       <nav class="module-tree" aria-label="Module contents">
-        <h3 style="margin-top:var(--space-8);margin-bottom:var(--space-3);font-size:var(--text-sm);color:var(--color-text-secondary);text-transform:uppercase;">All concepts</h3>
-        <ul style="list-style:none;padding:0;margin:0;">
-          <!-- POPULATE WITH CONCEPT LINKS FROM TOPIC -->
-          <li><a href="./baseline.html" style="font-size:var(--text-xs);">Baseline RAG</a></li>
-          <li><a href="./ingestion.html" style="font-size:var(--text-xs);">Document Ingestion</a></li>
-          <!-- ... more concepts ... -->
-        </ul>
+        <h3 class="sidebar__heading sidebar__heading--spaced">All concepts</h3>
+        <ul class="sidebar__list" data-rag-module-tree></ul>
       </nav>
     </aside>
 
-    <!-- MAIN CONTENT ────────────────────────────────────– -->
     <main class="content" id="main-content">
-
-      <!-- ─ SECTION 1: HOOK ──────────────────────────── -->
       <section id="hook" class="content-section" data-section-id="hook">
         <div class="hook-analogy" data-reveal="fade-up">
-          <div class="card card-compact" style="background-color:var(--color-accent-primary);color:var(--color-text-inverse);">
-            <p style="margin:0;font-style:italic;font-weight:600;">Think of it like...</p>
-            <p style="margin:var(--space-2) 0 0 0;">[ANALOGY_TEXT]</p>
+          <div class="hook-analogy-card">
+            <p class="hook-analogy-card__lead">Think of it like...</p>
+            <div class="hook-analogy-card__body">[ANALOGY_TEXT]</div>
           </div>
         </div>
-
-        <h1 style="margin-top:var(--space-8);">[CONCEPT_NAME]</h1>
-
-        <div class="pill pill--primary" style="display:inline-block;margin-top:var(--space-4);">
-          <strong>TL;DR:</strong> [ONE_SENTENCE_SUMMARY]
-        </div>
+        <h1>[CONCEPT_NAME]</h1>
+        <div class="tldr-pill"><strong>TL;DR:</strong> [ONE_SENTENCE_SUMMARY]</div>
       </section>
 
-      <!-- ─ SECTION 2: WHY IT MATTERS ────────────────– -->
       <section id="why-it-matters" class="content-section" data-section-id="why">
         <h2>Why this matters</h2>
-
         <p>[WHY_INTRODUCTION]</p>
-
-        <!-- Failure chain or consequence diagram -->
-        <div class="viz-container" data-viz-type="failure-chain" data-viz-config="conceptData">
-          <noscript>
-            <img src="../../assets/static/[CONCEPT]-failure.svg" alt="[CONCEPT_NAME] failure chain">
-          </noscript>
-        </div>
-
-        <div class="grid grid-cols-2" style="gap:var(--space-4);margin-top:var(--space-6);">
-          <div class="callout callout--warning">
-            <h4>Without this:</h4>
-            <p>[FAILURE_1]</p>
-          </div>
-          <div class="callout callout--info">
-            <h4>With this:</h4>
-            <p>[BENEFIT_1]</p>
-          </div>
-        </div>
       </section>
 
-      <!-- ─ SECTION 3: INTERACTIVE VIZ ──────────────── -->
       <section id="interactive-viz" class="content-section" data-section-id="viz">
-        <h2>See it work</h2>
-
-        <p>[VIZ_INTRODUCTION — no technical jargon yet]</p>
-
-        <div class="viz-container" data-viz-type="[VIZ_TYPE]">
-          <noscript>
-            <img src="../../assets/static/[CONCEPT]-diagram.svg" alt="[CONCEPT_NAME] visualization">
-          </noscript>
-        </div>
-
-        <p class="viz-caption" style="text-align:center;color:var(--color-text-secondary);font-size:var(--text-sm);margin-top:var(--space-4);">
-          [CAPTION — what to notice in the animation]
-        </p>
+        <h2>Play with the machinery</h2>
+        <p>[PLAYGROUND_INTRO]</p>
+        <div class="playground" data-playground="[PLAYGROUND_TYPE]"></div>
       </section>
 
-      <!-- ─ SECTION 4: CORE MECHANISM ──────────────── -->
       <section id="core-mechanism" class="content-section" data-section-id="mechanism">
         <h2>How it works</h2>
-
-        <p>[TRANSITION_TEXT connecting intuition to mechanism]</p>
-
-        <!-- Tabbed interface: Overview / Details / Code pattern -->
-        <div class="tab-panel" data-component="tabs">
-          <div role="tablist">
-            <button role="tab" data-tab="overview" aria-selected="true" style="margin-right:0;">Overview</button>
-            <button role="tab" data-tab="details" aria-selected="false">Details</button>
-            <button role="tab" data-tab="code" aria-selected="false">Code pattern</button>
-          </div>
-
-          <div role="tabpanel" data-tabpanel="overview">
-            <h3>Basic explanation</h3>
-            <p>[OVERVIEW_EXPLANATION]</p>
-            <p>[STEP_1]</p>
-            <p>[STEP_2]</p>
-            <p>[STEP_3]</p>
-          </div>
-
-          <div role="tabpanel" data-tabpanel="details" hidden>
-            <h3>Technical details</h3>
-            <p>[TECHNICAL_DETAILS]</p>
-            <p>Equations, parameters, trade-offs in detail.</p>
-            <pre><code>[PSEUDOCODE or FORMULA if needed]</code></pre>
-          </div>
-
-          <div role="tabpanel" data-tabpanel="code" hidden>
-            <h3>Implementation pattern</h3>
-            <pre><code class="language-python">[ILLUSTRATIVE CODE SNIPPET]</code></pre>
-          </div>
-        </div>
+        <p>[MECHANISM_TEXT]</p>
       </section>
 
-      <!-- ─ SECTION 5: TRADEOFFS ────────────────────– -->
       <section id="tradeoffs" class="content-section" data-section-id="tradeoffs">
         <h2>Tradeoffs</h2>
-
-        <div class="grid grid-cols-2" style="gap:var(--space-4);margin-bottom:var(--space-6);">
-          <div class="callout callout--use">
-            <h3>Use when</h3>
-            <ul style="margin:0;padding-left:var(--space-6);">
-              <li>[USE_CASE_1]</li>
-              <li>[USE_CASE_2]</li>
-              <li>[USE_CASE_3]</li>
-            </ul>
-          </div>
-
-          <div class="callout callout--avoid">
-            <h3>Poor fit when</h3>
-            <ul style="margin:0;padding-left:var(--space-6);">
-              <li>[AVOID_CASE_1]</li>
-              <li>[AVOID_CASE_2]</li>
-              <li>[AVOID_CASE_3]</li>
-            </ul>
-          </div>
+        <div class="grid grid-cols-2" style="gap:var(--space-4);">
+          <div class="callout callout--use"><h3>Use when</h3><ul><li>[USE_CASE_1]</li></ul></div>
+          <div class="callout callout--danger"><h3>Skip when</h3><ul><li>[AVOID_CASE_1]</li></ul></div>
         </div>
-
-        <!-- Before/After comparison -->
-        <h3>Impact comparison</h3>
-        <div class="viz-container" data-viz-type="pipeline-comparison">
-          <noscript>
-            <img src="../../assets/static/[CONCEPT]-comparison.svg" alt="Before/after comparison">
-          </noscript>
-        </div>
-
-        <!-- Cost/Benefit table -->
-        <table style="width:100%;margin-top:var(--space-6);border-collapse:collapse;">
-          <thead>
-            <tr style="border-bottom:2px solid var(--color-border);">
-              <th style="padding:var(--space-3);text-align:left;">Dimension</th>
-              <th style="padding:var(--space-3);text-align:left;">Cost</th>
-              <th style="padding:var(--space-3);text-align:left;">Benefit</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="border-bottom:1px solid var(--color-border);">
-              <td style="padding:var(--space-3);">Latency</td>
-              <td style="padding:var(--space-3);">[COST]</td>
-              <td style="padding:var(--space-3);">[BENEFIT]</td>
-            </tr>
-            <tr style="border-bottom:1px solid var(--color-border);">
-              <td style="padding:var(--space-3);">Index size</td>
-              <td style="padding:var(--space-3);">[COST]</td>
-              <td style="padding:var(--space-3);">[BENEFIT]</td>
-            </tr>
-            <tr style="border-bottom:1px solid var(--color-border);">
-              <td style="padding:var(--space-3);">Accuracy</td>
-              <td style="padding:var(--space-3);">[COST]</td>
-              <td style="padding:var(--space-3);">[BENEFIT]</td>
-            </tr>
-          </tbody>
-        </table>
       </section>
 
-      <!-- ─ SECTION 6: CONNECTIONS ──────────────────– -->
       <section id="connections" class="content-section" data-section-id="connections">
-        <h2>How it connects</h2>
-
-        <p>This concept builds on [PREREQUISITE] and flows into [DOWNSTREAM].</p>
-
-        <!-- Link cards -->
-        <div class="grid grid-cols-2" style="gap:var(--space-4);margin-top:var(--space-6);">
-          <a href="[PREREQ_PATH]" class="card" style="text-decoration:none;color:inherit;">
-            <h4 style="margin:0 0 var(--space-2) 0;">← [PREREQUISITE_NAME]</h4>
-            <p style="margin:0;font-size:var(--text-sm);color:var(--color-text-secondary);">You should understand this first</p>
-          </a>
-
-          <a href="[NEXT_PATH]" class="card" style="text-decoration:none;color:inherit;">
-            <h4 style="margin:0 0 var(--space-2) 0;">[NEXT_CONCEPT_NAME] →</h4>
-            <p style="margin:0;font-size:var(--text-sm);color:var(--color-text-secondary);">Builds on this concept</p>
-          </a>
-        </div>
+        <h2>Connections</h2>
+        <p>[CONNECTION_LINKS]</p>
       </section>
 
-      <!-- ─ SECTION 7: CHECK UNDERSTANDING ──────────– -->
-      <section id="check-understanding" class="content-section" data-section-id="quiz">
-        <h2>Check your understanding</h2>
-
-        <p>Answer these questions to confirm you've got it. You need to score ≥75% to mark this concept as learned.</p>
-
-        <div class="quiz-container" data-component="quiz" data-quiz-id="[CONCEPT_SLUG]">
-          <!-- Rendered by quiz.js from conceptData.quiz -->
-        </div>
+      <section id="put-it-together" class="content-section" data-section-id="together">
+        <h2>Put it together</h2>
+        <p>[TOGETHER_TEXT]</p>
       </section>
-
     </main>
   </div>
 
-  <!-- ── SCRIPTS ────────────────────────────────────── -->
   <script type="module">
-    import { initScrollspy } from '../../js/core/router.js';
-    import { initProgress } from '../../js/core/progress.js';
-    import { mountAll as mountViz } from '../../js/components/pipeline-viz.js';
-    import { mountAll as mountTabs } from '../../js/components/tab-panel.js';
-    import { mountAll as mountQuiz } from '../../js/components/quiz.js';
-    import { mountAll as mountProgressRings } from '../../js/components/progress-ring.js';
+    import { initRagConceptPage } from '../../js/core/concept-page.js';
     import conceptData from '../../js/topics/[TOPIC]/[CONCEPT_SLUG]-data.js';
-
-    // Initialize scroll-spy for section nav
-    initScrollspy();
-
-    // Initialize progress tracking
-    initProgress('[TOPIC_ID]', '[CONCEPT_SLUG]');
-
-    // Mount interactive components
-    mountViz(conceptData);
-    mountTabs();
-    mountQuiz(conceptData.quiz);
-    mountProgressRings({ '[TOPIC_ID]': { conceptCount: [TOTAL_CONCEPTS] } });
+    initRagConceptPage('[CONCEPT_SLUG]', conceptData);
   </script>
 </body>
 </html>

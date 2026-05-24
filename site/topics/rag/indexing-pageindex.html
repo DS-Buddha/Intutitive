@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Structure-first retrieval via table of contents navigation.">
+  <link rel="stylesheet" href="../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../design-system/components.css">
+  <link rel="stylesheet" href="../../design-system/animations.css">
+  <title>PageIndex (TOC Navigation) — Intuitive Learning</title>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="../../index.html">Home</a><span aria-hidden="true"> / </span>
+      <a href="index.html">RAG</a><span aria-hidden="true"> / </span>
+      <span aria-current="page">PageIndex (TOC Navigation)</span>
+    </nav>
+  </header>
+  <div class="page-layout">
+    <aside class="sidebar" aria-label="Page navigation">
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading">This page</h3>
+        <ul class="sidebar__list">
+          <li><a href="#hook" data-section="hook">💡 The analogy</a></li>
+          <li><a href="#why-it-matters" data-section="why">⚠️ Why it matters</a></li>
+          <li><a href="#interactive-viz" data-section="viz">🔬 Playgrounds</a></li>
+          <li><a href="#core-mechanism" data-section="mechanism">⚙️ How it works</a></li>
+          <li><a href="#tradeoffs" data-section="tradeoffs">⚖️ Tradeoffs</a></li>
+          <li><a href="#connections" data-section="connections">🔗 Connections</a></li>
+          <li><a href="#put-it-together" data-section="together">🧩 Put it together</a></li>
+        </ul>
+      </nav>
+      <nav class="module-tree" aria-label="RAG concepts">
+        <h3 class="sidebar__heading sidebar__heading--spaced">RAG pipeline</h3>
+        <ul class="sidebar__list" data-rag-module-tree></ul>
+      </nav>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section" data-section-id="hook">
+        <div class="hook-analogy" data-reveal="fade-up">
+          <div class="hook-analogy-card">
+            <p class="hook-analogy-card__lead">Think of it like...</p>
+            <div class="hook-analogy-card__body">Finding a policy in an employee handbook by opening the table of contents vs searching random sticky notes scattered on the floor. Structure beats bag-of-chunks for organized docs.</div>
+          </div>
+        </div>
+        <h1>PageIndex (TOC Navigation)</h1>
+        <div class="tldr-pill"><strong>TL;DR:</strong> PageIndex builds a TOC-like index and lets an LLM reason over structure to find passages — de-emphasizing embedding similarity over the whole file.</div>
+      </section>
+      <section id="why-it-matters" class="content-section" data-section-id="why">
+        <h2>Why this matters</h2>
+        <p>PageIndex builds a TOC-like index and lets an LLM reason over structure to find passages — de-emphasizing embedding similarity over the whole file.</p>
+        <div class="callout callout--danger">
+          <strong>Without this:</strong> downstream retrieval and generation inherit upstream mistakes — bigger models and rerankers rarely recover.
+        </div>
+        <div class="callout callout--success">
+          <strong>With this:</strong> each pipeline stage receives clean, structured input — grounding becomes possible instead of hopeful.
+        </div>
+      </section>
+      <section id="interactive-viz" class="content-section" data-section-id="viz">
+        <h2>Play with the machinery</h2>
+        <p>TOC navigation jumps to the right section in one hop. Flat chunk search may return fragments from wrong places.</p>
+        <div class="playground" data-playground="pageindex"></div>
+      </section>
+      <section id="core-mechanism" class="content-section" data-section-id="mechanism">
+        <h2>How it works</h2>
+        <p>Hierarchical index mirrors document outline. LLM chooses branches and drill-down paths before (or instead of) global embedding top-k.</p><ul><li><strong>Best for:</strong> manuals, policies, reports with reliable headings</li><li><strong>Hybrid:</strong> PageIndex routing → small embedding search inside section</li></ul>
+      </section>
+      <section id="tradeoffs" class="content-section" data-section-id="tradeoffs">
+        <h2>Tradeoffs</h2>
+        <div class="grid grid-cols-2" style="gap:var(--space-4);">
+          <div class="callout callout--use"><h3>Use when</h3><ul><li>Long structured PDFs with clear section hierarchy</li><li>Queries referencing sections ("remote work policy")</li></ul></div>
+          <div class="callout callout--danger"><h3>Skip when</h3><ul><li>Unstructured notes without headings</li><li>When pure semantic search over short docs is faster</li></ul></div>
+        </div>
+      </section>
+      <section id="connections" class="content-section" data-section-id="connections">
+        <h2>Connections</h2>
+        <p><a href="./indexing-raptor.html">RAPTOR</a> · <a href="./verification-agentic.html">Agentic RAG</a></p>
+        <p class="text-secondary"><a href="./indexing-raptor.html">← Previous lesson</a> · <a href="./graph-graphrag.html">Next lesson →</a></p>
+      </section>
+      <section id="put-it-together" class="content-section" data-section-id="together">
+        <h2>Put it together</h2>
+        <p>Search "remote work policy" in the sandbox. TOC lands on section 4 in one step; flat search may rank a random chunk mentioning "remote" from benefits.</p>
+        <a href="./graph-graphrag.html" class="btn btn--primary">Next: continue path →</a>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initRagConceptPage } from '../../js/core/concept-page.js';
+    import conceptData from '../../js/topics/rag/indexing-pageindex-data.js';
+    initRagConceptPage('indexing-pageindex', conceptData);
+  </script>
+</body>
+</html>

@@ -11,9 +11,23 @@ export function mountAll(conceptData) {
   const containers = document.querySelectorAll('[data-viz-type]');
   containers.forEach(container => {
     const vizType = container.getAttribute('data-viz-type');
-    const config = conceptData[vizType] || {};
+    const config = resolveVizConfig(conceptData, vizType);
     renderViz(container, vizType, config);
   });
+}
+
+/**
+ * Resolve viz config from concept data (supports nested and flat shapes).
+ */
+function resolveVizConfig(conceptData, vizType) {
+  if (conceptData[vizType]) return conceptData[vizType];
+  if (vizType === 'baseline-pipeline-stepper' && conceptData.steps) {
+    return { steps: conceptData.steps };
+  }
+  if (vizType === 'failure-chain' && conceptData.failureChain) {
+    return { steps: conceptData.failureChain };
+  }
+  return {};
 }
 
 /**
@@ -148,91 +162,135 @@ function renderPipelineMap(container, config) {
 }
 
 /**
- * Render a step-by-step stepper (baseline example).
- * Click each step to reveal its failure mode.
+ * Render a rich HTML step-by-step stepper with play walkthrough.
  */
 function renderStepper(container, config) {
   const { steps = [] } = config;
+  if (steps.length === 0) {
+    container.innerHTML = '<p class="text-secondary text-center">Interactive demo loading…</p>';
+    return;
+  }
 
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', '0 0 600 200');
-  svg.setAttribute('role', 'img');
-  svg.setAttribute('aria-label', 'Step-by-step pipeline');
+  container.classList.add('viz-container--interactive');
+  container.innerHTML = '';
 
-  const stepWidth = 130;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'pipeline-stepper';
+
+  const stepsRow = document.createElement('div');
+  stepsRow.className = 'stepper-steps';
+  stepsRow.setAttribute('role', 'tablist');
+
   steps.forEach((step, i) => {
-    const x = 50 + i * stepWidth;
-    const y = 80;
+    const btn = document.createElement('button');
+    btn.className = 'stepper-step';
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('data-step', i);
+    if (i === 0) btn.setAttribute('data-active', 'true');
 
-    // Circle for step number
-    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    circle.setAttribute('cx', x + 30);
-    circle.setAttribute('cy', y + 30);
-    circle.setAttribute('r', '20');
-    circle.setAttribute('fill', step.color || '#58a6ff');
-    circle.setAttribute('opacity', '0.6');
-    circle.setAttribute('class', 'stepper-dot');
-    circle.setAttribute('data-step', i);
+    btn.innerHTML = `
+      <span class="stepper-step__circle" style="background-color:${step.color || 'var(--color-accent-primary)'}">${i + 1}</span>
+      <span class="stepper-step__label">${step.label || `Step ${i + 1}`}</span>
+    `;
 
-    circle.addEventListener('click', () => {
-      highlightStep(svg, i, step);
-    });
-
-    svg.appendChild(circle);
-
-    // Step number
-    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', x + 30);
-    text.setAttribute('y', y + 35);
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('fill', 'white');
-    text.setAttribute('font-weight', '700');
-    text.setAttribute('font-size', '14');
-    text.textContent = i + 1;
-    svg.appendChild(text);
-
-    // Step label
-    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    label.setAttribute('x', x + 30);
-    label.setAttribute('y', y + 65);
-    label.setAttribute('text-anchor', 'middle');
-    label.setAttribute('font-size', '11');
-    label.setAttribute('fill', '#8b949e');
-    label.textContent = step.label || `Step ${i + 1}`;
-    svg.appendChild(label);
-
-    // Arrow to next step
-    if (i < steps.length - 1) {
-      const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      arrow.setAttribute('x1', x + 55);
-      arrow.setAttribute('y1', y + 30);
-      arrow.setAttribute('x2', x + 75);
-      arrow.setAttribute('y2', y + 30);
-      arrow.setAttribute('stroke', '#484f58');
-      arrow.setAttribute('stroke-width', '2');
-      arrow.setAttribute('marker-end', 'url(#arrow-stepper)');
-      svg.appendChild(arrow);
-    }
+    btn.addEventListener('click', () => showStep(wrapper, steps, i));
+    stepsRow.appendChild(btn);
   });
 
-  // Arrow marker
-  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-  const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
-  marker.setAttribute('id', 'arrow-stepper');
-  marker.setAttribute('markerWidth', '10');
-  marker.setAttribute('markerHeight', '10');
-  marker.setAttribute('refX', '9');
-  marker.setAttribute('refY', '3');
-  marker.setAttribute('orient', 'auto');
-  const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-  polygon.setAttribute('points', '0 0, 10 3, 0 6');
-  polygon.setAttribute('fill', '#484f58');
-  marker.appendChild(polygon);
-  defs.appendChild(marker);
-  svg.appendChild(defs);
+  const detail = document.createElement('div');
+  detail.className = 'stepper-detail';
+  detail.setAttribute('data-step-detail', 'true');
 
-  container.innerHTML = '';
-  container.appendChild(svg);
+  const controls = document.createElement('div');
+  controls.className = 'stepper-controls';
+
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'btn-secondary';
+  prevBtn.textContent = '← Previous';
+  prevBtn.addEventListener('click', () => {
+    const current = getActiveStepIndex(wrapper);
+    if (current > 0) showStep(wrapper, steps, current - 1);
+  });
+
+  const playBtn = document.createElement('button');
+  playBtn.className = 'btn-primary';
+  playBtn.textContent = '▶ Play walkthrough';
+  playBtn.addEventListener('click', () => runStepperWalkthrough(wrapper, steps, playBtn));
+
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'btn-secondary';
+  nextBtn.textContent = 'Next →';
+  nextBtn.addEventListener('click', () => {
+    const current = getActiveStepIndex(wrapper);
+    if (current < steps.length - 1) showStep(wrapper, steps, current + 1);
+  });
+
+  controls.appendChild(prevBtn);
+  controls.appendChild(playBtn);
+  controls.appendChild(nextBtn);
+
+  wrapper.appendChild(stepsRow);
+  wrapper.appendChild(detail);
+  wrapper.appendChild(controls);
+  container.appendChild(wrapper);
+
+  showStep(wrapper, steps, 0);
+}
+
+function getActiveStepIndex(wrapper) {
+  const active = wrapper.querySelector('.stepper-step[data-active="true"]');
+  return active ? parseInt(active.getAttribute('data-step'), 10) : 0;
+}
+
+function showStep(wrapper, steps, index) {
+  const step = steps[index];
+  if (!step) return;
+
+  wrapper.querySelectorAll('.stepper-step').forEach((btn, i) => {
+    btn.toggleAttribute('data-active', i === index);
+  });
+
+  const detail = wrapper.querySelector('[data-step-detail]');
+  if (detail) {
+    detail.innerHTML = `
+      <div class="stepper-detail__header">
+        <span class="stepper-detail__badge" style="background-color:${step.color || 'var(--color-accent-primary)'}">${index + 1}</span>
+        <h3 class="stepper-detail__title">${step.label || `Step ${index + 1}`}</h3>
+      </div>
+      <p class="stepper-detail__desc">${step.description || ''}</p>
+      <div class="stepper-detail__failure">
+        <p class="stepper-detail__failure-label">What breaks without this step</p>
+        <p>${step.failureDescription || 'This step is critical to the pipeline.'}</p>
+      </div>
+    `;
+  }
+}
+
+function runStepperWalkthrough(wrapper, steps, playBtn) {
+  let idx = 0;
+  let timer = null;
+
+  const stop = () => {
+    if (timer) clearTimeout(timer);
+    playBtn.textContent = '▶ Play walkthrough';
+    playBtn.onclick = () => runStepperWalkthrough(wrapper, steps, playBtn);
+  };
+
+  playBtn.textContent = '⏸ Pause';
+  playBtn.onclick = stop;
+
+  const advance = () => {
+    showStep(wrapper, steps, idx);
+    idx++;
+    if (idx < steps.length) {
+      timer = setTimeout(advance, 2500);
+    } else {
+      stop();
+    }
+  };
+
+  idx = 0;
+  advance();
 }
 
 /**
@@ -429,30 +487,4 @@ function runWalkthrough(container, steps) {
   };
 
   showStep();
-}
-
-/**
- * Highlight a single step in the stepper and show failure details.
- */
-function highlightStep(svg, stepIndex, stepData) {
-  const dots = svg.querySelectorAll('.stepper-dot');
-  dots.forEach((dot, i) => {
-    if (i === stepIndex) {
-      dot.setAttribute('opacity', '1');
-    } else {
-      dot.setAttribute('opacity', '0.3');
-    }
-  });
-
-  // Optionally show failure details below
-  const container = svg.parentElement;
-  let details = container.querySelector('[data-step-details]');
-  if (!details) {
-    details = document.createElement('p');
-    details.setAttribute('data-step-details', 'true');
-    details.style.marginTop = 'var(--space-4)';
-    details.style.textAlign = 'center';
-    container.appendChild(details);
-  }
-  details.textContent = stepData.failureDescription || `Step ${stepIndex + 1}: ${stepData.label}`;
 }
