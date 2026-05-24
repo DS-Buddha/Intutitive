@@ -27,6 +27,7 @@ import { mount as mountEvidenceLens } from './evidence-lens-playground.js';
 import { mount as mountAssumptionBreaker } from './assumption-breaker-playground.js';
 import { mount as mountIdeasWorkshop } from './ideas-workshop-playground.js';
 import { mount as mountPaperChat } from './paper-chat-playground.js';
+import { mount as mountTestTimeScaling } from './test-time-scaling-playground.js';
 
 const MOUNTERS = {
   chunking: mountChunking,
@@ -54,6 +55,7 @@ const MOUNTERS = {
   'assumption-breaker': mountAssumptionBreaker,
   'ideas-workshop': mountIdeasWorkshop,
   'paper-chat': mountPaperChat,
+  'test-time-scaling': mountTestTimeScaling,
 };
 
 export function mountAll(conceptData = {}) {

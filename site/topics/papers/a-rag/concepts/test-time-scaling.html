@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Test-time scaling — A-RAG paper concept">
+  <link rel="stylesheet" href="../../../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../../../design-system/components.css">
+  <link rel="stylesheet" href="../../../../design-system/animations.css">
+  <title>Test-Time Scaling — A-RAG</title>
+</head>
+<body>
+  <header class="site-header"><nav class="breadcrumb">
+    <a href="../../../../index.html">Home</a> / <a href="../../index.html">Papers</a> / <a href="../index.html">A-RAG</a> / <span aria-current="page">Test-time scaling</span>
+  </nav></header>
+  <div class="page-layout page-layout--paper">
+    <aside class="sidebar">
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading">This page</h3>
+        <ul class="sidebar__list">
+          <li><a href="#hook" data-section="hook">Analogy</a></li>
+          <li><a href="#why-it-matters" data-section="why">Why</a></li>
+          <li><a href="#interactive-viz" data-section="viz">Playground</a></li>
+          <li><a href="#core-mechanism" data-section="mechanism">Mechanism</a></li>
+          <li><a href="#put-it-together" data-section="together">Together</a></li>
+        </ul>
+      </nav>
+      <nav class="module-tree"><h3 class="sidebar__heading sidebar__heading--spaced">A-RAG paper</h3><ul class="sidebar__list" data-paper-nav></ul></nav>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section" data-section-id="hook">
+        <div class="hook-analogy-card"><p class="hook-analogy-card__lead">Think of it like…</p>
+        <p>Giving a detective more time and a bigger team — same case file, but more iterations to follow leads before committing to an answer.</p></div>
+        <h1>Test-Time Scaling</h1>
+        <div class="tldr-pill"><strong>TL;DR:</strong> A-RAG accuracy improves with max agent steps and reasoning effort — stronger models benefit more from longer horizons.</div>
+      </section>
+      <section id="why-it-matters" class="content-section" data-section-id="why">
+        <h2>Why this matters</h2>
+        <p>Fixed pipelines cap compute at design time. Agentic interfaces let you spend more test-time compute when the question is hard — the paper's scaling curves validate this on MuSiQue-300.</p>
+      </section>
+      <section id="interactive-viz" class="content-section" data-section-id="viz">
+        <h2>Steps vs accuracy</h2>
+        <p class="text-secondary">Drag max steps — watch LLM-Acc climb on the paper's MuSiQue-300 subset (GPT-5-mini).</p>
+        <div class="playground" data-playground="test-time-scaling"></div>
+      </section>
+      <section id="core-mechanism" class="content-section" data-section-id="mechanism">
+        <h2>Mechanism (§5.1)</h2>
+        <p>Max steps 5→20: ~+8 pts (GPT-5-mini). Reasoning effort minimal→high: ~+25 pts. GPT-5-mini gains roughly twice as much as GPT-4o-mini from longer horizons — capability and interface compound.</p>
+      </section>
+      <section id="put-it-together" class="content-section" data-section-id="together">
+        <h2>Put it together</h2>
+        <p>Full lab with both scaling dimensions: <a href="../lab.html#scaling">Paper journey → Test-time scaling</a></p>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initPaperConceptPage } from '../../../../js/core/paper-page.js';
+    import conceptData from '../../../../js/topics/papers/a-rag/concepts/test-time-scaling-data.js';
+    initPaperConceptPage('a-rag', 'test-time-scaling', conceptData);
+  </script>
+</body>
+</html>

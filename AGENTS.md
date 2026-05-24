@@ -110,16 +110,19 @@ Research papers use a standardized three-part journey (Understand → Verify →
 1. Write `Papers/<Paper-Name>/Paper-Notes.md` (assumptions, limits, extensions, benchmark numbers)
 2. Copy `site/_template/paper-hub.html` → `site/topics/papers/<paper-id>/index.html`
 3. Copy `site/_template/paper-lab.html` → `site/topics/papers/<paper-id>/lab.html`
-4. Create `site/js/topics/papers/<paper-id>/journey-data.js` and `lab-data.js`
-5. Add entry to `site/js/topics/paperRegistry.js` (include `understandSectionIds`, `coreVerifyPlaygrounds`, `readinessChecks`)
+4. Create `site/js/topics/papers/<paper-id>/`:
+   - `journey-data.js`, `lab-data.js`, `playground-configs.js` (with per-paper `labels`)
+   - Optional `*-scenarios.js`, concept pages under `concepts/`
+5. Add entry to `site/js/topics/paperRegistry.js` (include `understandSectionIds`, `coreVerifyPlaygrounds`, `readinessChecks`, optional `concepts`)
 6. Add `server/prompts/<paper-id>.md` for Gemini Paper chat
-7. Run `python server/dev_server.py` and audit structure against [DCI lab](site/topics/papers/dci-agent/lab.html)
+7. Optional concept deep dives: copy `site/_template/paper-concept.html` → `concepts/<slug>.html` + `concepts/<slug>-data.js`
+8. Run `python server/dev_server.py` and audit structure against [DCI lab](site/topics/papers/dci-agent/lab.html)
 
 **Rules:**
 
 - Part 1 (read-only) before any playground
 - Reuse shared chrome: journey bar, readiness panel, onboarding, Think pipeline
-- Pass all paper content via `lab-data.js` config — do not import paper data in shared playground components
+- Pass all paper content via `lab-data.js` / `playground-configs.js` — never hardcode paper names in shared playground components (use `labels` from `playground-labels.js`)
 - No per-paper CSS — design-system tokens only
 
 Use the `new-paper-journey` skill (see SKILLS.md) to automate this workflow.

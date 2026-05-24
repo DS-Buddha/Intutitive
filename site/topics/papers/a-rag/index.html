@@ -3,41 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="TODO: paper title — understand the paper end-to-end">
+  <meta name="description" content="A-RAG — understand agentic RAG with hierarchical retrieval interfaces">
   <link rel="stylesheet" href="../../../design-system/tokens.css">
   <link rel="stylesheet" href="../../../design-system/components.css">
   <link rel="stylesheet" href="../../../design-system/animations.css">
-  <title>TODO: Paper Title — Paper Hub</title>
+  <title>A-RAG — Paper Hub</title>
 </head>
 <body>
   <header class="site-header" role="banner">
     <nav class="breadcrumb" aria-label="breadcrumb">
       <a href="../../../index.html">Home</a><span aria-hidden="true"> / </span>
       <a href="../index.html">Papers</a><span aria-hidden="true"> / </span>
-      <span aria-current="page">TODO: short name</span>
+      <span aria-current="page">A-RAG</span>
     </nav>
   </header>
   <div class="page-layout page-layout--paper">
     <aside class="sidebar" aria-label="Paper navigation">
       <nav class="module-tree" aria-label="Paper sections">
-        <h3 class="sidebar__heading">TODO: paper name</h3>
+        <h3 class="sidebar__heading">A-RAG paper</h3>
         <ul class="sidebar__list" data-paper-nav></ul>
       </nav>
       <div class="readiness-panel">
         <h3 class="sidebar__heading sidebar__heading--spaced">Research readiness</h3>
         <ul class="readiness-list" data-readiness-checklist></ul>
-        <p class="readiness-banner" data-readiness-banner hidden>You're research-ready — you can explain the paper and propose extensions.</p>
+        <p class="readiness-banner" data-readiness-banner hidden>You're research-ready on A-RAG.</p>
       </div>
     </aside>
     <main class="content" id="main-content">
       <section id="hook" class="content-section">
-        <p class="paper-meta">arXiv:TODO · Paper Journey</p>
-        <h1>TODO: Paper Title</h1>
-        <p class="paper-thesis">TODO: one-sentence thesis.</p>
+        <p class="paper-meta">arXiv:2602.03442 · Paper Journey</p>
+        <h1>A-RAG</h1>
+        <p class="paper-thesis">Agentic RAG should expose <strong>hierarchical retrieval interfaces</strong> to the model — not fixed one-shot pipelines or human-designed workflows.</p>
         <div class="tldr-pill"><strong>How it works:</strong> Read the paper holistically first (Part 1) → verify with playgrounds (Part 2) → critique and extend (Part 3).</div>
         <div class="paper-hero-actions">
           <a href="./lab.html#understand-hook" class="btn btn--primary">Begin — understand first →</a>
-          <a href="https://arxiv.org/abs/TODO" class="btn btn--secondary" target="_blank" rel="noopener">Read paper</a>
+          <a href="https://arxiv.org/abs/2602.03442" class="btn btn--secondary" target="_blank" rel="noopener">Read paper</a>
         </div>
       </section>
 
@@ -50,14 +50,17 @@
         <h2>Deep dive on one concept</h2>
         <p class="text-secondary">Optional — after Part 1, explore a single idea with its own mini-journey (analogy → playground).</p>
         <div class="concept-map" data-stagger>
-          <!-- TODO: concept-map__card links to ./concepts/*.html — register in paperRegistry.js concepts -->
+          <a href="./concepts/hierarchical-tools.html" class="concept-map__card"><span class="concept-map__num">1</span><strong>Hierarchical tools</strong><p>keyword_search, semantic_search, chunk_read</p></a>
+          <a href="./concepts/progressive-disclosure.html" class="concept-map__card"><span class="concept-map__num">2</span><strong>Progressive disclosure</strong><p>Snippets first, full chunks on demand</p></a>
+          <a href="./concepts/agentic-autonomy.html" class="concept-map__card"><span class="concept-map__num">3</span><strong>Agentic autonomy</strong><p>Model decides retrieval — not a fixed workflow</p></a>
+          <a href="./concepts/test-time-scaling.html" class="concept-map__card"><span class="concept-map__num">4</span><strong>Test-time scaling</strong><p>More steps and reasoning effort → higher accuracy</p></a>
         </div>
       </section>
     </main>
   </div>
   <script type="module">
     import { initPaperHub } from '../../../js/core/paper-page.js';
-    initPaperHub('TODO-paper-id');
+    initPaperHub('a-rag');
   </script>
 </body>
 </html>

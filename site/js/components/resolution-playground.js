@@ -2,39 +2,39 @@
  * Resolution zoom — knob to see document vs line vs span access.
  */
 
+import { mergeLabels, RESOLUTION_LABELS } from './playground-labels.js';
+
 export function mount(container, config = {}) {
   const doc = config.document;
   const chunks = config.chunks || [];
+  const labels = mergeLabels(RESOLUTION_LABELS, config.labels);
+  const levelNames = labels.levelNames;
+  const tickLabels = labels.tickLabels || levelNames;
+  const insights = labels.insights;
 
   if (!doc) {
     container.textContent = 'Resolution playground requires config.document in lab-data.js';
     return;
   }
 
+  const maxLevel = levelNames.length - 1;
+
   container.className = 'playground playground--resolution';
   container.innerHTML = `
     <div class="playground__header">
-      <h3 class="playground__title">Interface resolution</h3>
-      <p class="playground__subtitle">Drag the slider from whole document down to exact line. This is what "higher resolution" means in the paper.</p>
+      <h3 class="playground__title">${labels.title}</h3>
+      <p class="playground__subtitle">${labels.subtitle}</p>
     </div>
     <div class="playground__controls">
       <div class="playground__control-group playground__control-group--wide">
-        <label class="playground__label">Resolution level: <span class="playground__value" data-res-label>Line</span></label>
-        <input type="range" min="0" max="3" value="2" data-res-slider>
-        <div class="res-ticks"><span>Document</span><span>Passage</span><span>Line</span><span>Span</span></div>
+        <label class="playground__label">Resolution level: <span class="playground__value" data-res-label>${levelNames[2] || levelNames[0]}</span></label>
+        <input type="range" min="0" max="${maxLevel}" value="${Math.min(2, maxLevel)}" data-res-slider>
+        <div class="res-ticks">${tickLabels.map(t => `<span>${t}</span>`).join('')}</div>
       </div>
     </div>
     <div class="res-doc-view" data-res-view></div>
     <p class="playground__insight" data-res-insight></p>
   `;
-
-  const labels = ['Document', 'Passage', 'Line', 'Span'];
-  const insights = [
-    'Retriever often returns a whole chunk — agent sees ~512 tokens, much of it irrelevant.',
-    'Passage-level: a retrieved snippet — better, but boundaries are fixed by chunking.',
-    'Line-level: grep returns exact matching lines with line numbers — DCI default.',
-    'Span-level: read surrounding context around match — precise citation for verification.',
-  ];
 
   const slider = container.querySelector('[data-res-slider]');
   const view = container.querySelector('[data-res-view]');
@@ -46,7 +46,7 @@ export function mount(container, config = {}) {
 
   const render = () => {
     const level = parseInt(slider.value, 10);
-    label.textContent = labels[level];
+    label.textContent = levelNames[level];
     insight.textContent = insights[level];
 
     let content = '';

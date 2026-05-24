@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TODO: concept name — paper concept deep dive">
+  <link rel="stylesheet" href="../../../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../../../design-system/components.css">
+  <link rel="stylesheet" href="../../../../design-system/animations.css">
+  <title>TODO: Concept — TODO: Paper short name</title>
+</head>
+<body>
+  <header class="site-header"><nav class="breadcrumb">
+    <a href="../../../../index.html">Home</a> / <a href="../../index.html">Papers</a> / <a href="../index.html">TODO: Paper short name</a> / <span aria-current="page">TODO: Concept name</span>
+  </nav></header>
+  <div class="page-layout page-layout--paper">
+    <aside class="sidebar">
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading">This page</h3>
+        <ul class="sidebar__list">
+          <li><a href="#hook" data-section="hook">Analogy</a></li>
+          <li><a href="#why-it-matters" data-section="why">Why</a></li>
+          <li><a href="#interactive-viz" data-section="viz">Playground</a></li>
+          <li><a href="#core-mechanism" data-section="mechanism">Mechanism</a></li>
+          <li><a href="#put-it-together" data-section="together">Together</a></li>
+        </ul>
+      </nav>
+      <nav class="module-tree"><h3 class="sidebar__heading sidebar__heading--spaced">TODO: Paper short name</h3><ul class="sidebar__list" data-paper-nav></ul></nav>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section" data-section-id="hook">
+        <div class="hook-analogy-card"><p class="hook-analogy-card__lead">Think of it like…</p>
+        <p>TODO: analogy</p></div>
+        <h1>TODO: Concept name</h1>
+        <div class="tldr-pill"><strong>TL;DR:</strong> TODO: one sentence</div>
+      </section>
+      <section id="why-it-matters" class="content-section" data-section-id="why">
+        <h2>Why this matters</h2>
+        <p>TODO: failure narrative</p>
+      </section>
+      <section id="interactive-viz" class="content-section" data-section-id="viz">
+        <h2>Interactive playground</h2>
+        <p class="text-secondary">TODO: try prompt</p>
+        <div class="playground" data-playground="TODO-playground-type"></div>
+      </section>
+      <section id="core-mechanism" class="content-section" data-section-id="mechanism">
+        <h2>Mechanism</h2>
+        <p>TODO: technical summary with paper section ref</p>
+      </section>
+      <section id="put-it-together" class="content-section" data-section-id="together">
+        <h2>Put it together</h2>
+        <p>Full lab: <a href="../lab.html">Paper journey →</a> · Next concept: <a href="./TODO-next.html">TODO next →</a></p>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initPaperConceptPage } from '../../../../js/core/paper-page.js';
+    import conceptData from '../../../../js/topics/papers/TODO-paper-id/concepts/TODO-concept-slug-data.js';
+    initPaperConceptPage('TODO-paper-id', 'TODO-concept-slug', conceptData);
+  </script>
+</body>
+</html>

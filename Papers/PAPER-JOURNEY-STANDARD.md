@@ -253,15 +253,81 @@ Each section needs `data-section-id` matching registry `understandSectionIds`.
 | `paradigm-compare` | Step-through two trajectories |
 | `context-level` | Ablation / context levels |
 | `evidence-lens` | Predict benchmark winner |
+| `test-time-scaling` | Steps / reasoning effort vs accuracy curves |
 | `assumption-breaker` | Toggle assumptions (Part 3, but listed here for registry) |
 | `ideas-workshop` | Draft improvements (Part 3) |
 | `paper-chat` | Gemini tutor (Part 3) |
 
 Paper-specific playgrounds: add `*-playground.js` + register in `playgrounds.js` only when reusable types cannot express the concept. Must use design-system playground classes.
 
+### Playground labels (required for compare / paradigm playgrounds)
+
+Shared verify components must stay paper-agnostic. Set copy in `playground-configs.js`, not inside `site/js/components/*-playground.js`.
+
+Defaults live in `site/js/components/playground-labels.js`. Override per paper:
+
+```js
+// playground-configs.js
+const compareLabels = {
+  title: 'Naive RAG vs A-RAG — live comparison',
+  baselineName: 'Naive RAG',
+  agentName: 'A-RAG (Full)',
+  agentMeta: 'keyword + semantic + chunk_read',
+  // ...see COMPARE_LABELS for all keys
+};
+
+'interface-compare': {
+  scenarios, chunks, rankByScenario,
+  agentMatches: aragMatches,  // prefer agentMatches; dciMatches still works
+  labels: compareLabels,
+  formatAgentCmd: (scenario) => scenario.agentCmd,  // optional
+},
+'paradigm-compare': {
+  retrieverSteps: journeyData.paradigmSteps.naive,
+  agentSteps: journeyData.paradigmSteps.arag,     // prefer agentSteps; dciSteps still works
+  labels: paradigmLabels,
+},
+```
+
+Also supported: `resolution.labels`, `context-level.labels`, `test-time-scaling.labels`.
+
 ### Connected lab (scenario bus)
 
 For stations sharing scenario/top-k state, set `syncBus: true` in playground config. Requires `initLabState(defaults, paperId)` — handled by `initPaperLab`.
+
+---
+
+## Concept deep dives (optional)
+
+One focused concept per page — lighter than the full lab. **Reference:** `site/topics/papers/a-rag/concepts/`
+
+### Folder layout
+
+```
+site/topics/papers/<paper-id>/concepts/<concept-slug>.html
+site/js/topics/papers/<paper-id>/concepts/<concept-slug>-data.js
+```
+
+### Workflow
+
+1. Copy `site/_template/paper-concept.html` → `concepts/<concept-slug>.html`
+2. Create `<concept-slug>-data.js` importing from `../playground-configs.js`:
+
+```js
+import { aragPlaygrounds } from '../playground-configs.js';
+
+export default {
+  playgrounds: {
+    resolution: aragPlaygrounds.resolution,
+  },
+};
+```
+
+3. Init: `initPaperConceptPage('<paper-id>', '<concept-slug>', conceptData)`
+4. Add to registry `concepts: [{ slug, label, file }]`
+5. Link from hub `concept-map` and lab `#understand-vocab` `vocab-map__deep` anchors
+
+Each concept page: analogy hook → why → one playground → mechanism → link to next concept / full lab.
 
 ---
 
@@ -337,6 +403,8 @@ Readiness checks (default):
 - [ ] `lab-data.js` passes all playground content via config
 - [ ] `Paper-Notes.md` complete
 - [ ] `server/prompts/<paper-id>.md` if using chat
+- [ ] `playground-configs.js` sets `labels` for compare / paradigm / resolution / context playgrounds
+- [ ] Concept deep dives (optional): template + registry `concepts` + hub cards
 - [ ] Visual parity audit against DCI (structure + chrome, not content)
 - [ ] Test: `python server/dev_server.py` — readiness, journey bar, Think pipeline, chat send
 
@@ -350,6 +418,8 @@ Readiness checks (default):
 | Gold standard hub | `site/topics/papers/dci-agent/index.html` |
 | Registry | `site/js/topics/paperRegistry.js` |
 | Init | `site/js/core/paper-page.js` |
+| Playground labels | `site/js/components/playground-labels.js` |
+| Concept template | `site/_template/paper-concept.html` |
 | Templates | `site/_template/paper-hub.html`, `paper-lab.html` |
 | Philosophy | `SOUL.md` |
 | Agent guide | `AGENTS.md` |

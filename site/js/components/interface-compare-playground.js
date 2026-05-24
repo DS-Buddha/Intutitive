@@ -1,27 +1,29 @@
 /**
- * Interface A/B lab — retriever vs DCI side-by-side with tunable knobs.
+ * Interface A/B lab — baseline retriever vs agent interface side-by-side.
  */
 
 import { getLabState, setLabState, subscribeLabState } from '../core/scenario-bus.js';
 import { markPlaygroundUsed } from '../core/playground-events.js';
+import { mergeLabels, COMPARE_LABELS } from './playground-labels.js';
 
 export function mount(container, config = {}) {
   const scenarios = config.scenarios;
   const chunks = config.chunks;
   const rankByScenario = config.rankByScenario;
-  const dciMatches = config.dciMatches;
+  const agentMatches = config.agentMatches || config.dciMatches;
   const syncBus = config.syncBus === true;
+  const labels = mergeLabels(COMPARE_LABELS, config.labels);
 
-  if (!scenarios?.length || !chunks?.length || !rankByScenario || !dciMatches) {
-    container.textContent = 'Interface compare requires scenarios, chunks, rankByScenario, and dciMatches in lab-data.js';
+  if (!scenarios?.length || !chunks?.length || !rankByScenario || !agentMatches) {
+    container.textContent = 'Interface compare requires scenarios, chunks, rankByScenario, and agentMatches in lab-data.js';
     return;
   }
 
   container.className = 'playground playground--interface-compare';
   container.innerHTML = `
     <div class="playground__header">
-      <h3 class="playground__title">Retriever vs DCI — live comparison</h3>
-      <p class="playground__subtitle">Same question, two interfaces. Tune top-k and resolution — see which one can actually answer.${syncBus ? ' <em>(Synced across lab stations)</em>' : ''}</p>
+      <h3 class="playground__title">${labels.title}</h3>
+      <p class="playground__subtitle">${labels.subtitle}${syncBus ? ' <em>(Synced across lab stations)</em>' : ''}</p>
     </div>
     <div class="playground__controls">
       <div class="playground__control-group">
@@ -33,7 +35,7 @@ export function mount(container, config = {}) {
         <input type="range" min="1" max="8" value="3" data-compare-topk>
       </div>
       <div class="playground__control-group">
-        <label class="playground__label">DCI resolution</label>
+        <label class="playground__label">${labels.agentControlLabel}</label>
         <select class="playground__select" data-compare-resolution>
           <option value="line">Line (grep)</option>
           <option value="passage">Passage (chunk read)</option>
@@ -44,14 +46,14 @@ export function mount(container, config = {}) {
     <p class="compare-question" data-compare-question></p>
     <div class="compare-grid">
       <div class="playground__panel compare-panel compare-panel--retriever">
-        <h4>Retriever-mediated</h4>
-        <p class="compare-panel__meta">Fixed top-k API · embedding similarity</p>
+        <h4>${labels.baselineName}</h4>
+        <p class="compare-panel__meta">${labels.baselineMeta}</p>
         <div data-compare-retriever></div>
         <div class="compare-verdict compare-verdict--fail" data-compare-r-verdict></div>
       </div>
       <div class="playground__panel compare-panel compare-panel--dci">
-        <h4>Direct corpus (DCI)</h4>
-        <p class="compare-panel__meta">grep + read · raw corpus</p>
+        <h4>${labels.agentName}</h4>
+        <p class="compare-panel__meta">${labels.agentMeta}</p>
         <div class="compare-cmd" data-compare-cmd></div>
         <div data-compare-dci></div>
         <div class="compare-verdict compare-verdict--ok" data-compare-d-verdict></div>
@@ -84,14 +86,22 @@ export function mount(container, config = {}) {
     if (syncBus) setLabState({ scenarioId: state.scenarioId, topK: state.topK, resolution: state.resolution });
   };
 
+  const formatCmd = (scenario) => {
+    if (typeof config.formatAgentCmd === 'function') return config.formatAgentCmd(scenario);
+    if (scenario.agentCmd) return scenario.agentCmd;
+    return scenario.dciPipe
+      ? `grep '${scenario.dciPattern}' | grep '${scenario.dciPipe}'`
+      : `grep '${scenario.dciPattern}'`;
+  };
+
   const render = () => {
     const scenario = scenarios.find(s => s.id === state.scenarioId);
     const ranked = rankByScenario(state.scenarioId, chunks);
     const kept = ranked.slice(0, state.topK);
     const keptIds = new Set(kept.map(c => c.id));
     const rGold = scenario.goldIds.filter(id => keptIds.has(id));
-    const dciHits = dciMatches(state.scenarioId, chunks);
-    const dGold = scenario.goldIds.filter(id => dciHits.some(h => h.id === id));
+    const agentHits = agentMatches(state.scenarioId, chunks);
+    const dGold = scenario.goldIds.filter(id => agentHits.some(h => h.id === id));
 
     els.question.innerHTML = `<strong>Agent question:</strong> ${scenario.question}`;
     els.topKVal.textContent = state.topK;
@@ -103,17 +113,14 @@ export function mount(container, config = {}) {
       </div>`
     ).join('') || '<p class="playground__hint">Nothing retrieved.</p>';
 
-    const cmd = scenario.dciPipe
-      ? `grep '${scenario.dciPattern}' | grep '${scenario.dciPipe}'`
-      : `grep '${scenario.dciPattern}'`;
-    els.cmd.textContent = `$ ${cmd}`;
+    els.cmd.textContent = `$ ${formatCmd(scenario)}`;
 
-    els.dci.innerHTML = dciHits.length
-      ? dciHits.map(c => `<div class="compare-hit compare-hit--gold">
+    els.dci.innerHTML = agentHits.length
+      ? agentHits.map(c => `<div class="compare-hit compare-hit--gold">
         <span>${c.file}:${c.line}</span>
         <p>${truncate(c.text, state.resolution === 'line' ? 999 : state.resolution === 'passage' ? 120 : 200)}</p>
       </div>`).join('')
-      : '<p class="playground__hint">No grep matches — try another scenario.</p>';
+      : '<p class="playground__hint">No agent matches — try another scenario.</p>';
 
     const rOk = rGold.length === scenario.goldIds.length;
     const dOk = dGold.length === scenario.goldIds.length;
@@ -125,8 +132,8 @@ export function mount(container, config = {}) {
 
     els.dVerdict.className = `compare-verdict ${dOk ? 'compare-verdict--ok' : 'compare-verdict--fail'}`;
     els.dVerdict.textContent = dOk
-      ? '✓ Exact evidence localized — agent can verify and cite'
-      : '✗ Gold line not matched — refine grep pattern';
+      ? labels.agentSuccessVerdict
+      : labels.agentFailVerdict;
 
     els.insight.textContent = scenario.insight;
   };

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Progressive disclosure — A-RAG paper concept">
+  <link rel="stylesheet" href="../../../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../../../design-system/components.css">
+  <link rel="stylesheet" href="../../../../design-system/animations.css">
+  <title>Progressive Disclosure — A-RAG</title>
+</head>
+<body>
+  <header class="site-header"><nav class="breadcrumb">
+    <a href="../../../../index.html">Home</a> / <a href="../../index.html">Papers</a> / <a href="../index.html">A-RAG</a> / <span aria-current="page">Progressive disclosure</span>
+  </nav></header>
+  <div class="page-layout page-layout--paper">
+    <aside class="sidebar">
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading">This page</h3>
+        <ul class="sidebar__list">
+          <li><a href="#hook" data-section="hook">Analogy</a></li>
+          <li><a href="#why-it-matters" data-section="why">Why</a></li>
+          <li><a href="#interactive-viz" data-section="viz">Playground</a></li>
+          <li><a href="#core-mechanism" data-section="mechanism">Mechanism</a></li>
+          <li><a href="#put-it-together" data-section="together">Together</a></li>
+        </ul>
+      </nav>
+      <nav class="module-tree"><h3 class="sidebar__heading sidebar__heading--spaced">A-RAG paper</h3><ul class="sidebar__list" data-paper-nav></ul></nav>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section" data-section-id="hook">
+        <div class="hook-analogy-card"><p class="hook-analogy-card__lead">Think of it like…</p>
+        <p>Reading a movie trailer before buying the ticket — previews first, full film only if the trailer confirms it's relevant.</p></div>
+        <h1>Progressive Disclosure</h1>
+        <div class="tldr-pill"><strong>TL;DR:</strong> Search tools return snippets; <code>chunk_read</code> loads full text on demand. A-RAG (Full) uses fewer tokens than Naive RAG despite higher accuracy.</div>
+      </section>
+      <section id="why-it-matters" class="content-section" data-section-id="why">
+        <h2>Why this matters</h2>
+        <p>A-RAG (Naive) — one embedding tool, no hierarchy — retrieved <em>56K</em> tokens on MuSiQue vs <em>5.6K</em> for A-RAG (Full). More tokens, worse accuracy. Dumping context hurts when most chunks are irrelevant.</p>
+      </section>
+      <section id="interactive-viz" class="content-section" data-section-id="viz">
+        <h2>Disclosure levels D0–D3</h2>
+        <p class="text-secondary">Toggle from single-shot dump → snippet-only → progressive read → context tracker dedup.</p>
+        <div class="playground" data-playground="context-level"></div>
+      </section>
+      <section id="core-mechanism" class="content-section" data-section-id="mechanism">
+        <h2>Mechanism (§3.3)</h2>
+        <p>Context tracker maintains <em>C<sup>read</sup></em>. Re-reading a chunk returns zero tokens ("This chunk has been read before"), encouraging exploration without context bloat.</p>
+      </section>
+      <section id="put-it-together" class="content-section" data-section-id="together">
+        <h2>Put it together</h2>
+        <p>Disclosure only works when the model controls the workflow — next: <a href="./agentic-autonomy.html">Agentic autonomy →</a></p>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initPaperConceptPage } from '../../../../js/core/paper-page.js';
+    import conceptData from '../../../../js/topics/papers/a-rag/concepts/progressive-disclosure-data.js';
+    initPaperConceptPage('a-rag', 'progressive-disclosure', conceptData);
+  </script>
+</body>
+</html>

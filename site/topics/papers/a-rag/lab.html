@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A-RAG Paper Journey — understand holistically, then verify with playgrounds">
+  <link rel="stylesheet" href="../../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../../design-system/components.css">
+  <link rel="stylesheet" href="../../../design-system/animations.css">
+  <title>A-RAG Paper Journey</title>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="../../../index.html">Home</a><span aria-hidden="true"> / </span>
+      <a href="../index.html">Papers</a><span aria-hidden="true"> / </span>
+      <a href="./index.html">A-RAG</a><span aria-hidden="true"> / </span>
+      <span aria-current="page">Paper journey</span>
+    </nav>
+  </header>
+
+  <div class="page-layout page-layout--paper">
+    <aside class="sidebar sidebar--lab" aria-label="Lab navigation">
+      <div class="readiness-panel readiness-panel--top">
+        <h3 class="sidebar__heading">Research readiness</h3>
+        <ul class="readiness-list" data-readiness-checklist></ul>
+        <p class="readiness-banner" data-readiness-banner hidden>You're research-ready on A-RAG — you can explain it and propose extensions.</p>
+      </div>
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading sidebar__heading--spaced">Part 1 — Understand</h3>
+        <ul class="sidebar__list">
+          <li><a href="#understand-hook" data-section="understand-hook">Hook & thesis</a></li>
+          <li><a href="#understand-problem" data-section="understand-problem">The problem</a></li>
+          <li><a href="#understand-insight" data-section="understand-insight">The insight</a></li>
+          <li><a href="#understand-method" data-section="understand-method">Method</a></li>
+          <li><a href="#understand-evidence" data-section="understand-evidence">Benchmarks (read)</a></li>
+          <li><a href="#understand-vocab" data-section="understand-vocab">Vocabulary</a></li>
+        </ul>
+        <h3 class="sidebar__heading sidebar__heading--spaced">Part 2 — Verify</h3>
+        <ul class="sidebar__list">
+          <li><a href="#verify-start" class="sidebar__part-intro" data-section="verify-start">Part 2 intro</a></li>
+          <li><a href="#paradigm" data-section="paradigm">Paradigm compare</a></li>
+          <li><a href="#granularity" data-section="granularity">Granularity zoom</a></li>
+          <li><a href="#compare" data-section="compare">Naive vs A-RAG</a></li>
+          <li><a href="#topk" data-section="topk">Top-k bottleneck</a></li>
+          <li class="sidebar__subgroup"><span>Deep-dive (pick 2+)</span></li>
+          <li><a href="#context" data-section="context">Progressive disclosure</a></li>
+          <li><a href="#scaling" data-section="scaling">Test-time scaling</a></li>
+          <li><a href="#evidence" data-section="evidence">Evidence lens</a></li>
+        </ul>
+        <h3 class="sidebar__heading sidebar__heading--spaced">Part 3 — Think</h3>
+        <ul class="sidebar__list">
+          <li><a href="#think-start" class="sidebar__part-intro" data-section="think-start">Part 3 intro</a></li>
+          <li><a href="#assumptions" data-section="assumptions">Assumptions</a></li>
+          <li><a href="#ideas" data-section="ideas">Ideas workshop</a></li>
+          <li><a href="#chat" data-section="chat">Paper chat</a></li>
+          <li><a href="#paper" data-section="paper">Paper links</a></li>
+        </ul>
+      </nav>
+      <details class="module-tree module-tree--collapsed">
+        <summary class="sidebar__heading">More: concept deep dives</summary>
+        <ul class="sidebar__list" data-paper-nav></ul>
+      </details>
+    </aside>
+
+    <main class="content" id="main-content">
+
+      <div class="journey-progress" data-journey-progress aria-label="Your progress"></div>
+
+      <!-- ═══ PART 1 — UNDERSTAND ═══ -->
+
+      <section id="understand-hook" class="content-section" data-section-id="understand-hook">
+        <p class="journey-part-label">Part 1 — Understand</p>
+        <p class="paper-meta">arXiv:2602.03442 · ~15 min read before playgrounds</p>
+        <div class="learn-objective">
+          <strong>You'll leave Part 1 able to:</strong> explain what A-RAG is, why fixed RAG pipelines fail to scale with model capability, and what the paper actually proved.
+        </div>
+        <div class="hook-analogy-card">
+          <p class="hook-analogy-card__lead">Think of it like…</p>
+          <p>Two ways to research a question in a library:</p>
+          <ul>
+            <li><strong>Naive RAG:</strong> A clerk photocopies 5 random pages and hands them to you. You read them once and answer — no going back.</li>
+            <li><strong>A-RAG:</strong> You get a card catalog (keyword search), a subject index (semantic search), and a reading room pass (chunk read). You decide what to look up, preview snippets, and only read full pages when needed.</li>
+          </ul>
+        </div>
+        <h1>A-RAG: Scaling Agentic RAG via Hierarchical Retrieval Interfaces</h1>
+        <p class="paper-thesis">Agentic RAG should expose <strong>hierarchical retrieval interfaces</strong> to the model — not fixed one-shot pipelines or human-designed workflows.</p>
+        <div class="tldr-pill"><strong>TL;DR:</strong> Give the agent three tools — <code>keyword_search</code>, <code>semantic_search</code>, <code>chunk_read</code> — at keyword, sentence, and chunk granularity. The model chooses when and how to retrieve. Beats Graph-RAG and Workflow-RAG on multi-hop QA with comparable or fewer tokens. Scales with model size and test-time compute.</div>
+        <p class="text-secondary"><strong>How to use this page:</strong> Read each section in order. Part 2 playgrounds only make sense after Part 1 clicks.</p>
+      </section>
+
+      <section id="understand-problem" class="content-section" data-section-id="understand-problem">
+        <h2>1. The problem</h2>
+        <p>Frontier models can reason and use tools over long horizons. But most RAG systems still treat the model as a passive reader — not a retrieval participant.</p>
+        <p>Existing RAG falls into two paradigms that <em>exclude</em> the model from retrieval decisions:</p>
+
+        <h3>The failure chain</h3>
+        <p class="text-secondary">When the model cannot steer retrieval, capability improvements don't transfer:</p>
+        <div class="failure-chain">
+          <div class="failure-chain__card">
+            <h4>Naive RAG</h4>
+            <p>Algorithm embeds query, retrieves top-k, dumps chunks. Model never chooses <em>what</em> or <em>when</em> to retrieve.</p>
+          </div>
+          <div class="failure-chain__card">
+            <h4>Workflow RAG</h4>
+            <p>Human designer fixes the steps (IRCoT, FLARE, MA-RAG). Model executes a script — cannot adapt strategy per task.</p>
+          </div>
+          <div class="failure-chain__card">
+            <h4>Scaling blocked</h4>
+            <p>Stronger reasoning models can't use their capability — retrieval policy is frozen outside the model.</p>
+          </div>
+        </div>
+        <div class="learn-takeaway"><strong>Takeaway:</strong> Even "Naive Agentic RAG" (one embedding tool, model in the loop) already beats fixed pipelines — autonomy alone helps.</div>
+      </section>
+
+      <section id="understand-insight" class="content-section" data-section-id="understand-insight">
+        <h2>2. The insight — hierarchical interfaces</h2>
+        <p>Corpus information exists at multiple granularities. A-RAG exposes three tools so the agent picks the right level per step:</p>
+
+        <div class="understand-diagram compare-grid">
+          <div class="playground__panel">
+            <h4>keyword_search</h4>
+            <p class="compare-panel__meta">Lexical · runtime exact match</p>
+            <ol class="understand-diagram__steps">
+              <li>Agent supplies keyword list</li>
+              <li>Score chunks by term frequency</li>
+              <li>Return top-k IDs + matching sentence snippets</li>
+              <li>Agent decides: read full chunk or search again</li>
+            </ol>
+          </div>
+          <div class="playground__panel">
+            <h4>semantic_search + chunk_read</h4>
+            <p class="compare-panel__meta">Sentence embeddings · full chunk access</p>
+            <ol class="understand-diagram__steps">
+              <li>Encode query → cosine similarity on sentences</li>
+              <li>Return top-k chunk IDs + best sentences</li>
+              <li>Agent calls chunk_read for promising IDs</li>
+              <li>Context tracker dedups re-reads (0 tokens)</li>
+            </ol>
+          </div>
+        </div>
+
+        <h3>Three principles of agentic autonomy (Figure 2)</h3>
+        <dl class="understand-terms">
+          <dt>Autonomous strategy</dt>
+          <dd>Model chooses tools and order — not a fixed workflow or external router.</dd>
+          <dt>Iterative execution</dt>
+          <dd>Multi-round retrieval adapts to intermediate observations — not one-shot.</dd>
+          <dt>Interleaved tool use</dt>
+          <dd>ReAct loop: reason → act → observe → reason again. A-RAG is the only compared method satisfying all three.</dd>
+        </dl>
+        <p class="text-secondary">You'll verify paradigms and granularity in <a href="#verify-start">Part 2</a>.</p>
+        <div class="learn-takeaway"><strong>Takeaway:</strong> Progressive disclosure — snippets first, full chunks on demand — is why A-RAG uses <em>fewer</em> tokens than Naive RAG.</div>
+      </section>
+
+      <section id="understand-method" class="content-section" data-section-id="understand-method">
+        <h2>3. Method — how A-RAG works</h2>
+        <p>A-RAG has three components: a lightweight hierarchical index, three retrieval tools, and a simple ReAct agent loop.</p>
+        <ul>
+          <li><strong>Index</strong> — ~1,000-token chunks (sentence-aligned); sentence embeddings via Qwen3-Embedding-0.6B; no offline keyword index</li>
+          <li><strong>Tools</strong> — <code>keyword_search</code>, <code>semantic_search</code>, <code>chunk_read</code></li>
+          <li><strong>Agent loop</strong> — one tool per iteration, max L steps; deliberately no parallel calls</li>
+        </ul>
+
+        <h3>Context tracker</h3>
+        <p>Maintains set <em>C<sup>read</sup></em> of chunk IDs already loaded. Re-reading returns "This chunk has been read before" — zero additional tokens. Encourages exploring new evidence instead of loops.</p>
+
+        <h3>A-RAG variants</h3>
+        <table class="paper-table">
+          <thead>
+            <tr><th>Variant</th><th>Tools</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>A-RAG (Naive)</td><td>semantic_search only</td><td>Isolate effect of agentic autonomy alone</td></tr>
+            <tr><td>A-RAG (Full)</td><td>all three tools</td><td>Full hierarchical interface — main result</td></tr>
+          </tbody>
+        </table>
+        <p class="text-secondary">Try progressive disclosure levels in <a href="#context">Part 2 → Progressive disclosure</a>.</p>
+        <div class="learn-takeaway"><strong>Takeaway:</strong> Simple ReAct backbone — the paper isolates interface design, not orchestration complexity.</div>
+      </section>
+
+      <section id="understand-evidence" class="content-section" data-section-id="understand-evidence">
+        <h2>4. Evidence — what the paper proved</h2>
+        <p>Evaluated on HotpotQA, 2WikiMultiHopQA, MuSiQue, and GraphRAG-Bench. Same LLM backbone across conditions — the paper swaps the retrieval <em>paradigm</em>, not the model.</p>
+
+        <table class="paper-table">
+          <thead>
+            <tr><th>Benchmark</th><th>Naive RAG</th><th>A-RAG (Full)</th><th>Tokens (A-RAG)</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>MuSiQue (GPT-5-mini)</td>
+              <td>52.8% LLM-Acc</td>
+              <td><strong>74.1%</strong> (+21.3)</td>
+              <td>5,663 vs 5,387 naive</td>
+            </tr>
+            <tr>
+              <td>HotpotQA (GPT-5-mini)</td>
+              <td>81.2%</td>
+              <td><strong>94.5%</strong> (+13.3)</td>
+              <td>2,737 vs 5,358 naive (−49%)</td>
+            </tr>
+            <tr>
+              <td>2WikiMultiHop (GPT-5-mini)</td>
+              <td>50.2%</td>
+              <td><strong>89.7%</strong> (+39.5)</td>
+              <td>2,930 vs 5,506 naive (−47%)</td>
+            </tr>
+            <tr>
+              <td>GraphRAG-Bench Novel</td>
+              <td>70.6%</td>
+              <td><strong>85.3%</strong> (+14.7)</td>
+              <td>6,087 vs 4,997 naive</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>Key pattern: A-RAG (Naive) without hierarchy uses <em>more</em> tokens (56K on MuSiQue) with <em>lower</em> accuracy than A-RAG (Full). Hierarchy enables selective reading.</p>
+        <p>Test-time scaling: max steps 5→20 gives ~8% on MuSiQue; reasoning effort minimal→high gives ~25%.</p>
+        <p class="text-secondary">Predict these yourself in <a href="#evidence">Part 2 → Evidence lens</a>.</p>
+        <div class="learn-takeaway"><strong>Takeaway:</strong> Better accuracy with fewer tokens on HotpotQA and 2Wiki — hierarchy beats dump-all retrieval.</div>
+      </section>
+
+      <section id="understand-vocab" class="content-section" data-section-id="understand-vocab">
+        <h2>5. Vocabulary — four ideas to remember</h2>
+        <p class="text-secondary">Four concepts from the paper — each has a verification playground in Part 2.</p>
+        <div class="vocab-map">
+          <div class="vocab-map__card">
+            <strong>Three RAG paradigms</strong>
+            <p>Naive (algorithm), Workflow (designer), Agentic (model) — only A-RAG satisfies full autonomy.</p>
+            <span class="vocab-map__verify">Try in Part 2 → <a href="#paradigm">Paradigm compare</a></span>
+            <a href="./concepts/agentic-autonomy.html" class="vocab-map__deep">Deep dive →</a>
+          </div>
+          <div class="vocab-map__card">
+            <strong>Hierarchical granularity</strong>
+            <p>Keyword → sentence snippet → full chunk — zoom in only when previews aren't enough.</p>
+            <span class="vocab-map__verify">Try in Part 2 → <a href="#granularity">Granularity zoom</a></span>
+            <a href="./concepts/hierarchical-tools.html" class="vocab-map__deep">Deep dive →</a>
+          </div>
+          <div class="vocab-map__card">
+            <strong>Progressive disclosure</strong>
+            <p>Search tools return snippets; chunk_read loads full text on demand — saves context.</p>
+            <span class="vocab-map__verify">Try in Part 2 → <a href="#context">Progressive disclosure</a></span>
+            <a href="./concepts/progressive-disclosure.html" class="vocab-map__deep">Deep dive →</a>
+          </div>
+          <div class="vocab-map__card">
+            <strong>Test-time scaling</strong>
+            <p>More steps and reasoning effort → higher accuracy. Stronger models benefit more.</p>
+            <span class="vocab-map__verify">Try in Part 2 → <a href="#scaling">Test-time scaling</a></span>
+            <a href="./concepts/test-time-scaling.html" class="vocab-map__deep">Deep dive →</a>
+          </div>
+        </div>
+      </section>
+
+      <p class="understand-next">
+        <a href="#verify-start" class="btn btn--primary">Continue to Part 2 — Verify →</a>
+      </p>
+
+      <!-- ═══ PART 2 — VERIFY ═══ -->
+
+      <div id="verify-start" class="journey-part-divider" data-section-id="verify-start">
+        <span class="journey-part-divider__label">Part 2 — Verify</span>
+        <p class="journey-part-divider__desc">Hands-on — each playground proves something you read above.</p>
+        <div class="learn-objective learn-objective--compact">
+          <strong>Recommended path:</strong> Paradigm compare → Granularity zoom → Naive vs A-RAG — then pick 2+ deep-dives (Progressive disclosure, Evidence lens).
+        </div>
+        <p class="verify-nudge" data-verify-nudge hidden><a href="#understand-hook">← Recommended: finish Part 1 first</a></p>
+      </div>
+
+      <p class="verify-group-label">Core concepts — start here</p>
+
+      <section id="paradigm" class="content-section" data-section-id="paradigm">
+        <div class="verify-bridge">From <a href="#understand-problem">§1 Two old paradigms</a></div>
+        <h2>Paradigm compare — Naive RAG vs A-RAG</h2>
+        <div class="learn-try"><strong>Try:</strong> Step through all 4 stages on both sides — same question, different who decides retrieval.</div>
+        <div class="playground" data-playground="paradigm-compare"></div>
+      </section>
+
+      <section id="granularity" class="content-section" data-section-id="granularity">
+        <div class="verify-bridge">From <a href="#understand-insight">§2 Hierarchical tools</a></div>
+        <h2>Granularity zoom</h2>
+        <div class="learn-try"><strong>Try:</strong> Drag from whole document → exact span. This is keyword → sentence → chunk in action.</div>
+        <div class="playground" data-playground="resolution"></div>
+      </section>
+
+      <section id="compare" class="content-section" data-section-id="compare">
+        <div class="verify-bridge">From <a href="#understand-insight">§2 Agent chooses tools</a></div>
+        <h2>Naive RAG vs A-RAG — live comparison</h2>
+        <div class="learn-try"><strong>Try:</strong> Scenario "Two-hop bridge", top-k = 3. Naive RAG misses gold at rank #4; A-RAG chains keyword + semantic hits.</div>
+        <div class="playground" data-playground="interface-compare"></div>
+      </section>
+
+      <section id="topk" class="content-section" data-section-id="topk">
+        <div class="verify-bridge">From <a href="#understand-problem">§1 Naive RAG one-shot</a></div>
+        <h2>Top-k bottleneck</h2>
+        <div class="learn-try"><strong>Try:</strong> Drag k down until ★ gold shows LOST. That's why one-shot retrieval fails multi-hop — and why A-RAG iterates instead.</div>
+        <div class="playground" data-playground="topk-bottleneck"></div>
+      </section>
+
+      <p class="verify-group-label verify-group-label--deep">Paper deep-dive — pick 2+</p>
+
+      <details class="verify-deep-dive" open>
+        <summary class="verify-deep-dive__summary">Deep-dive playgrounds (optional but recommended)</summary>
+        <div class="verify-deep-dive__body">
+      <section id="context" class="content-section" data-section-id="context">
+        <div class="verify-bridge">From <a href="#understand-method">§3 Progressive disclosure + tracker</a></div>
+        <h2>Progressive disclosure (D0–D3)</h2>
+        <div class="learn-try"><strong>Try:</strong> Jump from D0 (dump all) → D3 (+ context tracker). Watch tokens drop while evidence quality stays.</div>
+        <div class="playground" data-playground="context-level"></div>
+      </section>
+
+      <section id="scaling" class="content-section" data-section-id="scaling">
+        <div class="verify-bridge">From <a href="#understand-evidence">§5.1 Test-time scaling</a></div>
+        <h2>Test-time scaling</h2>
+        <div class="learn-try"><strong>Try:</strong> Toggle max steps vs reasoning effort — both dimensions improve accuracy on MuSiQue-300.</div>
+        <div class="playground" data-playground="test-time-scaling"></div>
+      </section>
+
+      <section id="evidence" class="content-section" data-section-id="evidence">
+        <div class="verify-bridge">From <a href="#understand-evidence">§4 Benchmarks</a></div>
+        <h2>Evidence lens</h2>
+        <div class="learn-try"><strong>Try:</strong> Pick HotpotQA, predict the winner, then reveal — did you expect higher accuracy with half the tokens?</div>
+        <div class="playground" data-playground="evidence-lens"></div>
+      </section>
+        </div>
+      </details>
+
+      <p class="understand-next">
+        <a href="#think-start" class="btn btn--primary">Continue to Part 3 — Think →</a>
+      </p>
+
+      <!-- ═══ PART 3 — THINK ═══ -->
+
+      <div id="think-start" class="journey-part-divider" data-section-id="think-start">
+        <div class="verify-bridge verify-bridge--think">From <a href="#evidence">Evidence lens</a> — you saw where A-RAG wins. Now break its assumptions.</div>
+        <span class="journey-part-divider__label">Part 3 — Think</span>
+        <p class="journey-part-divider__desc">You understand and verified the paper — now critique it and improve it.</p>
+        <div class="learn-objective learn-objective--compact">
+          <strong>Goal:</strong> Break assumptions → draft an improvement → discuss with the AI tutor.
+        </div>
+        <p class="verify-nudge think-nudge" data-think-nudge hidden><a href="#verify-start">← Recommended: try Part 2 core labs first</a></p>
+      </div>
+
+      <section id="assumptions" class="content-section" data-section-id="assumptions">
+        <h2>Assumption breaker</h2>
+        <div class="learn-try"><strong>Try:</strong> Turn off "capable reasoning model" — read the verdict. This is where A-RAG stops winning.</div>
+        <div class="playground" data-playground="assumption-breaker"></div>
+      </section>
+
+      <section id="ideas" class="content-section" data-section-id="ideas">
+        <h2>Ideas workshop</h2>
+        <div class="learn-try learn-try--think"><strong>Goal:</strong> Draft a research-style improvement — pick a seed, edit the four fields, save, then discuss in Paper chat.</div>
+        <div class="playground" data-playground="ideas-workshop"></div>
+      </section>
+
+      <section id="chat" class="content-section" data-section-id="chat">
+        <h2>Paper chat</h2>
+        <div class="learn-try learn-try--think"><strong>Goal:</strong> Stress-test your ideas or ask anything about A-RAG — send from the workshop or type below.</div>
+        <div class="playground" data-playground="paper-chat"></div>
+      </section>
+
+      <section id="paper" class="content-section" data-section-id="paper">
+        <h2>Paper links</h2>
+        <p>After this journey, read §3–§5 of the full paper for tool definitions, ablations, and test-time scaling analysis.</p>
+        <p class="paper-links">
+          <a href="https://arxiv.org/abs/2602.03442" target="_blank" rel="noopener">arXiv:2602.03442</a> ·
+          <a href="https://github.com/Ayanami0730/arag" target="_blank" rel="noopener">GitHub</a>
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initPaperLab } from '../../../js/core/paper-page.js';
+    import labData from '../../../js/topics/papers/a-rag/lab-data.js';
+    initPaperLab('a-rag', labData);
+  </script>
+</body>
+</html>

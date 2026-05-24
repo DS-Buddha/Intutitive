@@ -1,6 +1,8 @@
 /**
- * Context level playground — L0–L4 context management from paper §3.
+ * Context level playground — configurable disclosure / context policy levels.
  */
+
+import { mergeLabels, CONTEXT_LEVEL_LABELS } from './playground-labels.js';
 
 const MOCK_TRAJECTORY = [
   { tool: 'grep', output: 'contracts.txt:3: SKU-8842 valve warranty: 24 months', chars: 52 },
@@ -14,6 +16,7 @@ const MOCK_TRAJECTORY = [
 export function mount(container, config = {}) {
   const levels = config.levels;
   const trajectory = config.trajectory || MOCK_TRAJECTORY;
+  const labels = mergeLabels(CONTEXT_LEVEL_LABELS, config.labels);
 
   if (!levels?.length) {
     container.textContent = 'Context level requires config.levels in lab-data.js';
@@ -23,8 +26,8 @@ export function mount(container, config = {}) {
   container.className = 'playground playground--context-level';
   container.innerHTML = `
     <div class="playground__header">
-      <h3 class="playground__title">Context management (L0–L4)</h3>
-      <p class="playground__subtitle">Long agent trajectories fill context fast. Toggle levels — watch what the agent still remembers.</p>
+      <h3 class="playground__title">${labels.title}</h3>
+      <p class="playground__subtitle">${labels.subtitle}</p>
     </div>
     <div class="playground__controls">
       <div class="playground__control-group">
@@ -122,6 +125,6 @@ export function mount(container, config = {}) {
   };
 
   levelSel.addEventListener('change', render);
-  levelSel.value = 'L2';
+  levelSel.value = levels[0].id;
   render();
 }

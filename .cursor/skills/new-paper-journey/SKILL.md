@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Every paper must match the DCI shell and UX. Read [Papers/PAPER-JOURNEY-STANDARD.md](../../Papers/PAPER-JOURNEY-STANDARD.md) before starting.
 
-**Gold standard:** `site/topics/papers/dci-agent/`
+**Gold standard:** `site/topics/papers/dci-agent/` · **Labels reference:** `site/js/components/playground-labels.js`
 
 ## Workflow
 
@@ -26,22 +26,45 @@ Every paper must match the DCI shell and UX. Read [Papers/PAPER-JOURNEY-STANDARD
 
 3. Create `site/js/topics/papers/<paper-id>/`:
    - `journey-data.js` — assumptions, assumptionToSeed, improvementIdeas, chatStarters, benchmarks
-   - `lab-data.js` — wire all playgrounds via config (never import paper data in shared components)
+   - `playground-configs.js` — all playground configs **including `labels` overrides**
+   - `lab-data.js` — imports `playground-configs.js` (never import paper data in shared components)
    - Optional `*-scenarios.js`, `*-corpus.js` for verify playgrounds
 
 4. Add registry entry in `site/js/topics/paperRegistry.js`:
    - `id`, `title`, paths, `journey.phases`, `labSections`, `partGroups`
    - `understandSectionIds`, `coreVerifyPlaygrounds`, `readinessChecks`
+   - Optional `concepts: [{ slug, label, file }]` for deep dives
    - Optional `journey.onboarding.timeEstimate`
 
 5. Add `server/prompts/<paper-id>.md` for Gemini Paper chat
 
 6. Update hub `lab.html` script: `initPaperLab('<paper-id>', labData)`
 
-7. Run `python server/dev_server.py` and audit against DCI:
+7. **Playground labels** — in `playground-configs.js`, override copy for compare/paradigm/resolution/context playgrounds:
+
+```js
+'interface-compare': {
+  scenarios, chunks, rankByScenario,
+  agentMatches: myMatches,
+  labels: { title: '...', baselineName: '...', agentName: '...' },
+},
+'paradigm-compare': {
+  retrieverSteps, agentSteps,
+  labels: { baselineName: '...', agentName: '...', insights: [...] },
+},
+```
+
+8. **Concept deep dives (optional, 3–4 concepts):**
+   - Copy `site/_template/paper-concept.html` → `site/topics/papers/<paper-id>/concepts/<slug>.html`
+   - Create `site/js/topics/papers/<paper-id>/concepts/<slug>-data.js` importing from `../playground-configs.js`
+   - Add hub `concept-map` cards + lab vocab `vocab-map__deep` links
+   - Register in `paperRegistry.js` `concepts` array
+
+9. Run `python server/dev_server.py` and audit against DCI:
    - Part 1 read-only before playgrounds
    - Journey bar, readiness panel, onboarding, part CTAs
    - Think pipeline: assumption → ideas → chat
+   - Compare/paradigm panels show paper-specific names (not "DCI")
    - No per-paper CSS
 
 ## Slug alignment
@@ -51,6 +74,7 @@ These must match (kebab-case):
 - Registry `id` = folder name = `lab-data.js` paper-chat `paperId` = `server/prompts/<paper-id>.md`
 - `data-section-id` on Understand sections = `journey.understandSectionIds`
 - Core verify section ids = `journey.coreVerifyPlaygrounds`
+- Concept `slug` = `initPaperConceptPage` second arg = `*-data.js` filename stem
 
 ## Anti-patterns (do not do)
 
@@ -58,6 +82,7 @@ These must match (kebab-case):
 - Skipping journey bar / readiness / onboarding
 - Leading with playgrounds before Understand
 - Importing paper data inside `site/js/components/*-playground.js`
+- Hardcoding paper names in shared playground components (use `labels` in config)
 - One-off Think UI instead of assumption → ideas → chat
 
 ## Output
@@ -67,8 +92,8 @@ A Paper Journey visually and structurally aligned with DCI. Compare side-by-side
 ## Example
 
 ```
-Paper: Direct Corpus Interaction
-paper-id: dci-agent
-Source: Papers/DCI/Paper-Notes.md
-Reference: site/topics/papers/dci-agent/ (copy structure, replace content)
+Paper: A-RAG
+paper-id: a-rag
+Source: Papers/A-RAG/Paper-Notes.md
+Reference: site/topics/papers/a-rag/ (concepts + playground-configs.js labels)
 ```

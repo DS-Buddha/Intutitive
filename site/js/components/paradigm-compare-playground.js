@@ -1,57 +1,56 @@
 /**
- * Paradigm compare — Figure 2 retriever-mediated vs DCI trajectory morph.
+ * Paradigm compare — step-through baseline vs agent retrieval trajectories.
  */
 
-export function mount(container, config = {}) {
-  const retrieverSteps = config.retrieverSteps;
-  const dciSteps = config.dciSteps;
+import { mergeLabels, PARADIGM_LABELS } from './playground-labels.js';
 
-  if (!retrieverSteps?.length || !dciSteps?.length) {
-    container.textContent = 'Paradigm compare requires retrieverSteps and dciSteps in lab-data.js';
+export function mount(container, config = {}) {
+  const retrieverSteps = config.retrieverSteps || config.baselineSteps;
+  const agentSteps = config.agentSteps || config.dciSteps;
+  const labels = mergeLabels(PARADIGM_LABELS, config.labels);
+  const stepCount = retrieverSteps?.length || agentSteps?.length || 4;
+
+  if (!retrieverSteps?.length || !agentSteps?.length) {
+    container.textContent = 'Paradigm compare requires retrieverSteps and agentSteps in lab-data.js';
     return;
   }
 
   container.className = 'playground playground--paradigm';
   container.innerHTML = `
     <div class="playground__header">
-      <h3 class="playground__title">Two paradigms (Figure 2)</h3>
-      <p class="playground__subtitle">Same agent goal — different retrieval interface. Step through each trajectory.</p>
+      <h3 class="playground__title">${labels.title}</h3>
+      <p class="playground__subtitle">${labels.subtitle}</p>
     </div>
     <div class="playground__controls">
       <div class="playground__control-group">
-        <label class="playground__label">Step <span class="playground__value" data-paradigm-step-val>1</span> / 4</label>
-        <input type="range" min="1" max="4" value="1" data-paradigm-step>
+        <label class="playground__label">Step <span class="playground__value" data-paradigm-step-val>1</span> / ${stepCount}</label>
+        <input type="range" min="1" max="${stepCount}" value="1" data-paradigm-step>
       </div>
       <div class="playground__control-group">
         <label class="playground__label">Highlight</label>
         <select class="playground__select" data-paradigm-mode>
           <option value="both">Both side by side</option>
-          <option value="retriever">Retriever only</option>
-          <option value="dci">DCI only</option>
+          <option value="retriever">${labels.highlightBaseline}</option>
+          <option value="dci">${labels.highlightAgent}</option>
         </select>
       </div>
     </div>
     <div class="paradigm-grid">
       <div class="playground__panel paradigm-panel paradigm-panel--retriever" data-paradigm-r>
-        <h4>Retriever-mediated</h4>
-        <p class="compare-panel__meta">Offline index · top-k API</p>
+        <h4>${labels.baselineName}</h4>
+        <p class="compare-panel__meta">${labels.baselineMeta}</p>
         <ol class="paradigm-steps" data-paradigm-r-steps></ol>
       </div>
       <div class="playground__panel paradigm-panel paradigm-panel--dci" data-paradigm-d>
-        <h4>Direct corpus interaction</h4>
-        <p class="compare-panel__meta">Raw files · grep, read, pipe</p>
+        <h4>${labels.agentName}</h4>
+        <p class="compare-panel__meta">${labels.agentMeta}</p>
         <ol class="paradigm-steps" data-paradigm-d-steps></ol>
       </div>
     </div>
     <p class="playground__insight" data-paradigm-insight></p>
   `;
 
-  const insights = [
-    'Both start with the same user question — the interface diverges immediately.',
-    'Retriever compresses corpus access into one ranked API call. Agent cannot refine.',
-    'DCI composes weak lexical clues — each step narrows the search space.',
-    'Final step: retriever gives snippets; DCI gives verified line-level evidence.',
-  ];
+  const insights = labels.insights;
 
   const state = { step: 1, mode: 'both' };
   const stepSlider = container.querySelector('[data-paradigm-step]');
@@ -81,7 +80,7 @@ export function mount(container, config = {}) {
   const render = () => {
     stepVal.textContent = state.step;
     renderSteps(retrieverSteps, rSteps, 'retriever');
-    renderSteps(dciSteps, dSteps, 'dci');
+    renderSteps(agentSteps, dSteps, 'dci');
     rPanel.style.display = state.mode === 'dci' ? 'none' : '';
     dPanel.style.display = state.mode === 'retriever' ? 'none' : '';
     insight.textContent = insights[state.step - 1] || '';

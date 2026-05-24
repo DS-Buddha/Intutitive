@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Hierarchical retrieval tools — A-RAG paper concept">
+  <link rel="stylesheet" href="../../../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../../../design-system/components.css">
+  <link rel="stylesheet" href="../../../../design-system/animations.css">
+  <title>Hierarchical Tools — A-RAG</title>
+</head>
+<body>
+  <header class="site-header"><nav class="breadcrumb">
+    <a href="../../../../index.html">Home</a> / <a href="../../index.html">Papers</a> / <a href="../index.html">A-RAG</a> / <span aria-current="page">Hierarchical tools</span>
+  </nav></header>
+  <div class="page-layout page-layout--paper">
+    <aside class="sidebar">
+      <nav class="section-nav" data-scrollspy>
+        <h3 class="sidebar__heading">This page</h3>
+        <ul class="sidebar__list">
+          <li><a href="#hook" data-section="hook">Analogy</a></li>
+          <li><a href="#why-it-matters" data-section="why">Why</a></li>
+          <li><a href="#interactive-viz" data-section="viz">Playground</a></li>
+          <li><a href="#core-mechanism" data-section="mechanism">Mechanism</a></li>
+          <li><a href="#put-it-together" data-section="together">Together</a></li>
+        </ul>
+      </nav>
+      <nav class="module-tree"><h3 class="sidebar__heading sidebar__heading--spaced">A-RAG paper</h3><ul class="sidebar__list" data-paper-nav></ul></nav>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section" data-section-id="hook">
+        <div class="hook-analogy-card"><p class="hook-analogy-card__lead">Think of it like…</p>
+        <p>A library with three access modes: card catalog (keywords), subject index (semantic), and reading room (full page). You pick the coarsest mode that still narrows the search.</p></div>
+        <h1>Hierarchical Retrieval Tools</h1>
+        <div class="tldr-pill"><strong>TL;DR:</strong> A-RAG exposes <code>keyword_search</code>, <code>semantic_search</code>, and <code>chunk_read</code> — three granularities the agent chooses per step.</div>
+      </section>
+      <section id="why-it-matters" class="content-section" data-section-id="why">
+        <h2>Why this matters</h2>
+        <p>One-shot top-k treats every question the same — dump ~5K tokens of chunks. Multi-hop QA needs exact entity lookup <em>and</em> semantic bridging. A single retrieval mode cannot serve both.</p>
+      </section>
+      <section id="interactive-viz" class="content-section" data-section-id="viz">
+        <h2>Granularity zoom</h2>
+        <p class="text-secondary">Drag from whole chunk → snippet → line → span. This is how A-RAG avoids loading full text until previews justify it.</p>
+        <div class="playground" data-playground="resolution"></div>
+      </section>
+      <section id="core-mechanism" class="content-section" data-section-id="mechanism">
+        <h2>Mechanism (§3.2)</h2>
+        <p><strong>keyword_search</strong> — runtime exact match, returns top-k chunk IDs + keyword sentences.<br>
+        <strong>semantic_search</strong> — sentence embeddings, cosine similarity, aggregated to chunks.<br>
+        <strong>chunk_read</strong> — full chunk text (+ adjacent chunks optional) after snippets look promising.</p>
+      </section>
+      <section id="put-it-together" class="content-section" data-section-id="together">
+        <h2>Put it together</h2>
+        <p>Snippets save tokens only if the agent knows when to escalate — next: <a href="./progressive-disclosure.html">Progressive disclosure →</a></p>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initPaperConceptPage } from '../../../../js/core/paper-page.js';
+    import conceptData from '../../../../js/topics/papers/a-rag/concepts/hierarchical-tools-data.js';
+    initPaperConceptPage('a-rag', 'hierarchical-tools', conceptData);
+  </script>
+</body>
+</html>
