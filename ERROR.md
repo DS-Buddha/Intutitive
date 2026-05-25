@@ -483,6 +483,52 @@ See AGENTS.md for accessibility testing checklist.
 
 ---
 
+## Paper Journey Part 2 Playgrounds Are Empty (Gray Boxes, No Controls)
+
+**Symptom:**
+- On `lab.html`, Part 2 sections show empty rounded boxes — no sliders, dropdowns, or step-through UI
+- Part 1 (read-only text) renders fine; Part 3 may also be broken
+- Browser console shows: `Uncaught TypeError: Cannot read properties of undefined (reading 'map')` in `paper-page.js` (often at `renderPaperNav`)
+
+**Root Cause:**
+`initPaperLab()` calls `renderPaperNav()` **before** `mountPlaygrounds()`. If `renderPaperNav` throws, playground mounting never runs — containers stay as bare `<div class="playground">` elements.
+
+Common triggers when onboarding a new paper:
+
+1. **Missing `concepts` in `paperRegistry.js`** — `paper.concepts.map(...)` throws when `concepts` is omitted (use `concepts: []` if there are no deep dives)
+2. **Invalid `lab-data.js` import** — syntax error or bad path in `lab.html` script; entire module fails to load
+3. **`data-playground` key mismatch** — HTML has `data-playground="paradigm-compare"` but `lab-data.js` → `playgrounds` has no matching key (playground shows a text error *if* mount runs; silent empty box if mount never runs)
+4. **Required config missing** — e.g. `resolution` needs `config.document`; mount shows inline message but only if `mountPlaygrounds` was reached
+
+**Fix:**
+
+1. Open DevTools → Console on the paper's `lab.html`
+2. If `paper.concepts` error: add to registry entry:
+   ```js
+   concepts: [],  // or [{ slug, label, file }, ...]
+   ```
+   `paper-page.js` also guards with `(paper.concepts || []).map` — but registry should always define `concepts`.
+3. If module load error: fix the import path in `lab.html` and validate `lab-data.js` exports `default`
+4. If playground key mismatch: align every `data-playground="…"` in `lab.html` with a key in `playground-configs.js` / `lab-data.js` → `playgrounds`
+5. Hard-refresh (Ctrl+Shift+R) after JS changes
+
+**Prevention — verify every new Paper Journey before shipping:**
+
+```bash
+# From repo root (static wiring check)
+node scripts/verify-paper-lab.mjs <paper-id>
+```
+
+Then open `lab.html` in the browser (server: `python server/dev_server.py` or `python -m http.server 8080` in `site/`):
+- [ ] Console: zero errors on load
+- [ ] Part 2 → Paradigm compare: step slider and side panels render
+- [ ] Part 2 → at least one other core verify lab (compare / resolution / top-k) interactive
+- [ ] Part 3 → Assumption breaker toggles render
+
+See also `Papers/PAPER-JOURNEY-STANDARD.md` registry section and `.cursor/skills/new-paper-journey/SKILL.md` step 9.
+
+---
+
 ## Still Stuck?
 
 If your error isn't listed here:

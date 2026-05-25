@@ -67,6 +67,14 @@ Every paper must match the DCI shell and UX. Read [Papers/PAPER-JOURNEY-STANDARD
    - Compare/paradigm panels show paper-specific names (not "DCI")
    - No per-paper CSS
 
+10. **Verify Part 2 playgrounds mount (mandatory — see ERROR.md):**
+   ```bash
+   node scripts/verify-paper-lab.mjs <paper-id>
+   ```
+   - Registry entry includes `concepts: []` at minimum (omitting crashes lab init)
+   - Open `lab.html` → DevTools Console: **zero errors**
+   - Part 2 controls visible (not empty gray boxes): paradigm compare, resolution/granularity, interface-compare
+
 ## Slug alignment
 
 These must match (kebab-case):

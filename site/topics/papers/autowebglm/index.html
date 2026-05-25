@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AutoWebGLM — understand LLM web navigation agents end-to-end">
+  <link rel="stylesheet" href="../../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../../design-system/components.css">
+  <link rel="stylesheet" href="../../../design-system/animations.css">
+  <title>AutoWebGLM — Paper Hub</title>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="../../../index.html">Home</a><span aria-hidden="true"> / </span>
+      <a href="../index.html">Papers</a><span aria-hidden="true"> / </span>
+      <span aria-current="page">AutoWebGLM</span>
+    </nav>
+  </header>
+  <div class="page-layout page-layout--paper">
+    <aside class="sidebar" aria-label="Paper navigation">
+      <nav class="module-tree" aria-label="Paper sections">
+        <h3 class="sidebar__heading">AutoWebGLM paper</h3>
+        <ul class="sidebar__list" data-paper-nav></ul>
+      </nav>
+      <div class="readiness-panel">
+        <h3 class="sidebar__heading sidebar__heading--spaced">Research readiness</h3>
+        <ul class="readiness-list" data-readiness-checklist></ul>
+        <p class="readiness-banner" data-readiness-banner hidden>You're research-ready on AutoWebGLM.</p>
+      </div>
+    </aside>
+    <main class="content" id="main-content">
+      <section id="hook" class="content-section">
+        <p class="paper-meta">arXiv:2404.03648 · KDD 2024 · Paper Journey</p>
+        <h1>AutoWebGLM</h1>
+        <p class="paper-thesis">A 6B web agent can beat GPT-4 when you <strong>simplify HTML observations</strong>, train on a human–AI curriculum, and bootstrap with DPO + rejection sampling.</p>
+        <div class="tldr-pill"><strong>How it works:</strong> Read the paper holistically first (Part 1) → verify with playgrounds (Part 2) → critique and extend (Part 3).</div>
+        <div class="paper-hero-actions">
+          <a href="./lab.html#understand-hook" class="btn btn--primary">Begin — understand first →</a>
+          <a href="https://arxiv.org/abs/2404.03648" class="btn btn--secondary" target="_blank" rel="noopener">Read paper</a>
+        </div>
+      </section>
+
+      <section id="journey" class="content-section">
+        <h2>Your journey</h2>
+        <div data-journey-map></div>
+      </section>
+
+      <section id="prerequisites" class="content-section">
+        <h2>Prerequisites</h2>
+        <p class="text-secondary">Helpful background before diving in:</p>
+        <ul>
+          <li><a href="../../rag/verification-agentic.html">Agentic RAG</a> — tool loops and observation/action design</li>
+          <li><a href="../dci-agent/lab.html">DCI Paper Journey</a> — interface design mindset (retrieval vs browsing, same principle)</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { initPaperHub } from '../../../js/core/paper-page.js';
+    initPaperHub('autowebglm');
+  </script>
+</body>
+</html>

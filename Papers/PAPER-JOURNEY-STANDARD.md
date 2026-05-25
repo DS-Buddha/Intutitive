@@ -111,7 +111,8 @@ Add to [site/js/topics/paperRegistry.js](../site/js/topics/paperRegistry.js):
   labPath: './topics/papers/my-paper/lab.html',
   thesis: 'One-sentence thesis.',
   prerequisites: [{ label: '...', path: '../../rag/...' }],
-  concepts: [{ slug: '...', label: '...', file: '....html' }],
+  concepts: [],  // required array — use [] if no deep dives; omitting breaks lab.html init (see ERROR.md)
+  // concepts: [{ slug: '...', label: '...', file: '....html' }],
   journey: {
     phases: [
       { id: 'orient', label: 'Orient', href: './index.html' },

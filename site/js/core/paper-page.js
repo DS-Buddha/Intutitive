@@ -103,7 +103,7 @@ function renderPaperNav(paperId, activeConceptSlug, mode) {
   list.innerHTML = `
     <li><a href="${hubHref}"${hubActive ? ' data-active="true"' : ''}>Hub</a></li>
     <li><a href="${labHref}"${labActive ? ' data-active="true"' : ''}>Paper journey</a></li>
-    ${paper.concepts.map(c => {
+    ${(paper.concepts || []).map(c => {
       const href = inConcepts ? `./${c.file}` : `./concepts/${c.file}`;
       const active = activeConceptSlug === c.slug;
       return `<li><a href="${href}"${active ? ' data-active="true"' : ''}>${c.label}</a></li>`;
